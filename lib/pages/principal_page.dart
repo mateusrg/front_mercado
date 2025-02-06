@@ -66,7 +66,9 @@ class PrincipalPage extends StatelessWidget {
           ),
         ],
       ),
-      drawer: const drawer(),
+      
+      drawer: drawer(),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print('clicou no Editar');
