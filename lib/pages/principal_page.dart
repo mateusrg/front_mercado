@@ -63,6 +63,12 @@ class PrincipalPage extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print('clicou no Editar');
+        },
+        child: const Icon(Icons.edit),
+      ),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _informacoesUsuarioLogado(),
         builder: (BuildContext context,
@@ -78,16 +84,28 @@ class PrincipalPage extends StatelessWidget {
           }
 
           final userInfo = snapshot.data!;
-          return Center(
+          return  Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('ID: ${userInfo['idFuncionario']}'),
-                Text('Nome: ${userInfo['nome']}'),
-                Text('Email: ${userInfo['email']}'),
-                Text('Setor: ${userInfo['setor']}'),
-              ],
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'ID: ${userInfo['idFuncionario']}',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  Text(
+                    'Nome: ${userInfo['nome']}',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Email: ${userInfo['email']}',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                    ),
+                  Text(
+                    'Setor: ${userInfo['setor']}',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
             ),
           );
         },
