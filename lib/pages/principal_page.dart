@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
 import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
+import 'package:front_mercado/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrincipalPage extends StatelessWidget {
@@ -65,91 +66,7 @@ class PrincipalPage extends StatelessWidget {
           ),
         ],
       ),
-      drawer: NavigationDrawer(
-        children: [
-            Text('Fenomenos SM'),
-
-          InkWell( // Compras
-            onTap: () {
-              print('Clicou no Compras');
-            },
-            child: const ListTile(
-              title: Text('Compras'),
-              leading: Icon(Icons.shopping_cart),
-            ),
-          ),
-          InkWell( // Estoque
-            onTap: () {
-              print('Clicou em Estoque');
-            },
-            child: const ListTile(
-              title: Text('Estoque'),
-              leading: Icon(Icons.inventory_2_outlined),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FornecedoresPage()),
-                );
-            },       
-            child: const ListTile(
-              title: Text('Fornecedor'),
-              leading: Icon(Icons.fire_truck_outlined),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FuncionariosPage()),
-              );
-            },
-            child: const ListTile(
-              title: Text('Funcionarios'),
-              leading: Icon(Icons.group),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              print('Clicou no Movimentacoes Estoque');
-            },
-            child: const ListTile(
-              title: Text('Movimentações Estoque'),
-              leading: Icon(Icons.forklift),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              print('Clicou no Produtos');
-            },
-            child: const ListTile(
-              title: Text('Produtos'),
-              leading: Icon(Icons.sell_outlined),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              print('Clicou no Tipos Estoque');
-            },
-            child: const ListTile(
-              title: Text('Tipos Estoque'),
-              leading: Icon(Icons.inventory_outlined),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              print('Clicou no Tipos Movimentacao Estoque');
-            },
-            child: const ListTile(
-              title: Text('Tipos Movimentações Estoque'),
-              leading: Icon(Icons.move_down),
-            ),
-          ),
-        ],
-      ),
-
+      drawer: const drawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print('clicou no Editar');
