@@ -5,6 +5,8 @@ import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
 import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
 import 'package:front_mercado/pages/home_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
+import 'package:front_mercado/pages/produtos/produtos_page.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,7 +111,7 @@ class PrincipalPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const PrincipalPage())
+                    MaterialPageRoute(builder: (context) => const ProdutosPage())
                     );
                   },
                   child: Text('Consulta de Produtos'),
@@ -121,7 +123,7 @@ class PrincipalPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const PrincipalPage())
+                    MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage())
                     );
                   },
                   child: Text('Movimentações do Estoque'),
