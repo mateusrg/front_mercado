@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/home_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,9 +66,9 @@ class PrincipalPage extends StatelessWidget {
       ),
       drawer: NavigationDrawer(
         children: [
-            Text('Fenomenos SM'),
-
-          InkWell( // Compras
+          Text('Fenomenos SM'),
+          InkWell(
+            // Compras
             onTap: () {
               print('Clicou no Compras');
             },
@@ -79,7 +80,8 @@ class PrincipalPage extends StatelessWidget {
               leading: Icon(Icons.shopping_cart),
             ),
           ),
-          InkWell( // Estoque
+          InkWell(
+            // Estoque
             onTap: () {
               print('Clicou em Estoque');
             },
@@ -97,7 +99,7 @@ class PrincipalPage extends StatelessWidget {
             },
             onLongPress: () {
               print('Pressionou o Fornecedor');
-            },            
+            },
             child: const ListTile(
               title: Text('Fornecedor'),
               leading: Icon(Icons.fire_truck_outlined),
@@ -163,10 +165,8 @@ class PrincipalPage extends StatelessWidget {
               leading: Icon(Icons.move_down),
             ),
           )
-
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print('clicou no Editar');
@@ -188,16 +188,43 @@ class PrincipalPage extends StatelessWidget {
           }
 
           final userInfo = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: ListTile(
-                title: Text(userInfo['nome']),
-                subtitle: Text(userInfo['email']),
-                leading: Text('${userInfo['idFuncionario']}'),
-                trailing: Text(userInfo['setor']),
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: ListTile(
+                    title: Text(userInfo['nome']),
+                    subtitle: Text(userInfo['email']),
+                    leading: Text('${userInfo['idFuncionario']}'),
+                    trailing: Text(userInfo['setor']),
+                  ),
+                ),
               ),
-            ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PrincipalPage())
+                    );
+                  },
+                  child: Text('Consulta de Produtos'),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PrincipalPage())
+                    );
+                  },
+                  child: Text('Movimentações do Estoque'),
+                ),
+              ),
+            ],
           );
         },
       ),
