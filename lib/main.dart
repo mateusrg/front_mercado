@@ -31,7 +31,7 @@ class MainApp extends StatelessWidget {
       ),
       home: const Scaffold(
         body: Center(
-          child: FornecedoresPage(),
+          child: HomePage(),
         ),
       ),
     );
