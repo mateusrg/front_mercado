@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/home_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'dart:io';
 
@@ -30,7 +31,7 @@ class MainApp extends StatelessWidget {
       ),
       home: const Scaffold(
         body: Center(
-          child: LoginPage(),
+          child: HomePage(),
         ),
       ),
     );

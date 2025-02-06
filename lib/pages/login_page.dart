@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/principal_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
+  String _mensagemErro = '';
+  bool _estaCarregando = false;
 
   @override
   void dispose() {
@@ -29,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text('Login'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -54,11 +58,24 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                   validator: _validarSenha,
                 ),
-                const SizedBox(height: 24.0),
+                const SizedBox(height: 8),
                 ElevatedButton(
-                  onPressed: _validarLogin,
-                  child: const Text('Fazer Login'),
+                  onPressed: _estaCarregando ? null : _validarLogin,
+                  child: _estaCarregando
+                      ? const CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
+                      : const Text('Fazer Login'),
                 ),
+                if (_mensagemErro.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      _mensagemErro,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -94,22 +111,24 @@ class _LoginPageState extends State<LoginPage> {
 
   void _validarLogin() {
     if (_formKey.currentState!.validate()) {
+      FocusScope.of(context).unfocus();
+
       String email = _emailController.text;
       String senha = _senhaController.text;
 
       print('Email: $email');
       print('Senha: $senha');
 
-      _fazerLogin(email, senha);
+      setState(() {
+        _estaCarregando = true;
+      });
 
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Login realizado com sucesso!')),
-      // );
+      _fazerLogin(email, senha);
     }
   }
 
   void _fazerLogin(String email, String senha) async {
-    String urlBase = 'localhost:5277';
+    String urlBase = '10.0.2.2:5277';
     String urlComplementar = '/Funcionarios/login';
     Uri uri = Uri.http(urlBase, urlComplementar, null);
 
@@ -126,8 +145,29 @@ class _LoginPageState extends State<LoginPage> {
       }),
     );
 
+    if (resposta.statusCode >= 400) {
+      String mensagem = utf8.decode(resposta.bodyBytes);
+      setState(() {
+        _mensagemErro = mensagem;
+        _estaCarregando = false;
+      });
+      return;
+    }
+
     dynamic jsonResposta = json.decode(utf8.decode(resposta.bodyBytes));
 
-    print(jsonResposta);
+    setState(() {
+      _mensagemErro = '';
+      _estaCarregando = false;
+    });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('usuarioLogado', jsonEncode(jsonResposta));
+    String? teste = prefs.getString('usuarioLogado');
+    print(teste);
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (ctx) => const PrincipalPage()),
+    );
   }
 }
