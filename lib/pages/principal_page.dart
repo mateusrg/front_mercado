@@ -188,17 +188,15 @@ class PrincipalPage extends StatelessWidget {
           }
 
           final userInfo = snapshot.data!;
-          return  Padding(
+          return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('ID: ${userInfo['idFuncionario']}'),
-                Text('Nome: ${userInfo['nome']}'),
-                Text('Email: ${userInfo['email']}'),
-                Text('Setor: ${userInfo['setor']}'),
-              ],
+            child: Card(
+              child: ListTile(
+                title: Text(userInfo['nome']),
+                subtitle: Text(userInfo['email']),
+                leading: Text('${userInfo['idFuncionario']}'),
+                trailing: Text(userInfo['setor']),
+              ),
             ),
           );
         },
