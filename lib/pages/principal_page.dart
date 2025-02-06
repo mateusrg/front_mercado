@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
+import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -93,7 +95,10 @@ class PrincipalPage extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              print('Clicou no Fornecedor');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FornecedoresPage()),
+                );
             },
             onLongPress: () {
               print('Pressionou o Fornecedor');
@@ -105,7 +110,10 @@ class PrincipalPage extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              print('Funcionarios');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FuncionariosPage()),
+              );
             },
             onLongPress: () {
               print('Pressionou no Funcionarios');
@@ -159,11 +167,10 @@ class PrincipalPage extends StatelessWidget {
               print('Pressionou no Tipos Movimentacao Estoque');
             },
             child: const ListTile(
-              title: Text('Tipos Movimentacao Estoque'),
+              title: Text('Tipos Movimentações Estoque'),
               leading: Icon(Icons.move_down),
             ),
-          )
-
+          ),
         ],
       ),
 
