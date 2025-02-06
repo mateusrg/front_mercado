@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
 import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
+import 'package:front_mercado/pages/home_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
+import 'package:front_mercado/pages/produtos/produtos_page.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,7 +69,9 @@ class PrincipalPage extends StatelessWidget {
           ),
         ],
       ),
-      drawer: const drawer(),
+      
+      drawer: drawer(),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print('clicou no Editar');
@@ -88,16 +93,43 @@ class PrincipalPage extends StatelessWidget {
           }
 
           final userInfo = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: ListTile(
-                title: Text(userInfo['nome']),
-                subtitle: Text(userInfo['email']),
-                leading: Text('${userInfo['idFuncionario']}'),
-                trailing: Text(userInfo['setor']),
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: ListTile(
+                    title: Text(userInfo['nome']),
+                    subtitle: Text(userInfo['email']),
+                    leading: Text('${userInfo['idFuncionario']}'),
+                    trailing: Text(userInfo['setor']),
+                  ),
+                ),
               ),
-            ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const ProdutosPage())
+                    );
+                  },
+                  child: Text('Consulta de Produtos'),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage())
+                    );
+                  },
+                  child: Text('Movimentações do Estoque'),
+                ),
+              ),
+            ],
           );
         },
       ),

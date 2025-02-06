@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/widgets/drawer.dart';
 
 class FuncionariosPage extends StatefulWidget {
   const FuncionariosPage({super.key});
@@ -12,6 +13,7 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Funcionarios'),),
+      drawer: drawer()
     );
   }
 }
