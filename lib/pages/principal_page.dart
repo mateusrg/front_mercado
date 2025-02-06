@@ -73,9 +73,6 @@ class PrincipalPage extends StatelessWidget {
             onTap: () {
               print('Clicou no Compras');
             },
-            onLongPress: () {
-              print('Pressionou no Compras');
-            },
             child: const ListTile(
               title: Text('Compras'),
               leading: Icon(Icons.shopping_cart),
@@ -84,9 +81,6 @@ class PrincipalPage extends StatelessWidget {
           InkWell( // Estoque
             onTap: () {
               print('Clicou em Estoque');
-            },
-            onLongPress: () {
-              print('Pressionou o Estoque');
             },
             child: const ListTile(
               title: Text('Estoque'),
@@ -99,10 +93,7 @@ class PrincipalPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (context) => const FornecedoresPage()),
                 );
-            },
-            onLongPress: () {
-              print('Pressionou o Fornecedor');
-            },            
+            },       
             child: const ListTile(
               title: Text('Fornecedor'),
               leading: Icon(Icons.fire_truck_outlined),
@@ -115,9 +106,6 @@ class PrincipalPage extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const FuncionariosPage()),
               );
             },
-            onLongPress: () {
-              print('Pressionou no Funcionarios');
-            },
             child: const ListTile(
               title: Text('Funcionarios'),
               leading: Icon(Icons.group),
@@ -126,9 +114,6 @@ class PrincipalPage extends StatelessWidget {
           InkWell(
             onTap: () {
               print('Clicou no Movimentacoes Estoque');
-            },
-            onLongPress: () {
-              print('Pressionou o MovimentacoesEstoque');
             },
             child: const ListTile(
               title: Text('Movimentações Estoque'),
@@ -139,9 +124,6 @@ class PrincipalPage extends StatelessWidget {
             onTap: () {
               print('Clicou no Produtos');
             },
-            onLongPress: () {
-              print('Pressionou o Produtos');
-            },
             child: const ListTile(
               title: Text('Produtos'),
               leading: Icon(Icons.sell_outlined),
@@ -151,9 +133,6 @@ class PrincipalPage extends StatelessWidget {
             onTap: () {
               print('Clicou no Tipos Estoque');
             },
-            onLongPress: () {
-              print('Tipos Estoque');
-            },
             child: const ListTile(
               title: Text('Tipos Estoque'),
               leading: Icon(Icons.inventory_outlined),
@@ -162,9 +141,6 @@ class PrincipalPage extends StatelessWidget {
           InkWell(
             onTap: () {
               print('Clicou no Tipos Movimentacao Estoque');
-            },
-            onLongPress: () {
-              print('Pressionou no Tipos Movimentacao Estoque');
             },
             child: const ListTile(
               title: Text('Tipos Movimentações Estoque'),
