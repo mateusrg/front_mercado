@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
+import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
