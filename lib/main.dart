@@ -29,11 +29,7 @@ class MainApp extends StatelessWidget {
           seedColor: Colors.cyan,
         ),
       ),
-      home: const Scaffold(
-        body: Center(
-          child: HomePage(),
-        ),
-      ),
+      home: const HomePage(),
     );
   }
 }

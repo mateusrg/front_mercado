@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
@@ -13,6 +14,7 @@ class FornecedoresPage extends StatefulWidget {
 class _FornecedoresPageState extends State<FornecedoresPage> {
   final String apiUrl = '10.0.2.2:5277';
   List<Map<String, dynamic>> _fornecedores = [];
+  final TextEditingController _pesquisaController = TextEditingController();
 
   @override
   void initState() {
@@ -20,15 +22,20 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
     super.initState();
   }
 
-  Future<void> _listarFornecedores() async {
-    final response = await http.get(Uri.http(apiUrl, '/Fornecedores'));
+  Future<void> _listarFornecedores([String? query]) async {
+    final response = await http.get(Uri.http(
+        apiUrl,
+        query != null && query != ''
+            ? '/Fornecedores/nomeECnpj/$query'
+            : '/Fornecedores'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode < 400) {
       setState(() {
         _fornecedores =
             List<Map<String, dynamic>>.from(json.decode(response.body));
       });
     } else {
+      print(query);
       print('Erro ao listar fornecedores: ${response.statusCode}');
     }
   }
@@ -78,22 +85,53 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
     );
   }
 
+  void _pesquisarFornecedores() {
+    _listarFornecedores(_pesquisaController.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fornecedores'),
       ),
-      body: ListView.builder(
-        itemCount: _fornecedores.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_fornecedores[index]['nome']),
-            subtitle: Text('${_fornecedores[index]['cnpj']}'),
-            onTap: () =>
-                _abrirFormularioFornecedor(fornecedor: _fornecedores[index]),
-          );
-        },
+      drawer: const drawer(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _pesquisaController,
+                    decoration: const InputDecoration(
+                      labelText: 'Pesquisar',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: _pesquisarFornecedores,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _fornecedores.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_fornecedores[index]['nome']),
+                  subtitle: Text(_fornecedores[index]['cnpj']),
+                  onTap: () => _abrirFormularioFornecedor(
+                      fornecedor: _fornecedores[index]),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _abrirFormularioFornecedor(),
@@ -145,7 +183,8 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
       };
 
       if (widget.fornecedor != null) {
-        fornecedor['idFornecedor'] = widget.fornecedor!['idFornecedor'].toString();
+        fornecedor['idFornecedor'] =
+            widget.fornecedor!['idFornecedor'].toString();
       }
 
       widget.onSave(fornecedor);
@@ -194,7 +233,8 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _salvar,
-                child: const Text('Cadastrar'),
+                child:
+                    Text(widget.fornecedor == null ? 'Cadastrar' : 'Alterar'),
               ),
             ],
           ),
