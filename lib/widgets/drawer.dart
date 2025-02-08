@@ -18,124 +18,111 @@ class drawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return NavigationDrawer(
       children: [
-        Text('Fenomenos SM'),
-
-          InkWell( 
-            onTap: () { 
-              Navigator.push(
+        Padding(
+          padding: EdgeInsets.all(16.0), // Ajuste o valor conforme necessário
+          child: Text(
+            'Fenomenos SM',
+            style: TextStyle(fontSize: 24),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const PrincipalPage()));
+          },
+          child: const ListTile(
+            title: Text('Home'),
+            leading: Icon(Icons.home),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ComprasPage()));
+          },
+          child: const ListTile(
+            title: Text('Compras'),
+            leading: Icon(Icons.shopping_cart),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const EstoquePage()));
+          },
+          child: const ListTile(
+            title: Text('Estoque'),
+            leading: Icon(Icons.inventory_2_outlined),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FornecedoresPage()),
+            );
+          },
+          child: const ListTile(
+            title: Text('Fornecedor'),
+            leading: Icon(Icons.fire_truck_outlined),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FuncionariosPage()),
+            );
+          },
+          child: const ListTile(
+            title: Text('Funcionarios'),
+            leading: Icon(Icons.group),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PrincipalPage())
-              );
-            },
-            child: const ListTile(
-              title: Text('Home'),
-              leading: Icon(Icons.home),
-            ),
+                MaterialPageRoute(
+                    builder: (context) => const MovimentacoesEstoquePage()));
+          },
+          child: const ListTile(
+            title: Text('Movimentações Estoque'),
+            leading: Icon(Icons.forklift),
           ),
-
-          InkWell( 
-            onTap: () {
-              Navigator.push(
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProdutosPage()));
+          },
+          child: const ListTile(
+            title: Text('Produtos'),
+            leading: Icon(Icons.sell_outlined),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => TiposEstoquePage()));
+          },
+          child: const ListTile(
+            title: Text('Tipos Estoque'),
+            leading: Icon(Icons.inventory_outlined),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ComprasPage())
-              );
-            },
-            child: const ListTile(
-              title: Text('Compras'),
-              leading: Icon(Icons.shopping_cart),
-            ),
+                MaterialPageRoute(
+                    builder: (context) => TiposMovimentacoesEstoquePage()));
+          },
+          child: const ListTile(
+            title: Text('Tipos Movimentações Estoque'),
+            leading: Icon(Icons.move_down),
           ),
-
-          InkWell( 
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EstoquePage())
-              );
-            },
-            child: const ListTile(
-              title: Text('Estoque'),
-              leading: Icon(Icons.inventory_2_outlined),
-            ),
-          ),
-
-          InkWell( 
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FornecedoresPage()),
-                );
-            },       
-            child: const ListTile(
-              title: Text('Fornecedor'),
-              leading: Icon(Icons.fire_truck_outlined),
-            ),
-          ),
-
-          InkWell( 
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FuncionariosPage()),
-              );
-            },
-            child: const ListTile(
-              title: Text('Funcionarios'),
-              leading: Icon(Icons.group),
-            ),
-          ),
-
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage())
-                );
-            },
-            child: const ListTile(
-              title: Text('Movimentações Estoque'),
-              leading: Icon(Icons.forklift),
-            ),
-          ),
-
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProdutosPage())
-                );
-            },
-            child: const ListTile(
-              title: Text('Produtos'),
-              leading: Icon(Icons.sell_outlined),
-            ),
-          ),
-
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TiposEstoquePage())
-              );
-            },
-            child: const ListTile(
-              title: Text('Tipos Estoque'),
-              leading: Icon(Icons.inventory_outlined),
-            ),
-          ),
-
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TiposMovimentacoesEstoquePage())
-              );
-            },
-            child: const ListTile(
-              title: Text('Tipos Movimentações Estoque'),
-              leading: Icon(Icons.move_down),
-            ),
-          ),
+        ),
       ],
     );
   }
