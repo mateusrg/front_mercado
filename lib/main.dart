@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
 import 'package:front_mercado/pages/home_page.dart';
 import 'dart:io';
 

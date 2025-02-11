@@ -13,7 +13,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<String?> _paginaBaseadaNoLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(prefs.getString('usuarioLogado'));
     return prefs.getString('usuarioLogado');
   }
 

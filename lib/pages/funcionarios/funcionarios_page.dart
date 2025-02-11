@@ -12,8 +12,9 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Funcionarios'),),
-      drawer: drawer()
-    );
+        appBar: AppBar(
+          title: const Text('Funcionarios'),
+        ),
+        drawer: const DrawerFenomenos());
   }
 }

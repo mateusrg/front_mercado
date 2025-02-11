@@ -12,8 +12,10 @@ class _ComprasPageState extends State<ComprasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Compras'),),
-      drawer: drawer(),
+      appBar: AppBar(
+        title: const Text('Compras'),
+      ),
+      drawer: const DrawerFenomenos(),
     );
   }
 }

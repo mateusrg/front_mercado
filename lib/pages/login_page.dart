@@ -62,9 +62,14 @@ class _LoginPageState extends State<LoginPage> {
                 ElevatedButton(
                   onPressed: _estaCarregando ? null : _validarLogin,
                   child: _estaCarregando
-                      ? const CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                      ? const SizedBox(
+                          width: 25,
+                          height: 25,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            strokeWidth: 2.0,
+                          ),
                         )
                       : const Text('Fazer Login'),
                 ),
@@ -116,9 +121,6 @@ class _LoginPageState extends State<LoginPage> {
       String email = _emailController.text;
       String senha = _senhaController.text;
 
-      print('Email: $email');
-      print('Senha: $senha');
-
       setState(() {
         _estaCarregando = true;
       });
@@ -136,38 +138,54 @@ class _LoginPageState extends State<LoginPage> {
       'Content-Type': 'application/json',
     };
 
-    var resposta = await http.post(
-      uri,
-      headers: headers,
-      body: jsonEncode({
-        'email': email,
-        'senha': senha,
-      }),
-    );
+    try {
+      var resposta = await http
+          .post(
+            uri,
+            headers: headers,
+            body: jsonEncode({
+              'email': email,
+              'senha': senha,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
 
-    if (resposta.statusCode >= 400) {
-      String mensagem = utf8.decode(resposta.bodyBytes);
+      if (resposta.statusCode >= 400) {
+        String mensagem = utf8.decode(resposta.bodyBytes);
+        setState(() {
+          _mensagemErro = mensagem;
+          _estaCarregando = false;
+        });
+        return;
+      }
+
+      dynamic jsonResposta = json.decode(utf8.decode(resposta.bodyBytes));
+
       setState(() {
-        _mensagemErro = mensagem;
+        _mensagemErro = '';
         _estaCarregando = false;
       });
-      return;
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('usuarioLogado', jsonEncode(jsonResposta));
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (ctx) => const PrincipalPage()),
+      );
+    } catch (e) {
+      setState(() {
+        _estaCarregando = false;
+      });
+      _mostrarErro('Não foi possível se conectar com a API.');
     }
+  }
 
-    dynamic jsonResposta = json.decode(utf8.decode(resposta.bodyBytes));
-
-    setState(() {
-      _mensagemErro = '';
-      _estaCarregando = false;
-    });
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('usuarioLogado', jsonEncode(jsonResposta));
-    String? teste = prefs.getString('usuarioLogado');
-    print(teste);
-
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (ctx) => const PrincipalPage()),
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 }

@@ -15,6 +15,7 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
   final String apiUrl = '10.0.2.2:5277';
   List<Map<String, dynamic>> _fornecedores = [];
   final TextEditingController _pesquisaController = TextEditingController();
+  bool _carregando = false;
 
   @override
   void initState() {
@@ -23,48 +24,76 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
   }
 
   Future<void> _listarFornecedores([String? query]) async {
-    final response = await http.get(Uri.http(
-        apiUrl,
-        query != null && query != ''
-            ? '/Fornecedores/nomeECnpj/$query'
-            : '/Fornecedores'));
+    setState(() {
+      _carregando = true;
+    });
 
-    if (response.statusCode < 400) {
+    try {
+      final response = await http
+          .get(Uri.http(
+              apiUrl,
+              query != null && query != ''
+                  ? '/Fornecedores/nomeECnpj/$query'
+                  : '/Fornecedores'))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode < 400) {
+        setState(() {
+          _fornecedores =
+              List<Map<String, dynamic>>.from(json.decode(response.body));
+          _carregando = false;
+        });
+      } else {
+        _mostrarErro('Erro ao listar fornecedores: ${response.statusCode}');
+        setState(() {
+          _carregando = false;
+        });
+      }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API.');
       setState(() {
-        _fornecedores =
-            List<Map<String, dynamic>>.from(json.decode(response.body));
+        _carregando = false;
       });
-    } else {
-      print(query);
-      print('Erro ao listar fornecedores: ${response.statusCode}');
     }
   }
 
   Future<void> _adicionarFornecedor(Map<String, dynamic> fornecedor) async {
-    final response = await http.post(
-      Uri.http(apiUrl, '/Fornecedores'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(fornecedor),
-    );
+    try {
+      final response = await http
+          .post(
+            Uri.http(apiUrl, '/Fornecedores'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(fornecedor),
+          )
+          .timeout(const Duration(seconds: 15));
 
-    if (response.statusCode < 400) {
-      _listarFornecedores();
-    } else {
-      print('Erro ao adicionar fornecedor: ${response.statusCode}');
+      if (response.statusCode < 400) {
+        _listarFornecedores();
+      } else {
+        _mostrarErro('Erro ao adicionar fornecedor: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API.');
     }
   }
 
   Future<void> _editarFornecedor(Map<String, dynamic> fornecedor) async {
-    final response = await http.put(
-      Uri.http(apiUrl, '/Fornecedores'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(fornecedor),
-    );
+    try {
+      final response = await http
+          .put(
+            Uri.http(apiUrl, '/Fornecedores'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(fornecedor),
+          )
+          .timeout(const Duration(seconds: 15));
 
-    if (response.statusCode < 400) {
-      _listarFornecedores();
-    } else {
-      print('Erro ao editar fornecedor: ${response.statusCode}');
+      if (response.statusCode < 400) {
+        _listarFornecedores();
+      } else {
+        _mostrarErro('Erro ao editar fornecedor: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API.');
     }
   }
 
@@ -73,11 +102,11 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
       MaterialPageRoute(
         builder: (context) => FornecedorFormPage(
           fornecedor: fornecedor,
-          onSave: (fornecedor) {
+          onSave: (fornecedor) async {
             if (fornecedor.containsKey('idFornecedor')) {
-              _editarFornecedor(fornecedor);
+              await _editarFornecedor(fornecedor);
             } else {
-              _adicionarFornecedor(fornecedor);
+              await _adicionarFornecedor(fornecedor);
             }
           },
         ),
@@ -89,13 +118,22 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
     _listarFornecedores(_pesquisaController.text);
   }
 
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fornecedores'),
       ),
-      drawer: const drawer(),
+      drawer: const DrawerFenomenos(),
       body: Column(
         children: [
           Padding(
@@ -119,17 +157,19 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _fornecedores.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_fornecedores[index]['nome']),
-                  subtitle: Text(_fornecedores[index]['cnpj']),
-                  onTap: () => _abrirFormularioFornecedor(
-                      fornecedor: _fornecedores[index]),
-                );
-              },
-            ),
+            child: _carregando
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: _fornecedores.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_fornecedores[index]['nome']),
+                        subtitle: Text(_fornecedores[index]['cnpj']),
+                        onTap: () => _abrirFormularioFornecedor(
+                            fornecedor: _fornecedores[index]),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -143,7 +183,7 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
 
 class FornecedorFormPage extends StatefulWidget {
   final Map<String, dynamic>? fornecedor;
-  final Function(Map<String, dynamic>) onSave;
+  final Future<void> Function(Map<String, dynamic>) onSave;
 
   const FornecedorFormPage({super.key, this.fornecedor, required this.onSave});
 
@@ -155,6 +195,7 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nomeController;
   late MaskedTextController _cnpjController;
+  bool _salvando = false;
 
   @override
   void initState() {
@@ -175,8 +216,12 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
     super.dispose();
   }
 
-  void _salvar() {
+  void _salvar() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _salvando = true;
+      });
+
       final fornecedor = {
         'nome': _nomeController.text,
         'cnpj': _cnpjController.text,
@@ -187,9 +232,26 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
             widget.fornecedor!['idFornecedor'].toString();
       }
 
-      widget.onSave(fornecedor);
-      Navigator.of(context).pop();
+      try {
+        await widget.onSave(fornecedor);
+        Navigator.of(context).pop();
+      } catch (e) {
+        _mostrarErro('Não foi possível se conectar com a API.');
+      } finally {
+        setState(() {
+          _salvando = false;
+        });
+      }
     }
+  }
+
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override
@@ -232,9 +294,18 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _salvar,
-                child:
-                    Text(widget.fornecedor == null ? 'Cadastrar' : 'Alterar'),
+                onPressed: _salvando ? null : _salvar,
+                child: _salvando
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          strokeWidth: 2.0,
+                        ),
+                      )
+                    : Text(widget.fornecedor == null ? 'Cadastrar' : 'Alterar'),
               ),
             ],
           ),

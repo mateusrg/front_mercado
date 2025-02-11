@@ -12,8 +12,10 @@ class _EstoquePageState extends State<EstoquePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Estoque'),),
-      drawer: drawer(),
+      appBar: AppBar(
+        title: const Text('Estoque'),
+      ),
+      drawer: const DrawerFenomenos(),
     );
   }
 }

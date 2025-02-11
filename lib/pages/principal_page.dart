@@ -1,9 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
-import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
-import 'package:front_mercado/pages/home_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_page.dart';
@@ -69,12 +66,10 @@ class PrincipalPage extends StatelessWidget {
           ),
         ],
       ),
-      
-      drawer: drawer(),
-
+      drawer: const DrawerFenomenos(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print('clicou no Editar');
+          // tem q fzr editar
         },
         child: const Icon(Icons.edit),
       ),
@@ -110,11 +105,12 @@ class PrincipalPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const ProdutosPage())
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ProdutosPage()));
                   },
-                  child: Text('Consulta de Produtos'),
+                  child: const Text('Consulta de Produtos'),
                 ),
               ),
               const SizedBox(height: 10),
@@ -122,11 +118,13 @@ class PrincipalPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage())
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const MovimentacoesEstoquePage()));
                   },
-                  child: Text('Movimentações do Estoque'),
+                  child: const Text('Movimentações do Estoque'),
                 ),
               ),
             ],
