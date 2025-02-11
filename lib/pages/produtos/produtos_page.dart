@@ -268,7 +268,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
             children: <Widget>[
               TextFormField(
                 controller: _descricaoController,
-                decoration: const InputDecoration(labelText: 'Descricao'),
+                decoration: const InputDecoration(labelText: 'Descrição'),
                 maxLength: 100,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -279,15 +279,15 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
               ),
               TextFormField(
                 controller: _codbarrasController,
-                decoration: const InputDecoration(labelText: 'codbarras'),
-                maxLength: 18,
+                decoration: const InputDecoration(labelText: 'Código de Barras'),
+                maxLength: 13,
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o codbarras';
+                    return 'Por favor, insira o Código de Barras';
                   }
                   if (value.length != 13) {
-                    return 'O Codigo de barras deve ter 13 caracteres';
+                    return 'O Código de barras deve ter 13 caracteres';
                   }
                   return null;
                 },
