@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:front_mercado/pages/home_page.dart';
 import 'dart:io';
 
-class MyHttpoverrides extends HttpOverrides {
+class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
@@ -12,7 +13,7 @@ class MyHttpoverrides extends HttpOverrides {
 }
 
 void main() {
-  HttpOverrides.global = MyHttpoverrides();
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MainApp());
 }
 
@@ -28,6 +29,14 @@ class MainApp extends StatelessWidget {
           seedColor: Colors.cyan,
         ),
       ),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+      ],
       home: const HomePage(),
     );
   }
