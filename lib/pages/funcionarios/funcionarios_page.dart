@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
@@ -12,7 +13,7 @@ class FuncionariosPage extends StatefulWidget {
 }
 
 class _FuncionariosPageState extends State<FuncionariosPage> {
-  final String apiUrl = 'localhost:5277';
+  final String apiUrl = '${Params.ipApi}:5277';
   List<Map<String, dynamic>> _funcionarios = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;

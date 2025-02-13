@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/principal_page.dart';
+import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -130,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _fazerLogin(String email, String senha) async {
-    String urlBase = '10.0.2.2:5277';
+    String urlBase = '${Params.ipApi}:5277';
     String urlComplementar = '/Funcionarios/login';
     Uri uri = Uri.http(urlBase, urlComplementar, null);
 
