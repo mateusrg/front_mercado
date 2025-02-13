@@ -62,11 +62,12 @@ class _PrincipalPageState extends State<PrincipalPage> {
   }
 
   void _editarFuncionario(BuildContext context, Map<String, dynamic> userInfo) {
-    final TextEditingController nomeController = TextEditingController(text: userInfo['nome']);
-    final TextEditingController emailController = TextEditingController(text: userInfo['email']);
-    final TextEditingController setorController = TextEditingController(text: userInfo['setor']);
+  final TextEditingController nomeController = TextEditingController(text: userInfo['nome']);
+  final TextEditingController emailController = TextEditingController(text: userInfo['email']);
+  final TextEditingController setorController = TextEditingController(text: userInfo['setor']);
+  final TextEditingController senhaController = TextEditingController();
 
-     showDialog(
+  showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -103,6 +104,20 @@ class _PrincipalPageState extends State<PrincipalPage> {
                 controller: setorController,
                 decoration: const InputDecoration(labelText: 'Setor'),
               ),
+              TextFormField(
+                controller: senhaController,
+                decoration: const InputDecoration(labelText: 'Senha'),
+                obscureText: true,
+                validator: (String? senha) {
+                  if (senha == null || senha.isEmpty) {
+                    return 'Digite uma senha';
+                  }
+                  if (senha.length < 6) {
+                    return 'A senha deve ter pelo menos 6 caracteres';
+                  }
+                  return null;
+                },
+              ),
             ],
           ),
         ),
@@ -121,6 +136,9 @@ class _PrincipalPageState extends State<PrincipalPage> {
                 userInfo['nome'] = nomeController.text;
                 userInfo['email'] = emailController.text;
                 userInfo['setor'] = setorController.text;
+                if (senhaController.text.isNotEmpty) {
+                  userInfo['senha'] = senhaController.text;
+                }
                 await prefs.setString('usuarioLogado', jsonEncode(userInfo));
                 Navigator.of(context).pop();
               }
