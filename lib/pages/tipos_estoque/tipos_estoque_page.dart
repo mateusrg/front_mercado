@@ -255,7 +255,7 @@ class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _salvar,
-                      child: const Text('Salvar'),
+                      child: const Text('Cadastrar'),
                     ),
             ],
           ),
