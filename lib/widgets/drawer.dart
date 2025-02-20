@@ -20,7 +20,10 @@ class DrawerFenomenos extends StatelessWidget {
         children: <Widget>[
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Colors.blue,
+              image: DecorationImage(
+                image: AssetImage('assets/images/fenomenossm.jpg'),
+                fit: BoxFit.cover,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +53,7 @@ class DrawerFenomenos extends StatelessWidget {
             icon: Icons.home,
             text: 'Home',
             onTap: () => Navigator.push(
-              context,
+              context,  
               MaterialPageRoute(builder: (context) => const PrincipalPage()),
             ),
           ),

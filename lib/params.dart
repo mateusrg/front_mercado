@@ -1,3 +1,3 @@
 class Params {
-  static const String ipApi = 'localhost';
+  static const String ipApi = '192.168.230.104';
 }
