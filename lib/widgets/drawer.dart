@@ -69,7 +69,7 @@ class DrawerFenomenos extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.inventory_2_outlined,
-            text: 'Estoque',
+            text: 'Estoques',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const EstoquePage()),
@@ -78,7 +78,7 @@ class DrawerFenomenos extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.fire_truck_outlined,
-            text: 'Fornecedor',
+            text: 'Fornecedores',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const FornecedoresPage()),
