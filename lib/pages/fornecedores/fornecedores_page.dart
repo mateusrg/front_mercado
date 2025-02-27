@@ -148,6 +148,7 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
                       labelText: 'Pesquisar',
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _pesquisarFornecedores(), // Adicionado para executar ao pressionar Enter
                   ),
                 ),
                 IconButton(
@@ -277,6 +278,7 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(), // Adicionado para executar ao pressionar Enter
               ),
               TextFormField(
                 controller: _cnpjController,
@@ -292,6 +294,7 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(), // Adicionado para executar ao pressionar Enter
               ),
               const SizedBox(height: 20),
               ElevatedButton(

@@ -82,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           obscureText: true,
                           validator: _validarSenha,
+                          onFieldSubmitted: (_) => _validarLogin(), // Adicionado para executar ao pressionar Enter
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton(

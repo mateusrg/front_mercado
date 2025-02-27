@@ -148,6 +148,7 @@ class _TiposMovimentacoesEstoquePageState extends State<TiposMovimentacoesEstoqu
                       labelText: 'Pesquisar',
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _pesquisarTiposMovimentacoesEstoque(),
                   ),
                 ),
                 IconButton(
@@ -250,6 +251,7 @@ class _TipoMovimentacaoEstoqueFormPageState extends State<TipoMovimentacaoEstoqu
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               const SizedBox(height: 16.0),
               _salvando

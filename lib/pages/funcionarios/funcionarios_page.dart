@@ -124,6 +124,7 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
                       labelText: 'Pesquisar',
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _pesquisarFuncionarios(), 
                   ),
                 ),
                 IconButton(
@@ -274,6 +275,7 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               TextFormField(
                 controller: _emailController,
@@ -293,6 +295,7 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
 
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               TextFormField(
                 controller: _setorController,
@@ -316,6 +319,7 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               const SizedBox(height: 20),
               ElevatedButton(

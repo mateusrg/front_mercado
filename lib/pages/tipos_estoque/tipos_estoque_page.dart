@@ -148,6 +148,7 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
                       labelText: 'Pesquisar',
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _pesquisarTiposEstoque(),
                   ),
                 ),
                 IconButton(
@@ -250,6 +251,7 @@ class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               const SizedBox(height: 16.0),
               _salvando

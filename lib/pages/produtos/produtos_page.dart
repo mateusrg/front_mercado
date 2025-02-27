@@ -148,6 +148,7 @@ class _ProdutosPageState extends State<ProdutosPage> {
                       labelText: 'Pesquisar',
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _pesquisarProdutos(), 
                   ),
                 ),
                 IconButton(
@@ -277,6 +278,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               TextFormField(
                 controller: _codbarrasController,
@@ -292,6 +294,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (_) => _salvar(),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
