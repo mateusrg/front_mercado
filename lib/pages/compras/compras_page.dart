@@ -20,7 +20,6 @@ class _ComprasPageState extends State<ComprasPage> {
   List<Map<String, dynamic>> _compras = [];
   List<Map<String, dynamic>> _produtos = [];
   List<Map<String, dynamic>> _fornecedores = [];
-  final TextEditingController _pesquisaController = TextEditingController();
   final TextEditingController _quantidadeInicialController =
       TextEditingController();
   final TextEditingController _quantidadeFinalController =
@@ -73,12 +72,16 @@ class _ComprasPageState extends State<ComprasPage> {
     });
 
     final parametros = {
-      'produto': _produtoSelecionado?['idProduto'],
-      'dataInicial': _dataInicial?.toIso8601String(),
-      'dataFinal': _dataFinal?.toIso8601String(),
-      'fornecedor': _fornecedorSelecionado?['idFornecedor'],
-      'quantidadeInicial': _quantidadeInicialController.text,
-      'quantidadeFinal': _quantidadeFinalController.text,
+      'dataInicio': _dataInicial?.toIso8601String(),
+      'dataFim': _dataFinal?.toIso8601String(),
+      'quantMinima': _quantidadeInicialController.text == ''
+          ? null
+          : _quantidadeInicialController.text,
+      'quantMaxima': _quantidadeFinalController.text == ''
+          ? null
+          : _quantidadeFinalController.text,
+      'idProduto': _produtoSelecionado?['idProduto'],
+      'idFornecedor': _fornecedorSelecionado?['idFornecedor'],
     };
 
     try {
@@ -187,6 +190,29 @@ class _ComprasPageState extends State<ComprasPage> {
     });
   }
 
+  void _limparFiltros() {
+    setState(() {
+      _produtoSelecionado = null;
+      _fornecedorSelecionado = null;
+      _quantidadeInicialController.clear();
+      _quantidadeFinalController.clear();
+      _dataInicial = null;
+      _dataFinal = null;
+    });
+  }
+
+  void _limparProduto() {
+    setState(() {
+      _produtoSelecionado = null;
+    });
+  }
+
+  void _limparFornecedor() {
+    setState(() {
+      _fornecedorSelecionado = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,42 +230,79 @@ class _ComprasPageState extends State<ComprasPage> {
         children: [
           if (_mostrarFiltro)
             Card(
-              margin: const EdgeInsets.all(8.0),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    DropdownButtonFormField<Map<String, dynamic>>(
-                      value: _produtoSelecionado,
-                      decoration: const InputDecoration(labelText: 'Produto'),
-                      items: _produtos.map((produto) {
-                        return DropdownMenuItem<Map<String, dynamic>>(
-                          value: produto,
-                          child: Text(produto['descricao']),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _produtoSelecionado = value;
-                        });
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Map<String, dynamic>>(
+                            value: _produtoSelecionado,
+                            decoration:
+                                const InputDecoration(labelText: 'Produto'),
+                            items: _produtos.map((produto) {
+                              return DropdownMenuItem<Map<String, dynamic>>(
+                                value: produto,
+                                child: Text(produto['descricao']),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _produtoSelecionado = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: _limparProduto,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
-                    DropdownButtonFormField<Map<String, dynamic>>(
-                      value: _fornecedorSelecionado,
-                      decoration:
-                          const InputDecoration(labelText: 'Fornecedor'),
-                      items: _fornecedores.map((fornecedor) {
-                        return DropdownMenuItem<Map<String, dynamic>>(
-                          value: fornecedor,
-                          child: Text(fornecedor['nome']),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _fornecedorSelecionado = value;
-                        });
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Map<String, dynamic>>(
+                            value: _fornecedorSelecionado,
+                            decoration:
+                                const InputDecoration(labelText: 'Fornecedor'),
+                            items: _fornecedores.map((fornecedor) {
+                              return DropdownMenuItem<Map<String, dynamic>>(
+                                value: fornecedor,
+                                child: Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                            0.65,
+                                  ),
+                                  child: Text(
+                                    '${fornecedor['nome']} - ${fornecedor['cnpj']}',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _fornecedorSelecionado = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: _limparFornecedor,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -273,33 +336,47 @@ class _ComprasPageState extends State<ComprasPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextButton(
+                          child: TextButton.icon(
+                            icon: const Icon(Icons.calendar_month_outlined),
+                            label: Text(_dataInicial != null
+                                ? DateFormat('dd/MM/yyyy').format(_dataInicial!)
+                                : 'Data Inicial'),
                             onPressed: () => _selecionarDataInicial(context),
-                            child: Text(
-                              _dataInicial != null
-                                  ? DateFormat('dd/MM/yyyy')
-                                      .format(_dataInicial!)
-                                  : 'Data Inicial',
-                            ),
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Expanded(
-                          child: TextButton(
+                          child: TextButton.icon(
+                            icon: const Icon(Icons.calendar_month_outlined),
+                            label: Text(_dataFinal != null
+                                ? DateFormat('dd/MM/yyyy').format(_dataFinal!)
+                                : 'Data Final'),
                             onPressed: () => _selecionarDataFinal(context),
-                            child: Text(
-                              _dataFinal != null
-                                  ? DateFormat('dd/MM/yyyy').format(_dataFinal!)
-                                  : 'Data Final',
-                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: _listarCompras,
-                      child: const Text('Pesquisar'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
+                          ),
+                          onPressed: _listarCompras,
+                          child: const Text('Pesquisar'),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onInverseSurface,
+                          ),
+                          onPressed: _limparFiltros,
+                          child: const Text('Limpar'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
