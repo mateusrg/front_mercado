@@ -16,12 +16,18 @@ class _EstoquePageState extends State<EstoquePage> {
   final String apiUrl = 'localhost:5277';
   List<Map<String, dynamic>> _estoque = [];
   final TextEditingController _pesquisaController = TextEditingController();
+  Map<String, dynamic>? _estoqueSelecionado;
   bool _carregando = false;
+  bool _mostrarFiltro = false;
 
   @override
   void initState() {
-    _listarEstoque();
+    _carregandoEstoquesETiposEstoque();
     super.initState();
+  }
+
+  Future<void> _carregandoEstoquesETiposEstoque() async {
+    await _listarEstoque();
   }
 
   Future<void> _listarEstoque([String? query]) async {
@@ -62,6 +68,17 @@ class _EstoquePageState extends State<EstoquePage> {
     }
   }
 
+  Future<void> _carregandoEstoques() async {
+    final response = await http.get(Uri.http(apiUrl, '/Produtos'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _estoque = List<Map<String, dynamic>>.from(json.decode(response.body));
+      });
+    } else {
+      _mostrarErro('Erro ao carregar produtos: ${response.statusCode}');
+    }
+  }
+
   void _pesquisarEstoque() {
     _listarEstoque(_pesquisaController.text);
   }
@@ -75,11 +92,23 @@ class _EstoquePageState extends State<EstoquePage> {
     );
   }
 
+  void _toggleFiltro() {
+    setState(() {
+      _mostrarFiltro = !_mostrarFiltro;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Estoques'),
+        actions: [
+          IconButton(
+            onPressed: _toggleFiltro,
+            icon: const Icon(Icons.filter_list),
+          ),
+        ],
       ),
       drawer: const DrawerFenomenos(),
       body: Column(
@@ -88,20 +117,33 @@ class _EstoquePageState extends State<EstoquePage> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: _pesquisaController,
-                    decoration: const InputDecoration(
-                      labelText: 'Pesquisar',
-                      border: OutlineInputBorder(),
+                if (_mostrarFiltro)
+                  Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          DropdownButtonFormField<Map<String, dynamic>>(
+                            value: _estoqueSelecionado,
+                            decoration:
+                                const InputDecoration(labelText: 'Estoques'),
+                            items: _estoque.map((estoque) {
+                              return DropdownMenuItem<Map<String, dynamic>>(
+                                value: estoque,
+                                child: Text(estoque['descricao']),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _estoqueSelecionado = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _pesquisarEstoque,
-                ),
+                  )
               ],
             ),
           ),
