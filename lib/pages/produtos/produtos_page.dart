@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
+
 class ProdutosPage extends StatefulWidget {
   const ProdutosPage({super.key});
 
@@ -165,8 +166,8 @@ class _ProdutosPageState extends State<ProdutosPage> {
                       return ListTile(
                         title: Text(_produtos[index]['descricao']),
                         subtitle: Text(_produtos[index]['codBarras']),
-                        onTap: () =>
-                            _abrirFormularioProduto(produto: _produtos[index]),
+                        onTap: () => _abrirFormularioProduto(
+                          produto: _produtos[index]),
                       );
                     },
                   ),
@@ -208,7 +209,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
       text: widget.produto != null ? widget.produto!['codbarras'] : '',
     );
   }
-
+  
   @override
   void dispose() {
     _descricaoController.dispose();
@@ -221,14 +222,15 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
       setState(() {
         _salvando = true;
       });
-
+      
       final produto = {
         'descricao': _descricaoController.text,
         'codbarras': _codbarrasController.text,
       };
 
       if (widget.produto != null) {
-        produto['idProduto'] = widget.produto!['idProduto'].toString();
+        produto['idProduto'] =
+            widget.produto!['idProduto'].toString();
       }
 
       try {
@@ -278,8 +280,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
               ),
               TextFormField(
                 controller: _codbarrasController,
-                decoration:
-                    const InputDecoration(labelText: 'Código de Barras'),
+                decoration: const InputDecoration(labelText: 'Código de Barras'),
                 maxLength: 13,
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -300,12 +301,12 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                          valueColor:
+                          valueColor: 
                               AlwaysStoppedAnimation<Color>(Colors.white),
                           strokeWidth: 2.0,
                         ),
-                      )
-                    : Text(widget.produto == null ? 'Cadastrar' : 'Alterar'),
+                    )
+                  : Text(widget.produto == null ? 'Cadastrar' : 'Alterar'),
               ),
             ],
           ),

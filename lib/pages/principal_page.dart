@@ -204,7 +204,7 @@ class _PrincipalPageState extends State<PrincipalPage> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text('Fenomenos SM'),
+      title: const Text('Fenômenos SM'),
       actions: <Widget>[
         IconButton(
           icon: const Icon(Icons.logout),
