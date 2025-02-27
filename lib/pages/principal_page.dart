@@ -174,26 +174,42 @@ class _PrincipalPageState extends State<PrincipalPage> {
             padding: const EdgeInsets.all(8.0),
             children: [
               _buildUserInfoCard(userInfo),
-              _buildActionButton(
-                context,
-                text: 'Consulta de Produtos',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ProdutosPage()),
-                  );
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildActionButton(
+                      context,
+                      text: 'Consulta de Produtos',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ProdutosPage()),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: _buildActionButton(
+                      context,
+                      text: 'Movimentações do Estoque',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage()),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              _buildActionButton(
-                context,
-                text: 'Movimentações do Estoque',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage()),
-                  );
-                },
+              const SizedBox(height: 25),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: Image.asset(
+                  'assets/images/cartaofenomenos.png',
+                  width: 200,
+                ),
               ),
             ],
           );
@@ -242,7 +258,10 @@ class _PrincipalPageState extends State<PrincipalPage> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(text),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

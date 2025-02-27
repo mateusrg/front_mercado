@@ -13,7 +13,7 @@ class EstoquePage extends StatefulWidget {
 }
 
 class _EstoquePageState extends State<EstoquePage> {
-  final String apiUrl = 'localhost:5277';
+  final String apiUrl = '${Params.ipApi}:5277';
   List<Map<String, dynamic>> _estoque = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
