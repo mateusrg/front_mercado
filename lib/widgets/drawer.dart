@@ -52,7 +52,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.home,
             text: 'Home',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,  
               MaterialPageRoute(builder: (context) => const PrincipalPage()),
             ),
@@ -61,7 +61,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.shopping_cart,
             text: 'Compras',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const ComprasPage()),
             ),
@@ -70,7 +70,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.inventory_2_outlined,
             text: 'Estoque',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const EstoquePage()),
             ),
@@ -79,7 +79,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.fire_truck_outlined,
             text: 'Fornecedor',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const FornecedoresPage()),
             ),
@@ -88,7 +88,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.group,
             text: 'Funcionarios',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const FuncionariosPage()),
             ),
@@ -97,7 +97,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.forklift,
             text: 'Movimentações Estoque',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (context) => const MovimentacoesEstoquePage()),
@@ -107,7 +107,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.sell_outlined,
             text: 'Produtos',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const ProdutosPage()),
             ),
@@ -116,7 +116,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.inventory_outlined,
             text: 'Tipos Estoque',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const TiposEstoquePage()),
             ),
@@ -125,7 +125,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.move_down,
             text: 'Tipos Movimentações Estoque',
-            onTap: () => Navigator.push(
+            onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (context) => const TiposMovimentacoesEstoquePage()),

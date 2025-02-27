@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
@@ -62,122 +61,104 @@ class _PrincipalPageState extends State<PrincipalPage> {
   }
 
   void _editarFuncionario(BuildContext context, Map<String, dynamic> userInfo) {
-  final TextEditingController nomeController = TextEditingController(text: userInfo['nome']);
-  final TextEditingController emailController = TextEditingController(text: userInfo['email']);
-  final TextEditingController setorController = TextEditingController(text: userInfo['setor']);
-  final TextEditingController senhaController = TextEditingController();
+    final TextEditingController nomeController = TextEditingController(text: userInfo['nome']);
+    final TextEditingController emailController = TextEditingController(text: userInfo['email']);
+    final TextEditingController setorController = TextEditingController(text: userInfo['setor']);
+    final TextEditingController senhaController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Editar Funcionário'),
-        content: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: nomeController,
-                decoration: const InputDecoration(labelText: 'Nome'),
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                maxLength: 100,
-                validator: (String? email) {
-                  final RegExp emailRegex = RegExp(
-                      r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Editar Funcionário'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nomeController,
+                  decoration: const InputDecoration(labelText: 'Nome'),
+                ),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  maxLength: 100,
+                  validator: (String? email) {
+                    final RegExp emailRegex = RegExp(
+                        r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
 
-                  if (email == null || email.isEmpty) {
-                    return 'Digite um e-mail';
-                  }
+                    if (email == null || email.isEmpty) {
+                      return 'Digite um e-mail';
+                    }
 
-                  if (!emailRegex.hasMatch(email)) {
-                    return 'Digite um e-mail válido';
-                  }
+                    if (!emailRegex.hasMatch(email)) {
+                      return 'Digite um e-mail válido';
+                    }
 
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: setorController,
-                decoration: const InputDecoration(labelText: 'Setor'),
-              ),
-              TextFormField(
-                controller: senhaController,
-                decoration: const InputDecoration(labelText: 'Senha'),
-                obscureText: true,
-                validator: (String? senha) {
-                  if (senha == null || senha.isEmpty) {
-                    return 'Digite uma senha';
-                  }
-                  if (senha.length < 6) {
-                    return 'A senha deve ter pelo menos 6 caracteres';
-                  }
-                  return null;
-                },
-              ),
-            ],
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: setorController,
+                  decoration: const InputDecoration(labelText: 'Setor'),
+                ),
+                TextFormField(
+                  controller: senhaController,
+                  decoration: const InputDecoration(labelText: 'Senha'),
+                  obscureText: true,
+                  validator: (String? senha) {
+                    if (senha == null || senha.isEmpty) {
+                      return 'Digite uma senha';
+                    }
+                    if (senha.length < 6) {
+                      return 'A senha deve ter pelo menos 6 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (_formKey.currentState!.validate()) {
-                // Atualizar as informações do funcionário
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                userInfo['nome'] = nomeController.text;
-                userInfo['email'] = emailController.text;
-                userInfo['setor'] = setorController.text;
-                if (senhaController.text.isNotEmpty) {
-                  userInfo['senha'] = senhaController.text;
-                }
-                await prefs.setString('usuarioLogado', jsonEncode(userInfo));
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
                 Navigator.of(context).pop();
-              }
-            },
-            child: const Text('Salvar'),
-          ),
-        ],
-      );
-    },
-  );
-}
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  // Atualizar as informações do funcionário
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  userInfo['nome'] = nomeController.text;
+                  userInfo['email'] = emailController.text;
+                  userInfo['setor'] = setorController.text;
+                  if (senhaController.text.isNotEmpty) {
+                    userInfo['senha'] = senhaController.text;
+                  }
+                  await prefs.setString('usuarioLogado', jsonEncode(userInfo));
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Fenomenos SM'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _confirmarLogout(context),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context),
       drawer: const DrawerFenomenos(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final userInfo = await _informacoesUsuarioLogado();
-          if (userInfo != null) {
-            _editarFuncionario(context, userInfo);
-
-          }
-        },
-        child: const Icon(Icons.edit),
-      ),
+      floatingActionButton: _buildFloatingActionButton(context),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _informacoesUsuarioLogado(),
-        builder: (BuildContext context,
-            AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -189,48 +170,79 @@ class _PrincipalPageState extends State<PrincipalPage> {
           }
 
           final userInfo = snapshot.data!;
-          return Column(
+          return ListView(
+            padding: const EdgeInsets.all(8.0),
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: ListTile(
-                    title: Text(userInfo['nome']),
-                    subtitle: Text(userInfo['email']),
-                    leading: Text('${userInfo['idFuncionario']}'),
-                    trailing: Text(userInfo['setor']),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProdutosPage()));
-                  },
-                  child: const Text('Consulta de Produtos'),
-                ),
+              _buildUserInfoCard(userInfo),
+              _buildActionButton(
+                context,
+                text: 'Consulta de Produtos',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProdutosPage()),
+                  );
+                },
               ),
               const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const MovimentacoesEstoquePage()));
-                  },
-                  child: const Text('Movimentações do Estoque'),
-                ),
+              _buildActionButton(
+                context,
+                text: 'Movimentações do Estoque',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage()),
+                  );
+                },
               ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Fenomenos SM'),
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () => _confirmarLogout(context),
+        ),
+      ],
+    );
+  }
+
+  FloatingActionButton _buildFloatingActionButton(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () async {
+        final userInfo = await _informacoesUsuarioLogado();
+        if (userInfo != null) {
+          _editarFuncionario(context, userInfo);
+        }
+      },
+      child: const Icon(Icons.edit),
+    );
+  }
+
+  Widget _buildUserInfoCard(Map<String, dynamic> userInfo) {
+    return Card(
+      child: ListTile(
+        title: Text(userInfo['nome']),
+        subtitle: Text(userInfo['email']),
+        leading: Text('${userInfo['idFuncionario']}'),
+        trailing: Text(userInfo['setor']),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context, {required String text, required VoidCallback onPressed}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(text),
       ),
     );
   }
