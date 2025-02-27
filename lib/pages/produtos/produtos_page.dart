@@ -13,7 +13,7 @@ class ProdutosPage extends StatefulWidget {
 }
 
 class _ProdutosPageState extends State<ProdutosPage> {
-  final String apiUrl = '${Params.ipApi}:48712';
+  final String apiUrl = '${Params.ipApi}:5277';
   List<Map<String, dynamic>> _produtos = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
