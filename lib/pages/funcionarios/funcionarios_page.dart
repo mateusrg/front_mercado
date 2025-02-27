@@ -59,7 +59,6 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
   }
 
   Future<void> _adicionarFuncionario(Map<String, dynamic> funcionarios) async {
-    print(funcionarios);
     try {
       final response = await http
           .post(

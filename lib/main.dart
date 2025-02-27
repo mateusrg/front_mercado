@@ -25,8 +25,10 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.cyan,
+          brightness: Brightness.dark,
         ),
       ),
       localizationsDelegates: const [
