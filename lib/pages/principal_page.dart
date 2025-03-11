@@ -77,79 +77,81 @@ class _PrincipalPageState extends State<PrincipalPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Editar Funcionário'),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: nomeController,
-                  decoration: const InputDecoration(labelText: 'Nome'),
-                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                      context,
-                      userInfo,
-                      nomeController,
-                      emailController,
-                      setorController,
-                      senhaController),
-                ),
-                TextFormField(
-                  controller: emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  maxLength: 100,
-                  validator: (String? email) {
-                    final RegExp emailRegex = RegExp(
-                        r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
-
-                    if (email == null || email.isEmpty) {
-                      return 'Digite um e-mail';
-                    }
-
-                    if (!emailRegex.hasMatch(email)) {
-                      return 'Digite um e-mail válido';
-                    }
-
-                    return null;
-                  },
-                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                      context,
-                      userInfo,
-                      nomeController,
-                      emailController,
-                      setorController,
-                      senhaController),
-                ),
-                TextFormField(
-                  controller: setorController,
-                  decoration: const InputDecoration(labelText: 'Setor'),
-                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                      context,
-                      userInfo,
-                      nomeController,
-                      emailController,
-                      setorController,
-                      senhaController),
-                ),
-                TextFormField(
-                  controller: senhaController,
-                  decoration: const InputDecoration(
-                      labelText: 'Senha'),
-                  obscureText: true,
-                  validator: (String? senha) {
-                    if (senha != null && senha.isNotEmpty && senha.length < 6) {
-                      return 'A senha deve ter pelo menos 6 caracteres';
-                    }
-                    return null;
-                  },
-                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                      context,
-                      userInfo,
-                      nomeController,
-                      emailController,
-                      setorController,
-                      senhaController),
-                ),
-              ],
+          content: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: nomeController,
+                    decoration: const InputDecoration(labelText: 'Nome'),
+                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                        context,
+                        userInfo,
+                        nomeController,
+                        emailController,
+                        setorController,
+                        senhaController),
+                  ),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: const InputDecoration(labelText: 'Email'),
+                    maxLength: 100,
+                    validator: (String? email) {
+                      final RegExp emailRegex = RegExp(
+                          r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
+            
+                      if (email == null || email.isEmpty) {
+                        return 'Digite um e-mail';
+                      }
+            
+                      if (!emailRegex.hasMatch(email)) {
+                        return 'Digite um e-mail válido';
+                      }
+            
+                      return null;
+                    },
+                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                        context,
+                        userInfo,
+                        nomeController,
+                        emailController,
+                        setorController,
+                        senhaController),
+                  ),
+                  TextFormField(
+                    controller: setorController,
+                    decoration: const InputDecoration(labelText: 'Setor'),
+                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                        context,
+                        userInfo,
+                        nomeController,
+                        emailController,
+                        setorController,
+                        senhaController),
+                  ),
+                  TextFormField(
+                    controller: senhaController,
+                    decoration: const InputDecoration(
+                        labelText: 'Senha'),
+                    obscureText: true,
+                    validator: (String? senha) {
+                      if (senha != null && senha.isNotEmpty && senha.length < 6) {
+                        return 'A senha deve ter pelo menos 6 caracteres';
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                        context,
+                        userInfo,
+                        nomeController,
+                        emailController,
+                        setorController,
+                        senhaController),
+                  ),
+                ],
+              ),
             ),
           ),
           actions: <Widget>[
