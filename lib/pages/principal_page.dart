@@ -1,10 +1,12 @@
-import 'dart:convert';
+import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_page.dart';
+import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class PrincipalPage extends StatefulWidget {
   const PrincipalPage({super.key});
@@ -15,6 +17,7 @@ class PrincipalPage extends StatefulWidget {
 
 class _PrincipalPageState extends State<PrincipalPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final String apiUrl = '${Params.ipApi}:5277';
 
   Future<void> _deslogar(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -55,15 +58,18 @@ class _PrincipalPageState extends State<PrincipalPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jsonInformacoesUsuarioLogado = prefs.getString('usuarioLogado');
     if (jsonInformacoesUsuarioLogado != null) {
-      return jsonDecode(jsonInformacoesUsuarioLogado);
+      return convert.jsonDecode(jsonInformacoesUsuarioLogado);
     }
     return null;
   }
 
   void _editarFuncionario(BuildContext context, Map<String, dynamic> userInfo) {
-    final TextEditingController nomeController = TextEditingController(text: userInfo['nome']);
-    final TextEditingController emailController = TextEditingController(text: userInfo['email']);
-    final TextEditingController setorController = TextEditingController(text: userInfo['setor']);
+    final TextEditingController nomeController =
+        TextEditingController(text: userInfo['nome']);
+    final TextEditingController emailController =
+        TextEditingController(text: userInfo['email']);
+    final TextEditingController setorController =
+        TextEditingController(text: userInfo['setor']);
     final TextEditingController senhaController = TextEditingController();
 
     showDialog(
@@ -79,6 +85,13 @@ class _PrincipalPageState extends State<PrincipalPage> {
                 TextFormField(
                   controller: nomeController,
                   decoration: const InputDecoration(labelText: 'Nome'),
+                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                      context,
+                      userInfo,
+                      nomeController,
+                      emailController,
+                      setorController,
+                      senhaController),
                 ),
                 TextFormField(
                   controller: emailController,
@@ -98,24 +111,43 @@ class _PrincipalPageState extends State<PrincipalPage> {
 
                     return null;
                   },
+                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                      context,
+                      userInfo,
+                      nomeController,
+                      emailController,
+                      setorController,
+                      senhaController),
                 ),
                 TextFormField(
                   controller: setorController,
                   decoration: const InputDecoration(labelText: 'Setor'),
+                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                      context,
+                      userInfo,
+                      nomeController,
+                      emailController,
+                      setorController,
+                      senhaController),
                 ),
                 TextFormField(
                   controller: senhaController,
-                  decoration: const InputDecoration(labelText: 'Senha'),
+                  decoration: const InputDecoration(
+                      labelText: 'Senha'),
                   obscureText: true,
                   validator: (String? senha) {
-                    if (senha == null || senha.isEmpty) {
-                      return 'Digite uma senha';
-                    }
-                    if (senha.length < 6) {
+                    if (senha != null && senha.isNotEmpty && senha.length < 6) {
                       return 'A senha deve ter pelo menos 6 caracteres';
                     }
                     return null;
                   },
+                  onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
+                      context,
+                      userInfo,
+                      nomeController,
+                      emailController,
+                      setorController,
+                      senhaController),
                 ),
               ],
             ),
@@ -128,25 +160,72 @@ class _PrincipalPageState extends State<PrincipalPage> {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  // Atualizar as informações do funcionário
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  userInfo['nome'] = nomeController.text;
-                  userInfo['email'] = emailController.text;
-                  userInfo['setor'] = setorController.text;
-                  if (senhaController.text.isNotEmpty) {
-                    userInfo['senha'] = senhaController.text;
-                  }
-                  await prefs.setString('usuarioLogado', jsonEncode(userInfo));
-                  Navigator.of(context).pop();
-                }
-              },
+              onPressed: () => _salvarEdicaoFuncionario(
+                  context,
+                  userInfo,
+                  nomeController,
+                  emailController,
+                  setorController,
+                  senhaController),
               child: const Text('Salvar'),
             ),
           ],
         );
       },
+    );
+  }
+
+  Future<void> _salvarEdicaoFuncionario(
+    BuildContext context,
+    Map<String, dynamic> userInfo,
+    TextEditingController nomeController,
+    TextEditingController emailController,
+    TextEditingController setorController,
+    TextEditingController senhaController) async {
+  if (_formKey.currentState!.validate()) {
+    // Atualizar os dados editados
+    userInfo['nome'] = nomeController.text;
+    userInfo['email'] = emailController.text;
+    userInfo['setor'] = setorController.text;
+
+    // Só adiciona a senha se o campo não estiver vazio
+    if (senhaController.text.isNotEmpty) {
+      userInfo['senha'] = senhaController.text;
+    }
+
+    try {
+      final response = await http.put(
+        Uri.http(apiUrl, '/Funcionarios'),
+        headers: {'Content-Type': 'application/json'},
+        body: convert.jsonEncode(userInfo),
+      );
+
+      if (response.statusCode < 400) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('usuarioLogado', convert.jsonEncode(userInfo));
+
+        // Fechar o diálogo
+        Navigator.of(context).pop();
+
+        // Atualizar a interface
+        setState(() {});
+
+        print('Informações do usuário atualizadas: $userInfo'); // Log para depuração
+      } else {
+        _mostrarErro('Erro ao atualizar funcionário: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API.');
+    }
+  }
+}
+
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 
@@ -158,7 +237,8 @@ class _PrincipalPageState extends State<PrincipalPage> {
       floatingActionButton: _buildFloatingActionButton(context),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _informacoesUsuarioLogado(),
-        builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+        builder: (BuildContext context,
+            AsyncSnapshot<Map<String, dynamic>?> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -183,7 +263,8 @@ class _PrincipalPageState extends State<PrincipalPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ProdutosPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const ProdutosPage()),
                         );
                       },
                     ),
@@ -196,7 +277,9 @@ class _PrincipalPageState extends State<PrincipalPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const MovimentacoesEstoquePage()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const MovimentacoesEstoquePage()),
                         );
                       },
                     ),
@@ -253,7 +336,8 @@ class _PrincipalPageState extends State<PrincipalPage> {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, {required String text, required VoidCallback onPressed}) {
+  Widget _buildActionButton(BuildContext context,
+      {required String text, required VoidCallback onPressed}) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
