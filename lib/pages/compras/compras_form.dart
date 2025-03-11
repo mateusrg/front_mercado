@@ -20,6 +20,7 @@ const String apiUrl = '${Params.ipApi}:5277';
 class _CompraFormPageState extends State<CompraFormPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _quantidadeController;
+  late TextEditingController _horaController;
   bool _salvando = false;
   bool _carregando = true;
   DateTime? _dataSelecionada;
@@ -31,6 +32,9 @@ class _CompraFormPageState extends State<CompraFormPage> {
   @override
   void initState() {
     super.initState();
+    _horaController =
+        TextEditingController(text: DateFormat('HH:mm').format(DateTime.now()));
+    _dataSelecionada = DateTime.now();
     _quantidadeController = TextEditingController();
     _carregarFornecedoresEProdutos();
   }
@@ -93,10 +97,18 @@ class _CompraFormPageState extends State<CompraFormPage> {
         _salvando = true;
       });
 
+      final DateTime dataHora = DateTime(
+        _dataSelecionada!.year,
+        _dataSelecionada!.month,
+        _dataSelecionada!.day,
+        int.parse(_horaController.text.split(':')[0]),
+        int.parse(_horaController.text.split(':')[1]),
+      );
+
       final compra = {
         'idFornecedor': _fornecedorSelecionado!['idFornecedor'],
         'idProduto': _produtoSelecionado!['idProduto'],
-        'data': _dataSelecionada!.toIso8601String(),
+        'data': dataHora.toIso8601String(),
         'quantidade': _quantidadeController.text,
       };
 
@@ -129,7 +141,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
     if (_carregando) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Compra'),
+          title: const Text('Compras'),
         ),
         body: const Center(
           child: CircularProgressIndicator(),
@@ -139,7 +151,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Compra'),
+        title: const Text('Compras'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -205,32 +217,91 @@ class _CompraFormPageState extends State<CompraFormPage> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _quantidadeController,
+                decoration: const InputDecoration(labelText: 'Quantidade'),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira a quantidade';
+                  }
+                  return null;
+                },
+              ),
               Row(
                 children: [
                   Expanded(
+                    child: TextButton.icon(
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(_dataSelecionada != null
+                          ? DateFormat('dd/MM/yyyy').format(_dataSelecionada!)
+                          : 'Selecione a data'),
+                      onPressed: () => _selecionarData(context),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
                     child: TextFormField(
-                      controller: _quantidadeController,
-                      decoration:
-                          const InputDecoration(labelText: 'Quantidade'),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: _horaController,
+                      decoration: const InputDecoration(labelText: 'Hora'),
+                      keyboardType: TextInputType.datetime,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(4),
+                        TextInputFormatter.withFunction((va, vn) {
+                          final valorAntigo = va.text;
+                          final valorNovo = vn.text;
+                          final quantidade = valorNovo.length;
+
+                          if (quantidade == 1) {
+                            if (int.parse(valorNovo) <= 2) {
+                              return vn;
+                            }
+                            return const TextEditingValue(text: '');
+                          }
+
+                          if (quantidade == 2) {
+                            if (valorAntigo == '$valorNovo:') {
+                              return TextEditingValue(text: valorNovo[0]);
+                            }
+
+                            if (valorNovo[0] == '2') {
+                              if (int.parse(valorNovo[1]) < 4) {
+                                return TextEditingValue(text: '$valorNovo:');
+                              }
+                              return va;
+                            }
+                            return TextEditingValue(text: '$valorNovo:');
+                          }
+
+                          if (quantidade == 3) {
+                            if (int.parse(valorNovo[2]) > 5) {
+                              return va;
+                            }
+                            return TextEditingValue(
+                                text:
+                                    '${valorNovo.substring(0, 2)}:${valorNovo[2]}');
+                          }
+
+                          if (quantidade == 4) {
+                            return TextEditingValue(
+                                text:
+                                    '${valorNovo.substring(0, 2)}:${valorNovo.substring(2)}');
+                          }
+                          return vn;
+                        }),
+                      ],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor, insira a quantidade';
+                          return 'Insira a hora';
+                        }
+                        if (value.length != 5) {
+                          return 'Insira um horário válido';
                         }
                         return null;
                       },
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: () => _selecionarData(context),
-                  ),
-                  Text(
-                    _dataSelecionada != null
-                        ? DateFormat('dd/MM/yyyy').format(_dataSelecionada!)
-                        : 'Informe a data',
-                    style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),
@@ -247,7 +318,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
                           strokeWidth: 2.0,
                         ),
                       )
-                    : const Text('Cadastrar'),
+                    : const Text('Comprar'),
               ),
             ],
           ),

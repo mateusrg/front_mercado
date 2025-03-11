@@ -245,7 +245,10 @@ class _ComprasPageState extends State<ComprasPage> {
                             items: _produtos.map((produto) {
                               return DropdownMenuItem<Map<String, dynamic>>(
                                 value: produto,
-                                child: Text(produto['descricao']),
+                                child: Text(
+                                  produto['descricao'],
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               );
                             }).toList(),
                             onChanged: (value) {
@@ -253,14 +256,19 @@ class _ComprasPageState extends State<ComprasPage> {
                                 _produtoSelecionado = value;
                               });
                             },
+                            selectedItemBuilder: (BuildContext context) {
+                              return _produtos.map<Widget>((produto) {
+                                return Text(
+                                  produto['descricao'],
+                                  overflow: TextOverflow.ellipsis,
+                                );
+                              }).toList();
+                            },
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: _limparProduto,
-                          ),
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: _limparProduto,
                         ),
                       ],
                     ),
@@ -293,14 +301,26 @@ class _ComprasPageState extends State<ComprasPage> {
                                 _fornecedorSelecionado = value;
                               });
                             },
+                            selectedItemBuilder: (BuildContext context) {
+                              return _fornecedores.map<Widget>((fornecedor) {
+                                return Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                            0.65,
+                                  ),
+                                  child: Text(
+                                    '${fornecedor['nome']} - ${fornecedor['cnpj']}',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              }).toList();
+                            },
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: _limparFornecedor,
-                          ),
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: _limparFornecedor,
                         ),
                       ],
                     ),
@@ -390,7 +410,7 @@ class _ComprasPageState extends State<ComprasPage> {
                     itemBuilder: (context, index) {
                       final data = DateTime.parse(_compras[index]['data']);
                       final dataFormatada =
-                          DateFormat('dd/MM/yyyy').format(data);
+                          DateFormat('dd/MM/yyyy, HH:mm').format(data);
                       return ListTile(
                         leading: Text('${_compras[index]['quantidade']} un.'),
                         title: Text(_compras[index]['descricaoProduto']),

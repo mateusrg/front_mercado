@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/compras/compras_page.dart';
-import 'package:front_mercado/pages/estoque/estoque_page.dart';
+import 'package:front_mercado/pages/estoques/estoque_page.dart';
 import 'package:front_mercado/pages/fornecedores/fornecedores_page.dart';
 import 'package:front_mercado/pages/funcionarios/funcionarios_page.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
 import 'package:front_mercado/pages/principal_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_page.dart';
 import 'package:front_mercado/pages/tipos_estoque/tipos_estoque_page.dart';
-import 'package:front_mercado/pages/tipos_movimentacoes_estoque/tipos_movimentacoes_estoque_page.dart';
+import 'package:front_mercado/pages/tipos_movimentacao_estoque/tipos_movimentacao_estoque_page.dart';
 
 class DrawerFenomenos extends StatelessWidget {
   const DrawerFenomenos({super.key});
@@ -53,7 +53,7 @@ class DrawerFenomenos extends StatelessWidget {
             icon: Icons.home,
             text: 'Home',
             onTap: () => Navigator.pushReplacement(
-              context,  
+              context,
               MaterialPageRoute(builder: (context) => const PrincipalPage()),
             ),
           ),
@@ -87,7 +87,7 @@ class DrawerFenomenos extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.group,
-            text: 'Funcionarios',
+            text: 'Funcionários',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const FuncionariosPage()),
@@ -96,7 +96,7 @@ class DrawerFenomenos extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.forklift,
-            text: 'Movimentações Estoque',
+            text: 'Movimentações de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -115,7 +115,7 @@ class DrawerFenomenos extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.inventory_outlined,
-            text: 'Tipos Estoque',
+            text: 'Tipos de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const TiposEstoquePage()),
@@ -124,7 +124,7 @@ class DrawerFenomenos extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.move_down,
-            text: 'Tipos Movimentações Estoque',
+            text: 'Tipos de Movimentações de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
