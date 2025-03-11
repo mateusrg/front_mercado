@@ -286,12 +286,14 @@ class _PrincipalPageState extends State<PrincipalPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: Image.asset(
-                  'assets/images/cartaofenomenos.png',
-                  width: 200,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.0),
+                  child: Image.asset(
+                    'assets/images/cartaofenomenos.png',
+                    width: 200,
+                  ),
                 ),
               ),
             ],
