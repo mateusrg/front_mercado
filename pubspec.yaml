@@ -28,3 +28,10 @@ flutter:
     - assets/images/fenomenossm.jpg
     - assets/images/logo.png
     - assets/images/cartaofenomenos.png
+    - assets/images/avatarusuario.png
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700

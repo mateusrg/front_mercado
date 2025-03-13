@@ -101,15 +101,15 @@ class _PrincipalPageState extends State<PrincipalPage> {
                     validator: (String? email) {
                       final RegExp emailRegex = RegExp(
                           r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
-            
+
                       if (email == null || email.isEmpty) {
                         return 'Digite um e-mail';
                       }
-            
+
                       if (!emailRegex.hasMatch(email)) {
                         return 'Digite um e-mail válido';
                       }
-            
+
                       return null;
                     },
                     onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
@@ -133,8 +133,7 @@ class _PrincipalPageState extends State<PrincipalPage> {
                   ),
                   TextFormField(
                     controller: senhaController,
-                    decoration: const InputDecoration(
-                        labelText: 'Senha'),
+                    decoration: const InputDecoration(labelText: 'Senha'),
                     obscureText: true,
                     validator: (String? senha) {
                       if (senha != null && senha.isNotEmpty && senha.length < 6) {
@@ -294,8 +293,19 @@ class _PrincipalPageState extends State<PrincipalPage> {
                   borderRadius: BorderRadius.circular(16.0),
                   child: Image.asset(
                     'assets/images/cartaofenomenos.png',
-                    width: 200,
+                    width: MediaQuery.of(context).size.width * 0.9,
                   ),
+                ),
+              ),
+              const SizedBox(height: 50),
+              Text(
+                'Fenômenos SM - A rede 5 estrelas em atendimento onde qualidade e economia Brilham Muito!',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -332,9 +342,12 @@ class _PrincipalPageState extends State<PrincipalPage> {
   Widget _buildUserInfoCard(Map<String, dynamic> userInfo) {
     return Card(
       child: ListTile(
-        title: Text(userInfo['nome']),
+        leading: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: AssetImage('assets/images/avatarusuario.png'),
+        ),
+        title: Text('${userInfo['idFuncionario']} - ${userInfo['nome']}'),
         subtitle: Text(userInfo['email']),
-        leading: Text('${userInfo['idFuncionario']}'),
         trailing: Text(userInfo['setor']),
       ),
     );
