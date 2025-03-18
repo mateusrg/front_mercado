@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:front_mercado/pages/compras/compras_detalhes_page.dart';
 import 'package:front_mercado/pages/compras/compras_form.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
@@ -113,36 +114,13 @@ class _ComprasPageState extends State<ComprasPage> {
     }
   }
 
-  Future<void> _adicionarCompra(Map<String, dynamic> compra) async {
-    try {
-      final response = await http
-          .post(
-            Uri.http(apiUrl, '/Compras'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(compra),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode < 400) {
-        _listarCompras();
-      } else {
-        _mostrarErro('Erro ao adicionar compra: ${response.statusCode}');
-      }
-    } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
-    }
-  }
-
-  void _abrirFormularioCompra() {
-    Navigator.of(context).push(
+  void _abrirFormularioCompra() async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CompraFormPage(
-          onSave: (compra) async {
-            await _adicionarCompra(compra);
-          },
-        ),
+        builder: (context) => const CompraFormPage(),
       ),
     );
+    _listarCompras();
   }
 
   Future<void> _selecionarDataInicial(BuildContext context) async {
@@ -406,8 +384,11 @@ class _ComprasPageState extends State<ComprasPage> {
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: _compras.length,
+                    itemCount: _compras.length + 1,
                     itemBuilder: (context, index) {
+                      if (index == _compras.length) {
+                        return const SizedBox(height: 64);
+                      }
                       final data = DateTime.parse(_compras[index]['data']);
                       final dataFormatada =
                           DateFormat('dd/MM/yyyy, HH:mm').format(data);
@@ -416,6 +397,15 @@ class _ComprasPageState extends State<ComprasPage> {
                         title: Text(_compras[index]['descricaoProduto']),
                         subtitle: Text(_compras[index]['nomeFornecedor']),
                         trailing: Text(dataFormatada),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => CompraDetalhesPage(
+                                compra: _compras[index],
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

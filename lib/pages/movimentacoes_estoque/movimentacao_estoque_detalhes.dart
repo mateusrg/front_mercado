@@ -8,296 +8,101 @@ class MovimentacaoDetalhesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final data = DateTime.parse(movimentacao['dataHora']);
+    final dataFormatada = DateFormat('dd/MM/yyyy, HH:mm').format(data);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalhes da Movimentação'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.inventory),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'Movimentação',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Tipo: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text:
-                                  movimentacao['descricaoMovimentacaoEstoque']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Quantidade: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(text: movimentacao['quantidade'].toString()),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Data: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text: DateFormat('dd/MM/yyyy').format(
-                                  DateTime.parse(movimentacao['dataHora']))),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Hora: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text: DateFormat('HH:mm').format(
-                                  DateTime.parse(movimentacao['dataHora']))),
-                        ],
-                      ),
-                    ),
-                  ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.inventory),
+                  title: const Text('Movimentação'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Tipo: ${movimentacao['descricaoMovimentacaoEstoque']}'),
+                      Text('Quantidade: ${movimentacao['quantidade'].abs()}'),
+                      Text('Data: $dataFormatada'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.shopping_bag),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'Produto',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Descrição: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(text: movimentacao['descricaoProduto']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Código de Barras: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(text: movimentacao['codBarrasProduto']),
-                        ],
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 8),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.shopping_bag),
+                  title: const Text('Produto'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Descrição: ${movimentacao['descricaoProduto']}'),
+                      Text(
+                          'Código de Barras: ${movimentacao['codBarrasProduto']}'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.warehouse),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'Estoque',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Descrição: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(text: movimentacao['descricaoEstoque']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Tipo: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(text: movimentacao['descricaoTipoEstoque']),
-                        ],
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 8),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.warehouse),
+                  title: const Text('Estoque'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Descrição: ${movimentacao['descricaoEstoque']}'),
+                      Text('Tipo: ${movimentacao['descricaoTipoEstoque']}'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.person),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'Solicitador',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Nome: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text: movimentacao['nomeFuncionarioSolicitador']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Setor: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text:
-                                  movimentacao['setorFuncionarioSolicitador']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Email: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text:
-                                  movimentacao['emailFuncionarioSolicitador']),
-                        ],
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 8),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.person),
+                  title: const Text('Funcionário Solicitador'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Nome: ${movimentacao['nomeFuncionarioSolicitador']}'),
+                      Text(
+                          'Setor: ${movimentacao['setorFuncionarioSolicitador']}'),
+                      Text(
+                          'Email: ${movimentacao['emailFuncionarioSolicitador']}'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.person_outline),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'Autenticador',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Nome: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text:
-                                  movimentacao['nomeFuncionarioAutenticador']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Setor: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text:
-                                  movimentacao['setorFuncionarioAutenticador']),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Email: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text:
-                                  movimentacao['emailFuncionarioAutenticador']),
-                        ],
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 8),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.person_outline),
+                  title: const Text('Funcionário Autenticador'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Nome: ${movimentacao['nomeFuncionarioAutenticador']}'),
+                      Text(
+                          'Setor: ${movimentacao['setorFuncionarioAutenticador']}'),
+                      Text(
+                          'Email: ${movimentacao['emailFuncionarioAutenticador']}'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

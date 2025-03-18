@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  'Bem Vindos ao sistema Fenômenos SM',
+                  'Bem-vindo ao\nFenômenos SM',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
@@ -82,7 +82,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           obscureText: true,
                           validator: _validarSenha,
-                          onFieldSubmitted: (_) => _validarLogin(), // Adicionado para executar ao pressionar Enter
+                          onFieldSubmitted: (_) =>
+                              _validarLogin(), // Adicionado para executar ao pressionar Enter
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton(

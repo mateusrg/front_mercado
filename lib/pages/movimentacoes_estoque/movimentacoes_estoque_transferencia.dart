@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacao_estoque_dialog_produtos.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,9 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
 class TransferenciaEstoquePage extends StatefulWidget {
-  final Future<void> Function(Map<String, dynamic>) onSave;
-
-  const TransferenciaEstoquePage({super.key, required this.onSave});
+  const TransferenciaEstoquePage({super.key});
 
   @override
   State<TransferenciaEstoquePage> createState() =>
@@ -126,7 +125,6 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
         );
 
         if (response.statusCode == 200) {
-          await widget.onSave(movimentacao);
           Navigator.of(context).pop();
         } else if (response.statusCode == 400) {
           _mostrarErro('Quantidade insuficiente em estoque.');
@@ -168,6 +166,25 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
     );
   }
 
+  void _abrirDialogPesquisaProduto() async {
+    Map<String, dynamic>? produtoSelecionado = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DialogPesquisaProduto();
+      },
+    );
+    if (produtoSelecionado != null) {
+      for (var produto in _produtos) {
+        if (produto['idProduto'] == produtoSelecionado['idProduto']) {
+          setState(() {
+            _produtoSelecionado = produto;
+          });
+          break;
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_carregando) {
@@ -192,34 +209,47 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
             key: _formKey,
             child: Column(
               children: <Widget>[
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _produtoSelecionado,
-                  decoration: const InputDecoration(labelText: 'Produto'),
-                  items: _produtos.map((produto) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: produto,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.8,
-                        ),
-                        child: Text(
-                          '${produto['descricao']} - ${produto['codBarras']}',
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _produtoSelecionado,
+                        decoration: const InputDecoration(labelText: 'Produto'),
+                        items: _produtos.map((produto) {
+                          return DropdownMenuItem<Map<String, dynamic>>(
+                            value: produto,
+                            child: Container(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.8 -
+                                        32,
+                              ),
+                              child: Text(
+                                '${produto['descricao']} - ${produto['codBarras']}',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          print(value);
+                          setState(() {
+                            _produtoSelecionado = value;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Por favor, selecione um produto';
+                          }
+                          return null;
+                        },
                       ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _produtoSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um produto';
-                    }
-                    return null;
-                  },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: _abrirDialogPesquisaProduto,
+                    ),
+                  ],
                 ),
                 TextFormField(
                   controller: _quantidadeController,

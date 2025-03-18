@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/estoques/estoques_detalhes_page.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
@@ -154,12 +155,21 @@ class _EstoquePageState extends State<EstoquePage> {
                     itemCount: _estoque.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: ListTile(
                           title: Text(_estoque[index]['descricaoEstoque']),
                           leading: Text('${_estoque[index]['idEstoque']}'),
                           trailing:
                               Text(_estoque[index]['descricaoTipoEstoque']),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => EstoqueDetalhesPage(
+                                  estoque: _estoque[index],
+                                ),
+                              ),
+                            );  
+                          }
                         ),
                       );
                     }),

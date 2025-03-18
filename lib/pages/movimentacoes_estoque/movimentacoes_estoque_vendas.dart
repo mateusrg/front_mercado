@@ -7,9 +7,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VendaPage extends StatefulWidget {
-  final Future<void> Function(Map<String, dynamic>) onSave;
-
-  const VendaPage({super.key, required this.onSave});
+  const VendaPage({super.key});
 
   @override
   State<VendaPage> createState() => _VendaPageState();
@@ -88,18 +86,18 @@ class _VendaPageState extends State<VendaPage> {
 
       final venda = {
         'idProduto': _produtoSelecionado!['idProduto'],
-        'quantidade': -int.parse(_quantidadeController.text),
+        'quantidade': int.parse(_quantidadeController.text),
         'idFuncionarioSolicitador':
             _funcionarioSolicitadorSelecionado!['idFuncionario'],
         'idFuncionarioAutenticador':
             _funcionarioAutenticadorSelecionado!['idFuncionario'],
         'dataHora':
             '${DateFormat('yyyy-MM-dd').format(_dataSelecionada!)}T${_horaController.text}:00.000Z',
-        'idTipoMovimentacaoEstoque': 2,
+        'idEstoque': 2,
       };
 
       try {
-        await widget.onSave(venda);
+        await _vender(venda);
         Navigator.of(context).pop();
       } catch (e) {
         _mostrarErro('Não foi possível se conectar com a API.');
@@ -342,6 +340,24 @@ class _VendaPageState extends State<VendaPage> {
       setState(() {
         _dataSelecionada = selecionado;
       });
+    }
+  }
+
+  Future<void> _vender(Map<String, dynamic> venda) async {
+    try {
+      final response = await http
+          .post(
+            Uri.http(urlApi, 'MovimentacoesEstoque/venderProduto'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(venda),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode >= 400) {
+        _mostrarErro('Erro ao vender produto: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API.');
     }
   }
 }

@@ -20,7 +20,7 @@ class MovimentacoesEstoquePage extends StatefulWidget {
 }
 
 class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  final String urlApi = '${Params.ipApi}:5277';
   List<Map<String, dynamic>> _movimentacoes = [];
   bool _carregando = false;
 
@@ -37,7 +37,7 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
 
     try {
       final response =
-          await http.get(Uri.http(apiUrl, '/MovimentacoesEstoque/view'));
+          await http.get(Uri.http(urlApi, '/MovimentacoesEstoque/view'));
       if (response.statusCode == 200) {
         setState(() {
           _movimentacoes =
@@ -64,60 +64,31 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
     );
   }
 
-  void _abrirFormularioVenda() {
-    Navigator.of(context).push(
+  void _abrirFormularioVenda() async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => VendaPage(
-          onSave: (venda) async {
-            await _adicionarMovimentacao(venda);
-          },
-        ),
+        builder: (context) => const VendaPage(),
       ),
     );
+    _listarMovimentacoes();
   }
 
-  void _abrirFormularioTransferencia() {
-    Navigator.of(context).push(
+  void _abrirFormularioTransferencia() async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TransferenciaEstoquePage(
-          onSave: (transferencia) async {
-            await _adicionarMovimentacao(transferencia);
-          },
-        ),
+        builder: (context) => const TransferenciaEstoquePage(),
       ),
     );
+    _listarMovimentacoes();
   }
 
-  void _abrirFormularioCompras() {
-    Navigator.of(context).push(
+  void _abrirFormularioCompras() async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CompraFormPage(
-          onSave: (compra) async {
-            await _adicionarMovimentacao(compra);
-          },
-        ),
+        builder: (context) => const CompraFormPage(),
       ),
     );
-  }
-
-  Future<void> _adicionarMovimentacao(Map<String, dynamic> movimentacao) async {
-    try {
-      final response = await http
-          .post(
-            Uri.http(apiUrl, '/MovimentacoesEstoque'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(movimentacao),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode < 400) {
-        _listarMovimentacoes();
-      } else {
-        _mostrarErro('Erro ao adicionar movimentação: ${response.statusCode}');
-      }
-    } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
-    }
+    _listarMovimentacoes();
   }
 
   @override
@@ -188,7 +159,9 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
             child: const Icon(Icons.add_shopping_cart),
             backgroundColor: const Color.fromARGB(255, 0, 39, 118),
             label: 'Cadastrar Compra',
-            onTap: _abrirFormularioCompras,
+            onTap: () {
+              _abrirFormularioCompras();
+            },
           ),
         ],
       ),
