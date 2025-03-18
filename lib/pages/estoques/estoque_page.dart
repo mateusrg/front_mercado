@@ -4,7 +4,6 @@ import 'package:front_mercado/pages/estoques/estoques_detalhes_page.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class EstoquePage extends StatefulWidget {
   const EstoquePage({super.key});
@@ -16,10 +15,9 @@ class EstoquePage extends StatefulWidget {
 class _EstoquePageState extends State<EstoquePage> {
   final String apiUrl = '${Params.ipApi}:5277';
   List<Map<String, dynamic>> _estoque = [];
+  List<Map<String, dynamic>> _estoqueFiltrado = [];
   final TextEditingController _pesquisaController = TextEditingController();
-  Map<String, dynamic>? _estoqueSelecionado;
   bool _carregando = false;
-  bool _mostrarFiltro = false;
 
   @override
   void initState() {
@@ -53,6 +51,7 @@ class _EstoquePageState extends State<EstoquePage> {
         setState(() {
           _estoque =
               List<Map<String, dynamic>>.from(json.decode(response.body));
+          _estoqueFiltrado = _estoque;  // Inicializa com todos os itens
           _carregando = false;
         });
       } else {
@@ -69,19 +68,20 @@ class _EstoquePageState extends State<EstoquePage> {
     }
   }
 
-  Future<void> _carregandoEstoques() async {
-    final response = await http.get(Uri.http(apiUrl, '/Produtos'));
-    if (response.statusCode == 200) {
-      setState(() {
-        _estoque = List<Map<String, dynamic>>.from(json.decode(response.body));
-      });
-    } else {
-      _mostrarErro('Erro ao carregar produtos: ${response.statusCode}');
-    }
-  }
-
   void _pesquisarEstoque() {
-    _listarEstoque(_pesquisaController.text);
+    String query = _pesquisaController.text.toLowerCase();
+
+    setState(() {
+      if (query.isEmpty) {
+        _estoqueFiltrado = _estoque; // Se não houver pesquisa, mostra todos os itens
+      } else {
+        _estoqueFiltrado = _estoque
+            .where((estoque) => estoque['descricaoEstoque']
+                .toLowerCase()
+                .contains(query))
+            .toList(); // Filtra a lista por descrição
+      }
+    });
   }
 
   void _mostrarErro(String mensagem) {
@@ -93,72 +93,45 @@ class _EstoquePageState extends State<EstoquePage> {
     );
   }
 
-  void _toggleFiltro() {
-    setState(() {
-      _mostrarFiltro = !_mostrarFiltro;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Estoques'),
-        actions: [
-          IconButton(
-            onPressed: _toggleFiltro,
-            icon: const Icon(Icons.filter_list),
-          ),
-        ],
       ),
       drawer: const DrawerFenomenos(),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                if (_mostrarFiltro)
-                  Card(
-                    margin: const EdgeInsets.all(8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          DropdownButtonFormField<Map<String, dynamic>>(
-                            value: _estoqueSelecionado,
-                            decoration:
-                                const InputDecoration(labelText: 'Estoques'),
-                            items: _estoque.map((estoque) {
-                              return DropdownMenuItem<Map<String, dynamic>>(
-                                value: estoque,
-                                child: Text(estoque['descricao']),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _estoqueSelecionado = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-              ],
+            child: TextField(
+              controller: _pesquisaController,
+              decoration: InputDecoration(
+                labelText: 'Pesquisar por Descrição',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: _pesquisarEstoque,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (text) {
+                _pesquisarEstoque(); // Atualiza a pesquisa enquanto o usuário digita
+              },
             ),
           ),
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: _estoque.length,
+                    itemCount: _estoqueFiltrado.length,
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: EdgeInsets.all(8.0),
                         child: ListTile(
-                          title: Text(_estoque[index]['descricaoEstoque']),
-                          leading: Text('${_estoque[index]['idEstoque']}'),
+                          title: Text(_estoqueFiltrado[index]['descricaoEstoque']),
+                          leading: Text('${_estoqueFiltrado[index]['idEstoque']}'),
                           trailing:
                               Text(_estoque[index]['descricaoTipoEstoque']),
                           onTap: () {

@@ -7,6 +7,7 @@ import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 
 class PrincipalPage extends StatefulWidget {
   const PrincipalPage({super.key});
@@ -101,15 +102,15 @@ class _PrincipalPageState extends State<PrincipalPage> {
                     validator: (String? email) {
                       final RegExp emailRegex = RegExp(
                           r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
-            
+
                       if (email == null || email.isEmpty) {
                         return 'Digite um e-mail';
                       }
-            
+
                       if (!emailRegex.hasMatch(email)) {
                         return 'Digite um e-mail válido';
                       }
-            
+
                       return null;
                     },
                     onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
@@ -133,11 +134,12 @@ class _PrincipalPageState extends State<PrincipalPage> {
                   ),
                   TextFormField(
                     controller: senhaController,
-                    decoration: const InputDecoration(
-                        labelText: 'Senha'),
+                    decoration: const InputDecoration(labelText: 'Senha'),
                     obscureText: true,
                     validator: (String? senha) {
-                      if (senha != null && senha.isNotEmpty && senha.length < 6) {
+                      if (senha != null &&
+                          senha.isNotEmpty &&
+                          senha.length < 6) {
                         return 'A senha deve ter pelo menos 6 caracteres';
                       }
                       return null;
@@ -178,49 +180,50 @@ class _PrincipalPageState extends State<PrincipalPage> {
   }
 
   Future<void> _salvarEdicaoFuncionario(
-    BuildContext context,
-    Map<String, dynamic> userInfo,
-    TextEditingController nomeController,
-    TextEditingController emailController,
-    TextEditingController setorController,
-    TextEditingController senhaController) async {
-  if (_formKey.currentState!.validate()) {
-    // Atualizar os dados editados
-    userInfo['nome'] = nomeController.text;
-    userInfo['email'] = emailController.text;
-    userInfo['setor'] = setorController.text;
+      BuildContext context,
+      Map<String, dynamic> userInfo,
+      TextEditingController nomeController,
+      TextEditingController emailController,
+      TextEditingController setorController,
+      TextEditingController senhaController) async {
+    if (_formKey.currentState!.validate()) {
+      // Atualizar os dados editados
+      userInfo['nome'] = nomeController.text;
+      userInfo['email'] = emailController.text;
+      userInfo['setor'] = setorController.text;
 
-    // Só adiciona a senha se o campo não estiver vazio
-    if (senhaController.text.isNotEmpty) {
-      userInfo['senha'] = senhaController.text;
-    }
-
-    try {
-      final response = await http.put(
-        Uri.http(apiUrl, '/Funcionarios'),
-        headers: {'Content-Type': 'application/json'},
-        body: convert.jsonEncode(userInfo),
-      );
-
-      if (response.statusCode < 400) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('usuarioLogado', convert.jsonEncode(userInfo));
-
-        // Fechar o diálogo
-        Navigator.of(context).pop();
-
-        // Atualizar a interface
-        setState(() {});
-
-        print('Informações do usuário atualizadas: $userInfo'); // Log para depuração
-      } else {
-        _mostrarErro('Erro ao atualizar funcionário: ${response.statusCode}');
+      // Só adiciona a senha se o campo não estiver vazio
+      if (senhaController.text.isNotEmpty) {
+        userInfo['senha'] = senhaController.text;
       }
-    } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
+
+      try {
+        final response = await http.put(
+          Uri.http(apiUrl, '/Funcionarios'),
+          headers: {'Content-Type': 'application/json'},
+          body: convert.jsonEncode(userInfo),
+        );
+
+        if (response.statusCode < 400) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('usuarioLogado', convert.jsonEncode(userInfo));
+
+          // Fechar o diálogo
+          Navigator.of(context).pop();
+
+          // Atualizar a interface
+          setState(() {});
+
+          print(
+              'Informações do usuário atualizadas: $userInfo'); // Log para depuração
+        } else {
+          _mostrarErro('Erro ao atualizar funcionário: ${response.statusCode}');
+        }
+      } catch (e) {
+        _mostrarErro('Não foi possível se conectar com a API.');
+      }
     }
   }
-}
 
   void _mostrarErro(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -294,8 +297,48 @@ class _PrincipalPageState extends State<PrincipalPage> {
                   borderRadius: BorderRadius.circular(16.0),
                   child: Image.asset(
                     'assets/images/cartaofenomenos.png',
-                    width: 200,
+                    width: MediaQuery.of(context).size.width * 0.9,
                   ),
+                ),
+              ),
+              const SizedBox(height: 50),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  children: [
+                    Text(
+                      'Fenômenos SM',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 40, 
+                        fontWeight: FontWeight.bold,
+                        color: Colors.cyanAccent,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 5.0,
+                            color: const Color.fromARGB(255, 151, 147, 147),
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      'A Rede 5 estrelas em atendimento onde qualidade e economia brilham muito!',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18, 
+                        fontWeight: FontWeight.bold,
+                        color: Colors.cyan,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 5.0,
+                            color: const Color.fromARGB(255, 92, 91, 91),
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -332,9 +375,12 @@ class _PrincipalPageState extends State<PrincipalPage> {
   Widget _buildUserInfoCard(Map<String, dynamic> userInfo) {
     return Card(
       child: ListTile(
-        title: Text(userInfo['nome']),
+        leading: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: const AssetImage('assets/images/logo.png'),
+        ),
+        title: Text('${userInfo['idFuncionario']} - ${userInfo['nome']}'),
         subtitle: Text(userInfo['email']),
-        leading: Text('${userInfo['idFuncionario']}'),
         trailing: Text(userInfo['setor']),
       ),
     );
