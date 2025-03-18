@@ -238,7 +238,7 @@ class _PrincipalPageState extends State<PrincipalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Home'),
       floatingActionButton: _buildFloatingActionButton(context),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _informacoesUsuarioLogado(),

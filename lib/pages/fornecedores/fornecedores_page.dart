@@ -135,7 +135,7 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
       appBar: AppBar(
         title: const Text('Fornecedores'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Fornecedores'),
       body: Column(
         children: [
           Padding(

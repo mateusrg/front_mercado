@@ -99,7 +99,7 @@ class _EstoquePageState extends State<EstoquePage> {
       appBar: AppBar(
         title: const Text('Estoques'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Estoques'),
       body: Column(
         children: [
           Padding(

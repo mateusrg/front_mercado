@@ -134,7 +134,7 @@ class _TiposMovimentacoesEstoquePageState extends State<TiposMovimentacoesEstoqu
       appBar: AppBar(
         title: const Text('Tipos Movimentações Estoque'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Tipos de Movimentações de Estoque'),
       body: Column(
         children: [
           Padding(

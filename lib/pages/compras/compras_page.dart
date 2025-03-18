@@ -203,7 +203,7 @@ class _ComprasPageState extends State<ComprasPage> {
           ),
         ],
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Compras'),
       body: Column(
         children: [
           if (_mostrarFiltro)

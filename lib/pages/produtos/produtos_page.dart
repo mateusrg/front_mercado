@@ -136,7 +136,7 @@ class _ProdutosPageState extends State<ProdutosPage> {
       appBar: AppBar(
         title: const Text('Produtos'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Produtos'),
       body: Column(
         children: [
           Padding(

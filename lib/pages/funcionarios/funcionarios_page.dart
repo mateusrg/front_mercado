@@ -110,7 +110,7 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
       appBar: AppBar(
         title: const Text('Funcionarios'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Funcionarios'),
       body: Column(
         children: [
           Padding(
