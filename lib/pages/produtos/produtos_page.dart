@@ -121,12 +121,14 @@ class _ProdutosPageState extends State<ProdutosPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(mensagem),
         backgroundColor: Colors.red,
       ),
     );
+    } catch (e) {}
   }
 
   Widget build(BuildContext context) {
