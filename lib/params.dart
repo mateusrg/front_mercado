@@ -1,5 +1,5 @@
 class Params {
-  static const String ipApi = teleconMateus;
+  static const String ipApi = "10.1.90.248";
 }
 
 const teleconMateus = '192.168.230.122';

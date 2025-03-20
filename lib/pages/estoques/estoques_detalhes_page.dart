@@ -127,7 +127,7 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
                                         : movimentacoesRecentes.length);
                                 i++)
                               Text(
-                                  '${DateFormat('dd/MM/yy hh,mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}: ${movimentacoesRecentes[i]['quantidade'].abs()} ${movimentacoesRecentes[i]['descricaoProduto']} (${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']})'),
+                                  '${DateFormat('dd/MM/yy hh:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}: ${movimentacoesRecentes[i]['quantidade'].abs()} ${movimentacoesRecentes[i]['descricaoProduto']} (${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']})'),
                             if (movimentacoesRecentes.length > 3)
                               const Text('E mais...'),
                           ],
