@@ -1,5 +1,7 @@
 import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/compras/compras_form.dart';
+import 'package:front_mercado/pages/compras/compras_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_page.dart';
@@ -290,6 +292,17 @@ class _PrincipalPageState extends State<PrincipalPage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 2), // Espaçamento entre os botões
+              _buildActionButton(
+                context,
+                text: 'Nova Compra',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CompraFormPage()),
+                  );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
