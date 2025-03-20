@@ -10,7 +10,9 @@ import 'package:front_mercado/pages/tipos_estoque/tipos_estoque_page.dart';
 import 'package:front_mercado/pages/tipos_movimentacao_estoque/tipos_movimentacao_estoque_page.dart';
 
 class DrawerFenomenos extends StatelessWidget {
-  const DrawerFenomenos({super.key});
+  const DrawerFenomenos(this.pagina, {super.key});
+
+  final String pagina;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.home,
             text: 'Home',
+            isSelected: pagina == 'Home',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const PrincipalPage()),
@@ -61,6 +64,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.shopping_cart,
             text: 'Compras',
+            isSelected: pagina == 'Compras',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const ComprasPage()),
@@ -70,6 +74,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.inventory_2_outlined,
             text: 'Estoques',
+            isSelected: pagina == 'Estoques',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const EstoquePage()),
@@ -79,6 +84,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.fire_truck_outlined,
             text: 'Fornecedores',
+            isSelected: pagina == 'Fornecedores',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const FornecedoresPage()),
@@ -88,6 +94,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.group,
             text: 'Funcionários',
+            isSelected: pagina == 'Funcionarios',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const FuncionariosPage()),
@@ -97,6 +104,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.forklift,
             text: 'Movimentações de Estoque',
+            isSelected: pagina == 'Movimentações de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -107,6 +115,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.sell_outlined,
             text: 'Produtos',
+            isSelected: pagina == 'Produtos',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const ProdutosPage()),
@@ -116,6 +125,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.inventory_outlined,
             text: 'Tipos de Estoque',
+            isSelected: pagina == 'Tipos de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const TiposEstoquePage()),
@@ -125,6 +135,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.move_down,
             text: 'Tipos de Movimentações de Estoque',
+            isSelected: pagina == 'Tipos de Movimentações de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -136,14 +147,26 @@ class DrawerFenomenos extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context,
-      {required IconData icon,
-      required String text,
-      required GestureTapCallback onTap}) {
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String text,
+    required bool isSelected,
+    required GestureTapCallback onTap,
+  }) {
     return ListTile(
-      title: Text(text),
-      leading: Icon(icon),
-      onTap: onTap,
+      title: Text(
+        text,
+        style: TextStyle(
+          color: isSelected ? Colors.cyan : null,
+          fontWeight: isSelected ? FontWeight.bold : null,
+        ),
+      ),
+      leading: Icon(
+        icon,
+        color: isSelected ? Colors.cyan : null,
+      ),
+      onTap: isSelected ? null : onTap,
     );
   }
 }

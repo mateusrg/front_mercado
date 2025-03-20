@@ -134,7 +134,7 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
       appBar: AppBar(
         title: const Text('Tipos Estoque'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Tipos de Estoque'),
       body: Column(
         children: [
           Padding(

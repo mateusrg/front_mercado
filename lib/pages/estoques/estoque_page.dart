@@ -16,17 +16,43 @@ class _EstoquePageState extends State<EstoquePage> {
   final String apiUrl = '${Params.ipApi}:5277';
   List<Map<String, dynamic>> _estoque = [];
   List<Map<String, dynamic>> _estoqueFiltrado = [];
+  List<Map<String, dynamic>> _tiposEstoque = [];
+  String? _tipoSelecionado;
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
 
   @override
   void initState() {
-    _carregandoEstoquesETiposEstoque();
+    _carregarTiposEstoqueEListar();
     super.initState();
   }
 
-  Future<void> _carregandoEstoquesETiposEstoque() async {
+  _carregarTiposEstoqueEListar() async {
+    await _carregarTiposEstoque();
     await _listarEstoque();
+  }
+
+  Future<void> _carregarTiposEstoque() async {
+    try {
+      final response = await http.get(
+        Uri.http(apiUrl, '/TiposEstoque'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _tiposEstoque = [
+            {'descricao': 'Todos'} // Adiciona a opção "Todos"
+          ];
+          _tiposEstoque.addAll(
+              List<Map<String, dynamic>>.from(json.decode(response.body)));
+        });
+      } else {
+        _mostrarErro('Erro ao carregar tipos de estoque: ${response.statusCode}');
+      }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API.');
+    }
   }
 
   Future<void> _listarEstoque([String? query]) async {
@@ -68,19 +94,19 @@ class _EstoquePageState extends State<EstoquePage> {
     }
   }
 
-  void _pesquisarEstoque() {
+  void _filtrarEstoque() {
     String query = _pesquisaController.text.toLowerCase();
 
     setState(() {
-      if (query.isEmpty) {
-        _estoqueFiltrado = _estoque; // Se não houver pesquisa, mostra todos os itens
-      } else {
-        _estoqueFiltrado = _estoque
-            .where((estoque) => estoque['descricaoEstoque']
-                .toLowerCase()
-                .contains(query))
-            .toList(); // Filtra a lista por descrição
-      }
+      _estoqueFiltrado = _estoque.where((estoque) {
+        final descricaoMatch = estoque['descricaoEstoque']
+            .toLowerCase()
+            .contains(query);
+        final tipoMatch = _tipoSelecionado == null ||
+            _tipoSelecionado == 'Todos' || // Inclui todos os estoques
+            estoque['descricaoTipoEstoque'] == _tipoSelecionado;
+        return descricaoMatch && tipoMatch;
+      }).toList();
     });
   }
 
@@ -99,26 +125,51 @@ class _EstoquePageState extends State<EstoquePage> {
       appBar: AppBar(
         title: const Text('Estoques'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Estoques'),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _pesquisaController,
-              decoration: InputDecoration(
-                labelText: 'Pesquisar por Descrição',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _pesquisarEstoque,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _pesquisaController,
+                    decoration: InputDecoration(
+                      labelText: 'Pesquisar por Descrição',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: _filtrarEstoque, // Pesquisa ao clicar na lupa
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onSubmitted: (_) => _filtrarEstoque(), // Pesquisa ao pressionar Enter
+                  ),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _tipoSelecionado,
+                    decoration: const InputDecoration(
+                      labelText: 'Tipo de Estoque',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: _tiposEstoque.map((tipo) {
+                      return DropdownMenuItem<String>(
+                        value: tipo['descricao'],
+                        child: Text(tipo['descricao']),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _tipoSelecionado = value;
+                      });
+                    },
+                  ),
                 ),
-              ),
-              onChanged: (text) {
-                _pesquisarEstoque(); // Atualiza a pesquisa enquanto o usuário digita
-              },
+              ],
             ),
           ),
           Expanded(
@@ -128,24 +179,24 @@ class _EstoquePageState extends State<EstoquePage> {
                     itemCount: _estoqueFiltrado.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: ListTile(
                           title: Text(_estoqueFiltrado[index]['descricaoEstoque']),
                           leading: Text('${_estoqueFiltrado[index]['idEstoque']}'),
-                          trailing:
-                              Text(_estoque[index]['descricaoTipoEstoque']),
+                          trailing: Text(_estoqueFiltrado[index]['descricaoTipoEstoque']),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => EstoqueDetalhesPage(
-                                  estoque: _estoque[index],
+                                  estoque: _estoqueFiltrado[index],
                                 ),
                               ),
-                            );  
-                          }
+                            );
+                          },
                         ),
                       );
-                    }),
+                    },
+                  ),
           ),
         ],
       ),

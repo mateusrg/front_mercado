@@ -97,7 +97,7 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
       appBar: AppBar(
         title: const Text('Movimentações de Estoque'),
       ),
-      drawer: const DrawerFenomenos(),
+      drawer: const DrawerFenomenos('Movimentações de Estoque'),
       body: Column(
         children: [
           Expanded(
