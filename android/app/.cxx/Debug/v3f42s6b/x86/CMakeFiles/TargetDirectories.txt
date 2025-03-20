@@ -1,0 +1,2 @@
+C:/projetos/front_mercado/android/app/.cxx/Debug/v3f42s6b/x86/CMakeFiles/edit_cache.dir
+C:/projetos/front_mercado/android/app/.cxx/Debug/v3f42s6b/x86/CMakeFiles/rebuild_cache.dir

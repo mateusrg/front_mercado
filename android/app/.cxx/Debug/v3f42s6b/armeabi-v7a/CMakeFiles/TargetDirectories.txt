@@ -1,0 +1,2 @@
+C:/projetos/front_mercado/android/app/.cxx/Debug/v3f42s6b/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/projetos/front_mercado/android/app/.cxx/Debug/v3f42s6b/armeabi-v7a/CMakeFiles/rebuild_cache.dir

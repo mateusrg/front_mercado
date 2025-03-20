@@ -6,6 +6,8 @@ import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:material_symbols_icons/symbols.dart';
+
 class ProdutosPage extends StatefulWidget {
   const ProdutosPage({super.key});
 
@@ -107,6 +109,10 @@ class _ProdutosPageState extends State<ProdutosPage> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.search),
+                  onPressed: _pesquisarProdutos,
+                ),
+                IconButton(
+                  icon: const Icon(Symbols.barcode_scanner),
                   onPressed: _pesquisarProdutos,
                 ),
               ],
