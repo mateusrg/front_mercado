@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/estoques/estoques_form.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -199,6 +200,22 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () async {
+          final resultado = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EstoquesFormPage(estoque: widget.estoque),
+            ),
+          );
+
+          if (resultado == true) {
+            setState(() {
+              carregarProdutosEMovimentacoesRecentes();
+            });
+          }
+        },
       ),
     );
   }

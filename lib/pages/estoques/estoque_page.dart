@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/estoques/estoques_detalhes_page.dart';
+import 'package:front_mercado/pages/estoques/estoques_form.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
@@ -66,7 +67,7 @@ class _EstoquePageState extends State<EstoquePage> {
             Uri.http(
                 apiUrl,
                 query != null && query != ''
-                    ? '/Estoques/$query'
+                    ? '/Estoques'
                     : '/Estoques/tipo-estoque'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(<String, String>{'key': 'value'}),
@@ -119,6 +120,15 @@ class _EstoquePageState extends State<EstoquePage> {
     );
   }
 
+  void _abrirFormularioCompra() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const EstoquesFormPage(),
+      ),
+    );
+    _listarEstoque();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,6 +176,7 @@ class _EstoquePageState extends State<EstoquePage> {
                       setState(() {
                         _tipoSelecionado = value;
                       });
+                      _filtrarEstoque();
                     },
                   ),
                 ),
@@ -200,6 +211,89 @@ class _EstoquePageState extends State<EstoquePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _abrirFormularioCompra,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class _CadastroEstoqueDialog extends StatefulWidget {
+  final List<Map<String, dynamic>> tiposEstoque;
+
+  const _CadastroEstoqueDialog({required this.tiposEstoque, super.key});
+
+  @override
+  State<_CadastroEstoqueDialog> createState() => _CadastroEstoqueDialogState();
+}
+
+class _CadastroEstoqueDialogState extends State<_CadastroEstoqueDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _descricaoController = TextEditingController();
+  String? _tipoSelecionado;
+
+  Future<void> _salvarEstoque() async {
+    if (_formKey.currentState!.validate()) {
+      // Simula o envio para a API
+      Navigator.of(context).pop(true); // Retorna sucesso
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Cadastrar Estoque'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _descricaoController,
+              decoration: const InputDecoration(labelText: 'Descrição'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira a descrição';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16.0),
+            DropdownButtonFormField<String>(
+              value: _tipoSelecionado,
+              decoration: const InputDecoration(labelText: 'Tipo de Estoque'),
+              items: widget.tiposEstoque.map((tipo) {
+                return DropdownMenuItem<String>(
+                  value: tipo['descricao'],
+                  child: Text(tipo['descricao']),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _tipoSelecionado = value;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, selecione um tipo de estoque';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: _salvarEstoque,
+          child: const Text('Salvar'),
+        ),
+      ],
     );
   }
 }
