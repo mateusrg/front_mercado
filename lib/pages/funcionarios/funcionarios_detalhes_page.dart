@@ -53,67 +53,88 @@ class _FuncionariosDetalhesPageState extends State<FuncionariosDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.person),
-                  title: const Text('Funcionário'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text('Nome: ${widget.funcionario['nome']}'),
-                      Text('Setor: ${widget.funcionario['setor']}'),
-                      Text('Email: ${widget.funcionario['email']}'),
+                      const ListTile(
+                        leading: Icon(Icons.person, color: Colors.cyan),
+                        title: Text('Funcionário'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.person_outline,
+                          color: Colors.cyan.withValues(alpha: 0.5),
+                        ),
+                        title: Text(widget.funcionario['nome']),
+                        subtitle: Text(widget.funcionario['email']),
+                        trailing: Text(widget.funcionario['setor']),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: Column(
-                  children: [
-                    const ListTile(
-                      leading: const Icon(Icons.history),
-                      title: const Text('Movimentações de Estoque'),
-                    ),
-                    carregandoMovimentacoes
-                        ? const Center(child: CircularProgressIndicator())
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              for (int i = 0;
-                                  i <
-                                      (movimentacoes.length > 3
-                                          ? 3
-                                          : movimentacoes.length);
-                                  i++)
-                                ListTile(
-                                  leading: movimentacoes[i]
-                                              ['idFuncionarioSolicitador'] ==
-                                          widget.funcionario['idFuncionario']
-                                      ? const Icon(
-                                          Icons.vpn_key_outlined,
-                                          color: Colors.yellow,
-                                        )
-                                      : const Icon(
-                                          Icons.description_outlined,
-                                          color: Colors.green,
-                                        ),
-                                  title: Text(
-                                    movimentacoes[i]['descricaoProduto'],
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
+                    children: [
+                      const ListTile(
+                        leading: Icon(Icons.history, color: Colors.cyan),
+                        title: Text('Movimentações de Estoque'),
+                      ),
+                      carregandoMovimentacoes
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        (movimentacoes.length > 3
+                                            ? 3
+                                            : movimentacoes.length);
+                                    i++)
+                                  ListTile(
+                                    leading: movimentacoes[i]
+                                                ['idFuncionarioSolicitador'] ==
+                                            widget.funcionario['idFuncionario']
+                                        ? Icon(
+                                            Icons.vpn_key_outlined,
+                                            color: Colors.yellow
+                                                .withValues(alpha: 0.5),
+                                          )
+                                        : Icon(
+                                            Icons.description_outlined,
+                                            color: Colors.green
+                                                .withValues(alpha: 0.5),
+                                          ),
+                                    title: Text(
+                                      movimentacoes[i]['descricaoProduto'],
+                                    ),
+                                    subtitle: Text(
+                                      '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yyyy, HH:mm').format(
+                                        DateTime.parse(
+                                            movimentacoes[i]['dataHora']),
+                                      )}',
+                                    ),
+                                    trailing: Text(
+                                        '${movimentacoes[i]['quantidade'].abs()} un.'),
                                   ),
-                                  subtitle: Text(
-                                    '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yyyy, HH:mm').format(
-                                      DateTime.parse(
-                                          movimentacoes[i]['dataHora']),
-                                    )}',
-                                  ),
-                                  trailing: Text(
-                                      '${movimentacoes[i]['quantidade'].abs()} un.'),
-                                ),
-                              if (movimentacoes.length > 3)
-                                const ListTile(title: Text('E mais...')),
-                            ],
-                          ),
-                  ],
+                                if (movimentacoes.length > 3)
+                                  ListTile(
+                                      leading: Icon(
+                                        Icons.add,
+                                        color:
+                                            Colors.grey.withValues(alpha: 0.5),
+                                      ),
+                                      title: const Text('E mais...')),
+                              ],
+                            ),
+                    ],
+                  ),
                 ),
               ),
             ],

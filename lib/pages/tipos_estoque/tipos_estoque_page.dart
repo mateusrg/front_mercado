@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/tipos_estoque/tipos_estoque_detalhes_page.dart';
+import 'package:front_mercado/pages/tipos_estoque/tipos_estoque_form_page.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
@@ -57,62 +59,13 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
     }
   }
 
-  Future<void> _adicionarTipoEstoque(Map<String, dynamic> tipoEstoque) async {
-    tipoEstoque['idTipoEstoque'] = 0;
-    try {
-      final response = await http
-          .post(
-            Uri.http(apiUrl, '/TiposEstoque'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(tipoEstoque),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode < 400) {
-        _listarTiposEstoque();
-      } else {
-        _mostrarErro('Erro ao adicionar tipo de estoque: ${response.statusCode}');
-      }
-    } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
-    }
-  }
-
-  Future<void> _editarTipoEstoque(Map<String, dynamic> tipoEstoque) async {
-    try {
-      final response = await http
-          .put(
-            Uri.http(apiUrl, '/TiposEstoque'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(tipoEstoque),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode < 400) {
-        _listarTiposEstoque();
-      } else {
-        _mostrarErro('Erro ao editar tipo de estoque: ${response.statusCode}');
-      }
-    } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
-    }
-  }
-
-  void _abrirFormularioTipoEstoque({Map<String, dynamic>? tipoEstoque}) {
-    Navigator.of(context).push(
+  void _abrirFormularioTipoEstoque({Map<String, dynamic>? tipoEstoque}) async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TipoEstoqueFormPage(
-          tipoEstoque: tipoEstoque,
-          onSave: (tipoEstoque) async {
-            if (tipoEstoque['idTipoEstoque'] != null) {
-              await _editarTipoEstoque(tipoEstoque);
-            } else {
-              await _adicionarTipoEstoque(tipoEstoque);
-            }
-          },
-        ),
+        builder: (context) => TipoEstoqueFormPage(tipoEstoque: tipoEstoque),
       ),
     );
+    _listarTiposEstoque();
   }
 
   void _pesquisarTiposEstoque() {
@@ -132,7 +85,7 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tipos Estoque'),
+        title: const Text('Tipos de Estoque'),
       ),
       drawer: const DrawerFenomenos('Tipos de Estoque'),
       body: Column(
@@ -166,8 +119,16 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(_tiposEstoque[index]['descricao']),
-                        onTap: () => _abrirFormularioTipoEstoque(
-                            tipoEstoque: _tiposEstoque[index]),
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => TiposEstoqueDetalhesPage(
+                                tipoEstoque: _tiposEstoque[index],
+                              ),
+                            ),
+                          );
+                          _listarTiposEstoque();
+                        },
                       );
                     },
                   ),
@@ -177,92 +138,6 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _abrirFormularioTipoEstoque(),
         child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class TipoEstoqueFormPage extends StatefulWidget {
-  final Map<String, dynamic>? tipoEstoque;
-  final Future<void> Function(Map<String, dynamic>) onSave;
-
-  const TipoEstoqueFormPage({super.key, this.tipoEstoque, required this.onSave});
-
-  @override
-  State<TipoEstoqueFormPage> createState() => _TipoEstoqueFormPageState();
-}
-
-class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _descricaoController;
-  bool _salvando = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _descricaoController = TextEditingController(
-      text: widget.tipoEstoque != null ? widget.tipoEstoque!['descricao'] : '',
-    );
-  }
-
-  @override
-  void dispose() {
-    _descricaoController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _salvar() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _salvando = true;
-      });
-
-      await widget.onSave({
-        'idTipoEstoque': widget.tipoEstoque?['idTipoEstoque'],
-        'descricao': _descricaoController.text,
-      });
-
-      setState(() {
-        _salvando = false;
-      });
-
-      Navigator.of(context).pop();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tipo Estoque'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _descricaoController,
-                decoration: const InputDecoration(labelText: 'Descrição'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira uma descrição';
-                  }
-                  return null;
-                },
-                onFieldSubmitted: (_) => _salvar(),
-              ),
-              const SizedBox(height: 16.0),
-              _salvando
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _salvar,
-                      child: Text(widget.tipoEstoque == null ? 'Cadastrar' : 'Alterar'),
-                    ),
-            ],
-          ),
-        ),
       ),
     );
   }

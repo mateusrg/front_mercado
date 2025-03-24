@@ -29,7 +29,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
     );
     _codbarrasController = MaskedTextController(
       mask: '0000000000000',
-      text: widget.produto != null ? widget.produto!['codbarras'] : '',
+      text: widget.produto != null ? widget.produto!['codBarras'] : '',
     );
   }
 
@@ -43,8 +43,8 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
           )
           .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode < 400) {
-        _mostrarErro('Erro ao editar fornecedor: ${response.statusCode}');
+      if (response.statusCode >= 400) {
+        _mostrarErro('Erro ao editar produto: ${response.statusCode}');
       }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
@@ -61,7 +61,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
           )
           .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode < 400) {
+      if (response.statusCode >= 400) {
         _mostrarErro('Erro ao adicionar produto: ${response.statusCode}');
       }
     } catch (e) {
@@ -82,9 +82,9 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
         _salvando = true;
       });
 
-      final produto = {
+      var produto = {
         'descricao': _descricaoController.text,
-        'codbarras': _codbarrasController.text,
+        'codBarras': _codbarrasController.text,
       };
 
       if (widget.produto != null) {
@@ -92,12 +92,12 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
       }
 
       try {
-        if (produto.containsKey('IdProduto')) {
+        if (produto.containsKey('idProduto')) {
           await _editarProduto(produto);
         } else {
           await _adicionarProduto(produto);
         }
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(produto);
       } catch (e) {
         _mostrarErro('Não foi possível se conectar com a API.');
       } finally {

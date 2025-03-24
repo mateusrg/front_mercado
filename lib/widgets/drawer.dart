@@ -72,7 +72,7 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.inventory_2_outlined,
+            icon: Icons.inventory,
             text: 'Estoques',
             isSelected: pagina == 'Estoques',
             onTap: () => Navigator.pushReplacement(
@@ -82,7 +82,7 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.fire_truck_outlined,
+            icon: Icons.fire_truck,
             text: 'Fornecedores',
             isSelected: pagina == 'Fornecedores',
             onTap: () => Navigator.pushReplacement(
@@ -113,7 +113,7 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.sell_outlined,
+            icon: Icons.sell,
             text: 'Produtos',
             isSelected: pagina == 'Produtos',
             onTap: () => Navigator.pushReplacement(
@@ -123,7 +123,7 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.inventory_outlined,
+            icon: Icons.inventory_rounded,
             text: 'Tipos de Estoque',
             isSelected: pagina == 'Tipos de Estoque',
             onTap: () => Navigator.pushReplacement(
@@ -133,8 +133,8 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.move_down,
-            text: 'Tipos de Movimentações de Estoque',
+            icon: Icons.move_down_rounded,
+            text: 'Tipos de Movimentação de Estoque',
             isSelected: pagina == 'Tipos de Movimentações de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,

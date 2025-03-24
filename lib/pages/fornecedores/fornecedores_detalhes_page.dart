@@ -106,36 +106,75 @@ class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.business),
-                  title: const Text('Fornecedor'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text('Nome: ${widget.fornecedor['nome']}'),
-                      Text('CNPJ: ${widget.fornecedor['cnpj']}'),
+                      const ListTile(
+                        leading: Icon(Icons.business, color: Colors.cyan),
+                        title: Text('Fornecedor'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.business,
+                          color: Colors.cyan.withValues(alpha: 0.5),
+                        ),
+                        title: Text(widget.fornecedor['nome']),
+                        subtitle: Text(widget.fornecedor['cnpj']),
+                      )
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.shopping_cart),
-                  title: const Text('Compras'),
-                  subtitle: carregandoCompras
-                      ? const Center(child: CircularProgressIndicator())
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (int i = 0;
-                                i < (compras.length > 5 ? 5 : compras.length);
-                                i++)
-                              Text(
-                                  '${DateFormat('dd/MM/yyyy').format(DateTime.parse(compras[i]['data']))}: ${compras[i]['quantidade']} ${compras[i]['descricaoProduto']}'),
-                            if (compras.length > 5) const Text('E mais...'),
-                          ],
-                        ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
+                    children: [
+                      const ListTile(
+                        leading: Icon(Icons.shopping_cart, color: Colors.green),
+                        title: Text('Compras do Fornecedor'),
+                      ),
+                      carregandoCompras
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        (compras.length > 3
+                                            ? 3
+                                            : compras.length);
+                                    i++)
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.shopping_cart_outlined,
+                                      color:
+                                          Colors.green.withValues(alpha: 0.5),
+                                    ),
+                                    title: Text(compras[i]['descricaoProduto']),
+                                    subtitle: Text(
+                                        DateFormat('dd/MM/yyyy, HH:mm').format(
+                                            DateTime.parse(
+                                                compras[i]['data']))),
+                                    trailing:
+                                        Text('${compras[i]['quantidade']} un.'),
+                                  ),
+                                if (compras.length > 3)
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.add,
+                                      color: Colors.grey.withValues(alpha: 0.5),
+                                    ),
+                                    title: const Text('E mais...'),
+                                  ),
+                              ],
+                            )
+                    ],
+                  ),
                 ),
               ),
             ],

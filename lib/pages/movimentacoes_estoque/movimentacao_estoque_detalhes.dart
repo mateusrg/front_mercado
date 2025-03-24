@@ -22,81 +22,126 @@ class MovimentacaoDetalhesPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.inventory),
-                  title: const Text('Movimentação'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text(
-                          'Tipo: ${movimentacao['descricaoMovimentacaoEstoque']}'),
-                      Text('Quantidade: ${movimentacao['quantidade'].abs()}'),
-                      Text('Data: $dataFormatada'),
+                      const ListTile(
+                        leading: Icon(Icons.inventory, color: Colors.cyan),
+                        title: Text('Movimentação'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.inventory,
+                          color: Colors.cyan.withValues(alpha: 0.5),
+                        ),
+                        title:
+                            Text(movimentacao['descricaoMovimentacaoEstoque']),
+                        subtitle: Text(dataFormatada),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.shopping_bag),
-                  title: const Text('Produto'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text('Descrição: ${movimentacao['descricaoProduto']}'),
-                      Text(
-                          'Código de Barras: ${movimentacao['codBarrasProduto']}'),
+                      const ListTile(
+                        leading: Icon(Icons.shopping_bag, color: Colors.green),
+                        title: Text('Produto'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.shopping_bag_outlined,
+                          color: Colors.green.withValues(alpha: 0.5),
+                        ),
+                        title: Text(movimentacao['descricaoProduto']),
+                        subtitle: Text(movimentacao['codBarrasProduto']),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.warehouse),
-                  title: const Text('Estoque'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text('Descrição: ${movimentacao['descricaoEstoque']}'),
-                      Text('Tipo: ${movimentacao['descricaoTipoEstoque']}'),
+                      const ListTile(
+                        leading: Icon(Icons.warehouse, color: Colors.yellow),
+                        title: Text('Estoque'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.warehouse_outlined,
+                          color: Colors.yellow.withValues(alpha: 0.5),
+                        ),
+                        title: Text(movimentacao['descricaoEstoque']),
+                        subtitle: Text(movimentacao['descricaoTipoEstoque']),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.person),
-                  title: const Text('Funcionário Solicitador'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text(
-                          'Nome: ${movimentacao['nomeFuncionarioSolicitador']}'),
-                      Text(
-                          'Setor: ${movimentacao['setorFuncionarioSolicitador']}'),
-                      Text(
-                          'Email: ${movimentacao['emailFuncionarioSolicitador']}'),
+                      const ListTile(
+                        leading: Icon(Icons.person, color: Colors.blue),
+                        title: Text('Funcionário Solicitador'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.person_outline,
+                          color: Colors.blue.withValues(alpha: 0.5),
+                        ),
+                        title: Text(movimentacao['nomeFuncionarioSolicitador']),
+                        subtitle:
+                            Text(movimentacao['emailFuncionarioSolicitador']),
+                        trailing:
+                            Text(movimentacao['setorFuncionarioSolicitador']),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.person_outline),
-                  title: const Text('Funcionário Autenticador'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text(
-                          'Nome: ${movimentacao['nomeFuncionarioAutenticador']}'),
-                      Text(
-                          'Setor: ${movimentacao['setorFuncionarioAutenticador']}'),
-                      Text(
-                          'Email: ${movimentacao['emailFuncionarioAutenticador']}'),
+                      const ListTile(
+                        leading: Icon(
+                          Icons.person_search,
+                          color: Colors.indigoAccent,
+                        ),
+                        title: Text('Funcionário Autenticador'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.person_search_outlined,
+                          color: Colors.indigoAccent.withValues(alpha: 0.5),
+                        ),
+                        title:
+                            Text(movimentacao['nomeFuncionarioAutenticador']),
+                        subtitle:
+                            Text(movimentacao['emailFuncionarioAutenticador']),
+                        trailing:
+                            Text(movimentacao['setorFuncionarioAutenticador']),
+                      ),
                     ],
                   ),
                 ),

@@ -393,10 +393,10 @@ class _ComprasPageState extends State<ComprasPage> {
                       final dataFormatada =
                           DateFormat('dd/MM/yyyy, HH:mm').format(data);
                       return ListTile(
-                        leading: Text('${_compras[index]['quantidade']} un.'),
                         title: Text(_compras[index]['descricaoProduto']),
-                        subtitle: Text(_compras[index]['nomeFornecedor']),
-                        trailing: Text(dataFormatada),
+                        subtitle: Text(
+                            '${_compras[index]['nomeFornecedor']}\n$dataFormatada'),
+                        trailing: Text('${_compras[index]['quantidade']} un.'),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(

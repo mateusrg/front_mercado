@@ -76,62 +76,124 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.warehouse),
-                  title: const Text('Estoque'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Text('Descrição: ${widget.estoque['descricaoEstoque']}'),
-                      Text(
-                          'Tipo: ${widget.estoque['descricaoTipoEstoque'] ?? 'N/A'}'),
+                      const ListTile(
+                        leading: Icon(Icons.warehouse, color: Colors.cyan),
+                        title: Text('Estoque'),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.warehouse_outlined,
+                          color: Colors.cyan.withValues(alpha: 0.5),
+                        ),
+                        title: Text(widget.estoque['descricaoEstoque']),
+                        subtitle: Text(
+                            widget.estoque['descricaoTipoEstoque'] ?? 'N/A'),
+                      )
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.shopping_bag),
-                  title: const Text('Produtos no Estoque'),
-                  subtitle: carregandoProdutos
-                      ? const Center(child: CircularProgressIndicator())
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (int i = 0;
-                                i < (produtos.length > 5 ? 5 : produtos.length);
-                                i++)
-                              Text(
-                                  '${produtos[i]['produto']}: ${produtos[i]['quantidade']} un.'),
-                            if (produtos.length > 5) const Text('E mais...'),
-                            // falta testar com um estoque que tenha mais de 5 produtos cadastrados
-                          ],
-                        ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
+                    children: [
+                      const ListTile(
+                        leading: Icon(Icons.shopping_bag, color: Colors.green),
+                        title: Text('Produtos no Estoque'),
+                      ),
+                      carregandoProdutos
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        (produtos.length > 3
+                                            ? 3
+                                            : produtos.length);
+                                    i++)
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.shopping_bag_outlined,
+                                      color:
+                                          Colors.green.withValues(alpha: 0.5),
+                                    ),
+                                    title: Text(produtos[i]['produto']),
+                                    trailing: Text(
+                                        '${produtos[i]['quantidade']} un.'),
+                                  ),
+                                if (produtos.length > 3)
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.add,
+                                      color: Colors.grey.withValues(alpha: 0.5),
+                                    ),
+                                    title: const Text('E mais...'),
+                                  ),
+                              ],
+                            )
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: ListTile(
-                  leading: const Icon(Icons.history),
-                  title: const Text('Movimentações Recentes'),
-                  subtitle: carregandoMovimentacoes
-                      ? const Center(child: CircularProgressIndicator())
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (int i = 0;
-                                i <
-                                    (movimentacoesRecentes.length > 3
-                                        ? 3
-                                        : movimentacoesRecentes.length);
-                                i++)
-                              Text(
-                                  '${DateFormat('dd/MM/yy hh:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}: ${movimentacoesRecentes[i]['quantidade'].abs()} ${movimentacoesRecentes[i]['descricaoProduto']} (${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']})'),
-                            if (movimentacoesRecentes.length > 3)
-                              const Text('E mais...'),
-                          ],
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {},
+                  child: Column(
+                    children: [
+                      const ListTile(
+                        leading: Icon(
+                          Icons.history,
+                          color: Colors.yellow,
                         ),
+                        title: Text('Movimentações Recentes'),
+                      ),
+                      carregandoMovimentacoes
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        (movimentacoesRecentes.length > 3
+                                            ? 3
+                                            : movimentacoesRecentes.length);
+                                    i++)
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.history_outlined,
+                                      color:
+                                          Colors.yellow.withValues(alpha: 0.5),
+                                    ),
+                                    title: Text(movimentacoesRecentes[i]
+                                        ['descricaoProduto']),
+                                    subtitle: Text(
+                                        '${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}'),
+                                    trailing: Text(
+                                        '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                  ),
+                                if (movimentacoesRecentes.length > 3)
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.add,
+                                      color: Colors.grey.withValues(alpha: 0.5),
+                                    ),
+                                    title: const Text('E mais...'),
+                                  ),
+                              ],
+                            )
+                    ],
+                  ),
                 ),
               ),
             ],
