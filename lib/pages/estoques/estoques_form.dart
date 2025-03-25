@@ -47,14 +47,15 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
           _tiposEstoque = decodedBody is List
               ? List<Map<String, dynamic>>.from(decodedBody)
               : [decodedBody as Map<String, dynamic>];
-              
+
           _tiposCarregados = true;
           if (widget.estoque != null) {
             _tipoSelecionado = widget.estoque!['idTipoEstoque']?.toString();
           }
         });
       } else {
-        _mostrarErro('Erro ao carregar tipos de estoque: ${response.statusCode}');
+        _mostrarErro(
+            'Erro ao carregar tipos de estoque: ${response.statusCode}');
       }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
@@ -62,43 +63,55 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   }
 
   Future<void> _salvarOuAlterarEstoque() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _carregando = true;
-      });
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _carregando = true;
+    });
 
-      final estoque = {
-        'descricao': _descricaoController.text,
-        'idTipoEstoque': _tipoSelecionado != null ? int.tryParse(_tipoSelecionado!) : null,
-      };
+    final estoque = {
+      'descricao': _descricaoController.text,
+      'idTipoEstoque': _tipoSelecionado != null ? int.tryParse(_tipoSelecionado!) : null,
+    };
 
-      try {
-        final response = widget.estoque == null
-            ? await http.post(
-                Uri.http('${Params.ipApi}:5277', '/Estoques'),
-                headers: {'Content-Type': 'application/json'},
-                body: jsonEncode(estoque),
-              )
-            : await http.put(
-                Uri.http('${Params.ipApi}:5277', '/Estoques/${widget.estoque!['id']}'),
-                headers: {'Content-Type': 'application/json'},
-                body: jsonEncode(estoque),
-              );
+    // Debug print statements added here
+    print('Making request to: ${Uri.http('${Params.ipApi}:5277', widget.estoque == null ? '/api/Estoques' : '/api/Estoques/${widget.estoque!['id']}')}');
+    print('With body: ${jsonEncode(estoque)}');
+    print('Headers: ${{'Content-Type': 'application/json'}}');
 
-        if (response.statusCode < 400) {
-          Navigator.of(context).pop(true);
-        } else {
-          _mostrarErro('Erro ao salvar/alterar estoque: ${response.statusCode}');
-        }
-      } catch (e) {
-        _mostrarErro('Não foi possível se conectar com a API.');
-      } finally {
-        setState(() {
-          _carregando = false;
-        });
+    try {
+      final response = widget.estoque == null
+          ? await http.post(
+              Uri.http('${Params.ipApi}:5277', '/api/Estoques'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(estoque),
+            )
+          : await http.put(
+              Uri.http('${Params.ipApi}:5277', '/api/Estoques/${widget.estoque!['id']}'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(estoque),
+            );
+
+      // Print response details for debugging
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        Navigator.of(context).pop(true);
+      } else {
+        final errorBody = json.decode(response.body);
+        final errorMessage = errorBody['message'] ?? 'Erro desconhecido';
+        _mostrarErro('Erro ao salvar/alterar estoque: $errorMessage (${response.statusCode})');
       }
+    } catch (e) {
+      print('Error caught: $e');  // Added error print
+      _mostrarErro('Não foi possível se conectar com a API: ${e.toString()}');
+    } finally {
+      setState(() {
+        _carregando = false;
+      });
     }
   }
+}
 
   void _mostrarErro(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -113,7 +126,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
+        title: Text(
+            widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
       ),
       body: _carregando
           ? const Center(child: CircularProgressIndicator())
@@ -137,9 +151,11 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                     _tiposCarregados
                         ? DropdownButtonFormField<String>(
                             value: _tipoSelecionado,
-                            decoration: const InputDecoration(labelText: 'Tipo de Estoque'),
+                            decoration: const InputDecoration(
+                                labelText: 'Tipo de Estoque'),
                             items: _tiposEstoque.map((tipo) {
-                              final value = tipo['idTipoEstoque']?.toString() ?? '';
+                              final value =
+                                  tipo['idTipoEstoque']?.toString() ?? '';
                               return DropdownMenuItem<String>(
                                 value: value,
                                 child: Text(tipo['descricao'] ?? ''),
@@ -161,7 +177,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: _salvarOuAlterarEstoque,
-                      child: Text(widget.estoque == null ? 'Salvar' : 'Alterar'),
+                      child:
+                          Text(widget.estoque == null ? 'Salvar' : 'Alterar'),
                     ),
                   ],
                 ),
