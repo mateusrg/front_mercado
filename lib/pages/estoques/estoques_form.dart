@@ -63,53 +63,56 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   }
 
   Future<void> _salvarOuAlterarEstoque() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _carregando = true;
-    });
-
-    final estoque = {
-      'descricao': _descricaoController.text,
-      'idTipoEstoque': _tipoSelecionado != null ? int.tryParse(_tipoSelecionado!) : null,
-    };
-
-    // Debug print statements added here
-    print('Making request to: ${Uri.http(Params.apiUrl, widget.estoque == null ? '/api/Estoques' : '/api/Estoques/${widget.estoque!['id']}')}');
-    print('With body: ${jsonEncode(estoque)}');
-    print('Headers: ${{'Content-Type': 'application/json'}}');
-
-    try {
-      final response = widget.estoque == null
-          ? await http.post(
-              Uri.http(Params.apiUrl, '/api/Estoques'),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(estoque),
-            )
-          : await http.put(
-              Uri.http(Params.apiUrl, '/api/Estoques/${widget.estoque!['id']}'),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(estoque),
-            );
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        Navigator.of(context).pop(true);
-      } else {
-        final erro = json.decode(response.body);
-        final mensagem = erro['message'] ?? 'Erro desconhecido';
-        _mostrarErro('Erro ao salvar/alterar estoque: $mensagem (${response.statusCode})');
-      }
-    } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API: ${e.toString()}');
-    } finally {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _carregando = false;
+        _carregando = true;
       });
+
+      final estoque = {
+        'idEstoque': widget.estoque?['idEstoque'],
+        'descricao': _descricaoController.text,
+        'idTipoEstoque':
+            _tipoSelecionado != null ? int.tryParse(_tipoSelecionado!) : null,
+      };
+
+      try {
+        final response = widget.estoque == null
+            ? await http.post(
+                Uri.http(Params.apiUrl, '/Estoques'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode(estoque),
+              )
+            : await http.put(
+                Uri.http(Params.apiUrl, '/Estoques'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode(estoque),
+              );
+
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          final tipoEstoqueSelecionado = _tiposEstoque.firstWhere(
+            (tipo) => tipo['idTipoEstoque'].toString() == _tipoSelecionado,
+            orElse: () => {},
+          )['descricao'];
+          Navigator.of(context).pop({
+            'estoque': _descricaoController.text,
+            'idTipoEstoque': _tipoSelecionado,
+            'tipoEstoque': tipoEstoqueSelecionado,
+          });
+        } else {
+          final erro = json.decode(response.body);
+          final mensagem = erro['message'] ?? 'Erro desconhecido';
+          _mostrarErro(
+              'Erro ao salvar/alterar estoque: $mensagem (${response.statusCode})');
+        }
+      } catch (e) {
+        _mostrarErro('Não foi possível se conectar com a API: ${e.toString()}');
+      } finally {
+        setState(() {
+          _carregando = false;
+        });
+      }
     }
   }
-}
 
   void _mostrarErro(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -124,7 +127,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
+        title: Text(
+            widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
       ),
       body: _carregando
           ? const Center(child: CircularProgressIndicator())

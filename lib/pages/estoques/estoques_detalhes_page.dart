@@ -272,9 +272,11 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
             ),
           );
 
-          if (resultado == true) {
+          if (resultado != null) {
             setState(() {
-              carregarProdutosEMovimentacoesRecentes();
+              widget.estoque['descricaoEstoque'] = resultado['estoque'];
+              widget.estoque['idTipoEstoque'] = resultado['idTipoEstoque'];
+              widget.estoque['descricaoTipoEstoque'] = resultado['tipoEstoque'];
             });
           }
         },

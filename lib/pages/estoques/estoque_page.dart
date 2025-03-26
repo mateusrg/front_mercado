@@ -15,8 +15,7 @@ class EstoquePage extends StatefulWidget {
 
 class _EstoquePageState extends State<EstoquePage> {
   static const String apiUrl = Params.apiUrl;
-  List<Map<String, dynamic>> _estoque = [];
-  List<Map<String, dynamic>> _estoqueFiltrado = [];
+  List<Map<String, dynamic>> _estoques = [];
   List<Map<String, dynamic>> _tiposEstoque = [];
   String? _tipoSelecionado;
   final TextEditingController _pesquisaController = TextEditingController();
@@ -30,7 +29,7 @@ class _EstoquePageState extends State<EstoquePage> {
 
   _carregarTiposEstoqueEListar() async {
     await _carregarTiposEstoque();
-    await _listarEstoque();
+    await _listarEstoques();
   }
 
   Future<void> _carregarTiposEstoque() async {
@@ -43,72 +42,57 @@ class _EstoquePageState extends State<EstoquePage> {
       if (response.statusCode == 200) {
         setState(() {
           _tiposEstoque = [
-            {'descricao': 'Todos'} // Adiciona a opção "Todos"
+            {'idTipoEstoque': null, 'descricao': 'Todos'}
           ];
-          _tiposEstoque.addAll(
-              List<Map<String, dynamic>>.from(json.decode(response.body)));
+
+          _tiposEstoque.addAll((json.decode(response.body) as List)
+              .map((tipo) => {
+                    'idTipoEstoque': tipo['idTipoEstoque'].toString(),
+                    'descricao': tipo['descricao'],
+                  })
+              .toList());
+
+          _tipoSelecionado = null;
         });
       } else {
-        _mostrarErro(
-            'Erro ao carregar tipos de estoque: ${response.statusCode}');
+        _mostrarErro('Erro ao carregar tipos: ${response.statusCode}');
       }
     } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
+      _mostrarErro('Erro na conexão com a API');
     }
   }
 
-  Future<void> _listarEstoque([String? query]) async {
-    setState(() {
-      _carregando = true;
-    });
+  Future<void> _listarEstoques([String? query]) async {
+    setState(() => _carregando = true);
+
+    final Map<String, dynamic> parametros = {
+      'descricaoEstoque': query,
+      'idTipoEstoque': _tipoSelecionado,
+    };
 
     try {
       final response = await http
           .post(
-            Uri.http(
-                apiUrl,
-                query != null && query != ''
-                    ? '/Estoques'
-                    : '/Estoques/tipo-estoque'),
+            Uri.http(apiUrl, '/Estoques/tipo-estoque'),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(<String, String>{'key': 'value'}),
+            body: jsonEncode(parametros),
           )
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode < 400) {
         setState(() {
-          _estoque =
+          _estoques =
               List<Map<String, dynamic>>.from(json.decode(response.body));
-          _estoqueFiltrado = _estoque; // Inicializa com todos os itens
           _carregando = false;
         });
       } else {
-        _mostrarErro('Erro ao listar estoque: ${response.statusCode}');
-        setState(() {
-          _carregando = false;
-        });
+        _mostrarErro('Falha ao carregar dados: ${response.statusCode}');
+        setState(() => _carregando = false);
       }
     } catch (e) {
-      _mostrarErro('Não foi possível se conectar com a API.');
-      setState(() {
-        _carregando = false;
-      });
+      _mostrarErro('Erro na conexão');
+      setState(() => _carregando = false);
     }
-  }
-
-  void _filtrarEstoque() {
-    String query = _pesquisaController.text.toLowerCase();
-
-    setState(() {
-      _estoqueFiltrado = _estoque.where((estoque) {
-        final descricaoMatch =
-            estoque['descricaoEstoque'].toLowerCase().contains(query);
-        final tipoMatch = _tipoSelecionado == null ||
-            _tipoSelecionado == 'Todos' || // Inclui todos os estoques
-            estoque['descricaoTipoEstoque'] == _tipoSelecionado;
-        return descricaoMatch && tipoMatch;
-      }).toList();
-    });
   }
 
   void _mostrarErro(String mensagem) {
@@ -120,13 +104,12 @@ class _EstoquePageState extends State<EstoquePage> {
     );
   }
 
-  void _abrirFormularioCompra() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const EstoquesFormPage(),
-      ),
+  void _abrirFormularioEstoque() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const EstoquesFormPage()),
     );
-    _listarEstoque();
+    _listarEstoques();
   }
 
   @override
@@ -146,39 +129,37 @@ class _EstoquePageState extends State<EstoquePage> {
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: InputDecoration(
-                      labelText: 'Pesquisar por Descrição',
+                      labelText: 'Pesquisar',
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search),
-                        onPressed:
-                            _filtrarEstoque, // Pesquisa ao clicar na lupa
+                        onPressed: () =>
+                            _listarEstoques(_pesquisaController.text),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     onSubmitted: (_) =>
-                        _filtrarEstoque(), // Pesquisa ao pressionar Enter
+                        _listarEstoques(_pesquisaController.text),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: DropdownButtonFormField<String>(
+                  child: DropdownButtonFormField<String?>(
                     value: _tipoSelecionado,
                     decoration: const InputDecoration(
                       labelText: 'Tipo de Estoque',
                       border: OutlineInputBorder(),
                     ),
                     items: _tiposEstoque.map((tipo) {
-                      return DropdownMenuItem<String>(
-                        value: tipo['descricao'],
+                      return DropdownMenuItem<String?>(
+                        value: tipo['idTipoEstoque']?.toString(),
                         child: Text(tipo['descricao']),
                       );
                     }).toList(),
                     onChanged: (value) {
-                      setState(() {
-                        _tipoSelecionado = value;
-                      });
-                      _filtrarEstoque();
+                      setState(() => _tipoSelecionado = value);
+                      _listarEstoques(_pesquisaController.text);
                     },
                   ),
                 ),
@@ -189,27 +170,25 @@ class _EstoquePageState extends State<EstoquePage> {
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: _estoqueFiltrado.length,
+                    itemCount: _estoques.length,
                     itemBuilder: (context, index) {
+                      final estoque = _estoques[index];
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
-                          title:
-                              Text(_estoqueFiltrado[index]['descricaoEstoque']),
-                          leading:
-                              Text('${_estoqueFiltrado[index]['idEstoque']}'),
-                          trailing: Text(
-                              _estoqueFiltrado[index]['descricaoTipoEstoque']),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => EstoqueDetalhesPage(
-                                  estoque: _estoqueFiltrado[index],
+                            title: Text(estoque['descricaoEstoque']),
+                            leading: Text('${estoque['idEstoque']}'),
+                            trailing: Text(estoque['descricaoTipoEstoque']),
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EstoqueDetalhesPage(estoque: estoque),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                              _listarEstoques();
+                            }),
                       );
                     },
                   ),
@@ -217,88 +196,9 @@ class _EstoquePageState extends State<EstoquePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _abrirFormularioCompra,
+        onPressed: _abrirFormularioEstoque,
         child: const Icon(Icons.add),
       ),
-    );
-  }
-}
-
-class _CadastroEstoqueDialog extends StatefulWidget {
-  final List<Map<String, dynamic>> tiposEstoque;
-
-  const _CadastroEstoqueDialog({required this.tiposEstoque, super.key});
-
-  @override
-  State<_CadastroEstoqueDialog> createState() => _CadastroEstoqueDialogState();
-}
-
-class _CadastroEstoqueDialogState extends State<_CadastroEstoqueDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _descricaoController = TextEditingController();
-  String? _tipoSelecionado;
-
-  Future<void> _salvarEstoque() async {
-    if (_formKey.currentState!.validate()) {
-      // Simula o envio para a API
-      Navigator.of(context).pop(true); // Retorna sucesso
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Cadastrar Estoque'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _descricaoController,
-              decoration: const InputDecoration(labelText: 'Descrição'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor, insira a descrição';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16.0),
-            DropdownButtonFormField<String>(
-              value: _tipoSelecionado,
-              decoration: const InputDecoration(labelText: 'Tipo de Estoque'),
-              items: widget.tiposEstoque.map((tipo) {
-                return DropdownMenuItem<String>(
-                  value: tipo['descricao'],
-                  child: Text(tipo['descricao']),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _tipoSelecionado = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor, selecione um tipo de estoque';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: _salvarEstoque,
-          child: const Text('Salvar'),
-        ),
-      ],
     );
   }
 }
