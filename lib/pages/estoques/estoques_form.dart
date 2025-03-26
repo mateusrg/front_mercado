@@ -18,6 +18,7 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   String? _tipoSelecionado;
   List<Map<String, dynamic>> _tiposEstoque = [];
   bool _carregando = false;
+  bool _tiposCarregados = false;
 
   @override
   void initState() {
@@ -29,11 +30,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   }
 
   void _preencherCamposParaEdicao() {
-    widget.estoque!['descricaoEstoque'];
-    widget.estoque!['descricaoTipoEstoque'];
-    '${widget.estoque}\n${widget.estoque!['idTipoEstoque'].toString()}';
-    _descricaoController.text = widget.estoque!['descricaoEstoque'];
-    _tipoSelecionado = widget.estoque!['idTipoEstoque'].toString();
+    _descricaoController.text = widget.estoque!['descricaoEstoque'] ?? '';
+    _tipoSelecionado = widget.estoque!['idTipoEstoque']?.toString();
   }
 
   Future<void> _carregarTiposEstoque() async {
@@ -45,8 +43,15 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
 
       if (response.statusCode == 200) {
         setState(() {
-          _tiposEstoque =
-              List<Map<String, dynamic>>.from(json.decode(response.body));
+          final dynamic decodedBody = json.decode(response.body);
+          _tiposEstoque = decodedBody is List
+              ? List<Map<String, dynamic>>.from(decodedBody)
+              : [decodedBody as Map<String, dynamic>];
+
+          _tiposCarregados = true;
+          if (widget.estoque != null) {
+            _tipoSelecionado = widget.estoque!['idTipoEstoque']?.toString();
+          }
         });
       } else {
         _mostrarErro(
@@ -58,44 +63,53 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   }
 
   Future<void> _salvarOuAlterarEstoque() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _carregando = true;
-      });
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _carregando = true;
+    });
 
-      final estoque = {
-        'descricao': _descricaoController.text,
-        'idTipoEstoque': _tipoSelecionado,
-      };
+    final estoque = {
+      'descricao': _descricaoController.text,
+      'idTipoEstoque': _tipoSelecionado != null ? int.tryParse(_tipoSelecionado!) : null,
+    };
 
-      try {
-        final response = widget.estoque == null
-            ? await http.post(
-                Uri.http(Params.apiUrl, '/Estoques'),
-                headers: {'Content-Type': 'application/json'},
-                body: jsonEncode(estoque),
-              )
-            : await http.put(
-                Uri.http(Params.apiUrl, '/Estoques/${widget.estoque!['id']}'),
-                headers: {'Content-Type': 'application/json'},
-                body: jsonEncode(estoque),
-              );
+    // Debug print statements added here
+    print('Making request to: ${Uri.http(Params.apiUrl, widget.estoque == null ? '/api/Estoques' : '/api/Estoques/${widget.estoque!['id']}')}');
+    print('With body: ${jsonEncode(estoque)}');
+    print('Headers: ${{'Content-Type': 'application/json'}}');
 
-        if (response.statusCode < 400) {
-          Navigator.of(context).pop(true); // Retorna sucesso
-        } else {
-          _mostrarErro(
-              'Erro ao salvar/alterar estoque: ${response.statusCode}');
-        }
-      } catch (e) {
-        _mostrarErro('Não foi possível se conectar com a API.');
-      } finally {
-        setState(() {
-          _carregando = false;
-        });
+    try {
+      final response = widget.estoque == null
+          ? await http.post(
+              Uri.http(Params.apiUrl, '/api/Estoques'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(estoque),
+            )
+          : await http.put(
+              Uri.http(Params.apiUrl, '/api/Estoques/${widget.estoque!['id']}'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(estoque),
+            );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        Navigator.of(context).pop(true);
+      } else {
+        final erro = json.decode(response.body);
+        final mensagem = erro['message'] ?? 'Erro desconhecido';
+        _mostrarErro('Erro ao salvar/alterar estoque: $mensagem (${response.statusCode})');
       }
+    } catch (e) {
+      _mostrarErro('Não foi possível se conectar com a API: ${e.toString()}');
+    } finally {
+      setState(() {
+        _carregando = false;
+      });
     }
   }
+}
 
   void _mostrarErro(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -110,8 +124,7 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
+        title: Text(widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
       ),
       body: _carregando
           ? const Center(child: CircularProgressIndicator())
@@ -132,28 +145,32 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                       },
                     ),
                     const SizedBox(height: 16.0),
-                    DropdownButtonFormField<String>(
-                      value: _tipoSelecionado,
-                      decoration:
-                          const InputDecoration(labelText: 'Tipo de Estoque'),
-                      items: _tiposEstoque.map((tipo) {
-                        return DropdownMenuItem<String>(
-                          value: tipo['idTipoEstoque'].toString(),
-                          child: Text(tipo['descricao']),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _tipoSelecionado = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, selecione um tipo de estoque';
-                        }
-                        return null;
-                      },
-                    ),
+                    _tiposCarregados
+                        ? DropdownButtonFormField<String>(
+                            value: _tipoSelecionado,
+                            decoration: const InputDecoration(
+                                labelText: 'Tipo de Estoque'),
+                            items: _tiposEstoque.map((tipo) {
+                              final value =
+                                  tipo['idTipoEstoque']?.toString() ?? '';
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(tipo['descricao'] ?? ''),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _tipoSelecionado = value;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor, selecione um tipo de estoque';
+                              }
+                              return null;
+                            },
+                          )
+                        : const Center(child: CircularProgressIndicator()),
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: _salvarOuAlterarEstoque,
