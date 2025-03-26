@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/funcionarios/funcionarios_detalhes_card_page.dart';
+import 'package:front_mercado/pages/funcionarios/movimentacoes_de_estoque_funcionario_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -15,7 +17,7 @@ class FuncionariosDetalhesPage extends StatefulWidget {
 }
 
 class _FuncionariosDetalhesPageState extends State<FuncionariosDetalhesPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<dynamic> movimentacoes = [];
   bool carregandoMovimentacoes = true;
 
@@ -53,23 +55,44 @@ class _FuncionariosDetalhesPageState extends State<FuncionariosDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => FuncionariosDetalhesCardPage(
+                            funcionario: widget.funcionario),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.person, color: Colors.cyan),
-                        title: Text('Funcionário'),
-                      ),
-                      ListTile(
-                        leading: Icon(
-                          Icons.person_outline,
-                          color: Colors.cyan.withValues(alpha: 0.5),
+                      const Hero(
+                        tag: 'tituloFuncionariosDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.person,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Funcionário'),
+                          ),
                         ),
-                        title: Text(widget.funcionario['nome']),
-                        subtitle: Text(widget.funcionario['email']),
-                        trailing: Text(widget.funcionario['setor']),
+                      ),
+                      Hero(
+                        tag: 'listTileFuncionariosDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.person_outline,
+                              color: Colors.cyan.withAlpha(128),
+                            ),
+                            title: Text(widget.funcionario['nome']),
+                            subtitle: Text(widget.funcionario['email']),
+                            trailing: Text(widget.funcionario['setor']),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -77,14 +100,31 @@ class _FuncionariosDetalhesPageState extends State<FuncionariosDetalhesPage> {
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MovimentacoesFuncionarioPage(
+                          movimentacoes: movimentacoes,
+                          funcionario: widget.funcionario,
+                        ),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.history, color: Colors.cyan),
-                        title: Text('Movimentações de Estoque'),
+                      const Hero(
+                        tag: 'tituloMovimentacoesFuncionario',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.history,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Movimentações'),
+                          ),
+                        ),
                       ),
                       carregandoMovimentacoes
                           ? const Center(child: CircularProgressIndicator())
@@ -97,31 +137,38 @@ class _FuncionariosDetalhesPageState extends State<FuncionariosDetalhesPage> {
                                             ? 3
                                             : movimentacoes.length);
                                     i++)
-                                  ListTile(
-                                    leading: movimentacoes[i]
-                                                ['idFuncionarioSolicitador'] ==
-                                            widget.funcionario['idFuncionario']
-                                        ? Icon(
-                                            Icons.vpn_key_outlined,
-                                            color: Colors.yellow
-                                                .withValues(alpha: 0.5),
-                                          )
-                                        : Icon(
-                                            Icons.description_outlined,
-                                            color: Colors.green
-                                                .withValues(alpha: 0.5),
-                                          ),
-                                    title: Text(
-                                      movimentacoes[i]['descricaoProduto'],
+                                  Hero(
+                                    tag: 'listTileMovimentacoesFuncionario$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: movimentacoes[i][
+                                                    'idFuncionarioSolicitador'] ==
+                                                widget.funcionario[
+                                                    'idFuncionario']
+                                            ? Icon(
+                                                Icons.vpn_key_outlined,
+                                                color: Colors.yellow
+                                                    .withValues(alpha: 0.5),
+                                              )
+                                            : Icon(
+                                                Icons.description_outlined,
+                                                color: Colors.green
+                                                    .withValues(alpha: 0.5),
+                                              ),
+                                        title: Text(
+                                          movimentacoes[i]['descricaoProduto'],
+                                        ),
+                                        subtitle: Text(
+                                          '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yyyy, HH:mm').format(
+                                            DateTime.parse(
+                                                movimentacoes[i]['dataHora']),
+                                          )}',
+                                        ),
+                                        trailing: Text(
+                                            '${movimentacoes[i]['quantidade'].abs()} un.'),
+                                      ),
                                     ),
-                                    subtitle: Text(
-                                      '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yyyy, HH:mm').format(
-                                        DateTime.parse(
-                                            movimentacoes[i]['dataHora']),
-                                      )}',
-                                    ),
-                                    trailing: Text(
-                                        '${movimentacoes[i]['quantidade'].abs()} un.'),
                                   ),
                                 if (movimentacoes.length > 3)
                                   ListTile(

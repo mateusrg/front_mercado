@@ -15,7 +15,7 @@ class VendaPage extends StatefulWidget {
 
 class _VendaPageState extends State<VendaPage> {
   final _formKey = GlobalKey<FormState>();
-  final urlApi = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   late TextEditingController _quantidadeController;
   late TextEditingController _horaController;
   bool _salvando = false;
@@ -46,7 +46,7 @@ class _VendaPageState extends State<VendaPage> {
   }
 
   Future<void> _carregarProdutos() async {
-    final response = await http.get(Uri.http(urlApi, '/Produtos'));
+    final response = await http.get(Uri.http(apiUrl, '/Produtos'));
     if (response.statusCode == 200) {
       setState(() {
         _produtos = List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -57,7 +57,7 @@ class _VendaPageState extends State<VendaPage> {
   }
 
   Future<void> _carregarFuncionarios() async {
-    final response = await http.get(Uri.http(urlApi, '/Funcionarios'));
+    final response = await http.get(Uri.http(apiUrl, '/Funcionarios'));
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final usuarioLogadoString = prefs.getString('usuarioLogado');
@@ -347,7 +347,7 @@ class _VendaPageState extends State<VendaPage> {
     try {
       final response = await http
           .post(
-            Uri.http(urlApi, 'MovimentacoesEstoque/venderProduto'),
+            Uri.http(apiUrl, 'MovimentacoesEstoque/venderProduto'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(venda),
           )

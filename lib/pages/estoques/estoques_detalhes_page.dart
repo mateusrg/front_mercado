@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/estoques/estoque_detalhes_card_page.dart';
 import 'package:front_mercado/pages/estoques/estoques_form.dart';
+import 'package:front_mercado/pages/estoques/movimentacoes_recentes_do_estoque_page.dart';
+import 'package:front_mercado/pages/estoques/produtos_no_estoque_page.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -15,7 +18,7 @@ class EstoqueDetalhesPage extends StatefulWidget {
   State<EstoqueDetalhesPage> createState() => _EstoqueDetalhesPageState();
 }
 
-const String apiUrl = '${Params.ipApi}:5277';
+const String apiUrl = Params.apiUrl;
 
 class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
   List<dynamic> produtos = [];
@@ -77,23 +80,45 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EstoqueDetalhesCardPage(estoque: widget.estoque),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.warehouse, color: Colors.cyan),
-                        title: Text('Estoque'),
-                      ),
-                      ListTile(
-                        leading: Icon(
-                          Icons.warehouse_outlined,
-                          color: Colors.cyan.withValues(alpha: 0.5),
+                      const Hero(
+                        tag: 'tituloEstoqueDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.warehouse,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Estoque'),
+                          ),
                         ),
-                        title: Text(widget.estoque['descricaoEstoque']),
-                        subtitle: Text(
-                            widget.estoque['descricaoTipoEstoque'] ?? 'N/A'),
+                      ),
+                      Hero(
+                        tag: 'listTileEstoqueDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.warehouse_outlined,
+                              color: Colors.cyan.withAlpha(128),
+                            ),
+                            title: Text(widget.estoque['descricaoEstoque']),
+                            subtitle: Text(
+                                widget.estoque['descricaoTipoEstoque'] ??
+                                    'N/A'),
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -101,14 +126,27 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProdutosNoEstoquePage(produtos: produtos),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.shopping_bag, color: Colors.green),
-                        title: Text('Produtos no Estoque'),
+                      const Hero(
+                        tag: 'produtosNoEstoqueTitulo',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading:
+                                Icon(Icons.shopping_bag, color: Colors.green),
+                            title: Text('Produtos no Estoque'),
+                          ),
+                        ),
                       ),
                       carregandoProdutos
                           ? const Center(child: CircularProgressIndicator())
@@ -121,21 +159,26 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
                                             ? 3
                                             : produtos.length);
                                     i++)
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.shopping_bag_outlined,
-                                      color:
-                                          Colors.green.withValues(alpha: 0.5),
+                                  Hero(
+                                    tag: 'listTileProdutosNoEstoque$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.shopping_bag_outlined,
+                                          color: Colors.green.withAlpha(128),
+                                        ),
+                                        title: Text(produtos[i]['produto']),
+                                        trailing: Text(
+                                            '${produtos[i]['quantidade']} un.'),
+                                      ),
                                     ),
-                                    title: Text(produtos[i]['produto']),
-                                    trailing: Text(
-                                        '${produtos[i]['quantidade']} un.'),
                                   ),
                                 if (produtos.length > 3)
                                   ListTile(
                                     leading: Icon(
                                       Icons.add,
-                                      color: Colors.grey.withValues(alpha: 0.5),
+                                      color: Colors.grey.withAlpha(128),
                                     ),
                                     title: const Text('E mais...'),
                                   ),
@@ -147,17 +190,30 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MovimentacoesRecentesDoEstoquePage(
+                                movimentacoes: movimentacoesRecentes),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(
-                          Icons.history,
-                          color: Colors.yellow,
+                      const Hero(
+                        tag: 'tituloMovimentacoesRecentesDoEstoque',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.history,
+                              color: Colors.yellow,
+                            ),
+                            title: Text('Movimentações Recentes'),
+                          ),
                         ),
-                        title: Text('Movimentações Recentes'),
                       ),
                       carregandoMovimentacoes
                           ? const Center(child: CircularProgressIndicator())
@@ -170,24 +226,30 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
                                             ? 3
                                             : movimentacoesRecentes.length);
                                     i++)
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.history_outlined,
-                                      color:
-                                          Colors.yellow.withValues(alpha: 0.5),
+                                  Hero(
+                                    tag:
+                                        'listTileMovimentacoesRecentesDoEstoque$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.history_outlined,
+                                          color: Colors.yellow.withAlpha(128),
+                                        ),
+                                        title: Text(movimentacoesRecentes[i]
+                                            ['descricaoProduto']),
+                                        subtitle: Text(
+                                            '${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}'),
+                                        trailing: Text(
+                                            '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                      ),
                                     ),
-                                    title: Text(movimentacoesRecentes[i]
-                                        ['descricaoProduto']),
-                                    subtitle: Text(
-                                        '${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}'),
-                                    trailing: Text(
-                                        '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
                                   ),
                                 if (movimentacoesRecentes.length > 3)
                                   ListTile(
                                     leading: Icon(
                                       Icons.add,
-                                      color: Colors.grey.withValues(alpha: 0.5),
+                                      color: Colors.grey.withAlpha(128),
                                     ),
                                     title: const Text('E mais...'),
                                   ),

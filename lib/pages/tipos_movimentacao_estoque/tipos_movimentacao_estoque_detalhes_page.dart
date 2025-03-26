@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/tipos_movimentacao_estoque/movimentacoes_tipo_movimentacao_card_page.dart';
+import 'package:front_mercado/pages/tipos_movimentacao_estoque/tipos_movimentacao_estoque_card_page.dart';
 import 'package:front_mercado/pages/tipos_movimentacao_estoque/tipos_movimentacao_estoque_form.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,7 +20,7 @@ class TiposMovimentacaoDetalhesPage extends StatefulWidget {
 
 class _TiposMovimentacaoDetalhesPageState
     extends State<TiposMovimentacaoDetalhesPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<dynamic> movimentacoes = [];
   bool carregandoMovimentacoes = true;
 
@@ -73,64 +75,112 @@ class _TiposMovimentacaoDetalhesPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Card(
-                child: Column(
-                  children: [
-                    const ListTile(
-                      leading: Icon(
-                        Icons.move_down_rounded,
-                        color: Colors.cyan,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => TiposMovimentacaoEstoqueCardPage(
+                          tipoMovimentacaoEstoque: widget.tipoMovimentacao),
+                    ),
+                  );
+                },
+                child: Card(
+                  child: Column(
+                    children: [
+                      const Hero(
+                        tag: 'tituloTiposMovimentacaoEstoqueCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.move_down_rounded,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Tipo'),
+                          ),
+                        ),
                       ),
-                      title: Text('Tipo de Movimentação'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.move_down_outlined,
-                          color: Colors.cyan.withValues(alpha: 0.5)),
-                      title: Text(widget.tipoMovimentacao['descricao']),
-                    ),
-                  ],
+                      Hero(
+                        tag: 'listTileTiposMovimentacaoEstoqueCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.move_down_outlined,
+                              color: Colors.cyan.withAlpha(128),
+                            ),
+                            title: Text(widget.tipoMovimentacao['descricao']),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              Card(
-                child: Column(
-                  children: [
-                    const ListTile(
-                      leading: Icon(Icons.history, color: Colors.green),
-                      title: Text('Movimentações desse Tipo'),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => MovimentacoesDoTipoMovimentacaoPage(
+                          movimentacoes: movimentacoes),
                     ),
-                    carregandoMovimentacoes
-                        ? const Center(child: CircularProgressIndicator())
-                        : Column(
-                            children: [
-                              for (int i = 0;
-                                  i <
-                                      (movimentacoes.length > 3
-                                          ? 3
-                                          : movimentacoes.length);
-                                  i++)
-                                ListTile(
-                                  leading: Icon(Icons.history_outlined,
-                                      color:
-                                          Colors.green.withValues(alpha: 0.5)),
-                                  title: Text(
-                                      movimentacoes[i]['descricaoProduto']),
-                                  subtitle: Text(DateFormat('dd/MM/yyyy HH:mm')
-                                      .format(DateTime.parse(
-                                          movimentacoes[i]['dataHora']))),
-                                  trailing: Text(
-                                      '${movimentacoes[i]['quantidade']} un.'),
-                                ),
-                              if (movimentacoes.length > 3)
-                                ListTile(
-                                  leading: Icon(Icons.add,
-                                      color:
-                                          Colors.grey.withValues(alpha: 0.5)),
-                                  title: const Text('E mais...'),
-                                ),
-                            ],
+                  );
+                },
+                child: Card(
+                  child: Column(
+                    children: [
+                      const Hero(
+                        tag: 'tituloMovimentacoesDoTipoEstoque',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.history,
+                              color: Colors.green,
+                            ),
+                            title: Text('Movimentações desse Tipo'),
                           ),
-                  ],
+                        ),
+                      ),
+                      carregandoMovimentacoes
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        (movimentacoes.length > 3
+                                            ? 3
+                                            : movimentacoes.length);
+                                    i++)
+                                  Hero(
+                                    tag: 'listTileMovimentacoesDoTipoEstoque$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(Icons.history_outlined,
+                                            color: Colors.green
+                                                .withValues(alpha: 0.5)),
+                                        title: Text(movimentacoes[i]
+                                            ['descricaoProduto']),
+                                        subtitle: Text(
+                                            '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoes[i]['dataHora']))}'),
+                                        trailing: Text(
+                                            '${movimentacoes[i]['quantidade']} un.'),
+                                      ),
+                                    ),
+                                  ),
+                                if (movimentacoes.length > 3)
+                                  ListTile(
+                                    leading: Icon(Icons.add,
+                                        color:
+                                            Colors.grey.withValues(alpha: 0.5)),
+                                    title: const Text('E mais...'),
+                                  ),
+                              ],
+                            ),
+                    ],
+                  ),
                 ),
               ),
             ],

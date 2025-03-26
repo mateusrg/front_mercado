@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _fazerLogin(String email, String senha) async {
-    String urlBase = '${Params.ipApi}:5277';
+    const String urlBase = Params.apiUrl;
     String urlComplementar = '/Funcionarios/login';
     Uri uri = Uri.http(urlBase, urlComplementar, null);
 

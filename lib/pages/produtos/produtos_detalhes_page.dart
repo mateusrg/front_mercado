@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/produtos/compras_produtos_card_page.dart';
+import 'package:front_mercado/pages/produtos/estoques_produtos_card_page.dart';
+import 'package:front_mercado/pages/produtos/produtos_detalhes_card_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_form_page.dart';
+import 'package:front_mercado/pages/produtos/produtos_movimentacoes_card_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -15,7 +19,7 @@ class ProdutosDetalhesPage extends StatefulWidget {
 }
 
 class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<dynamic> estoques = [];
   List<dynamic> movimentacoesRecentes = [];
   List<dynamic> compras = [];
@@ -118,23 +122,43 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProdutosDetalhesCardPage(produto: widget.produto),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(
-                          Icons.shopping_bag,
-                          color: Colors.cyan,
+                      const Hero(
+                        tag: 'tituloProdutosDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.shopping_bag,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Produto'),
+                          ),
                         ),
-                        title: Text('Produto'),
                       ),
-                      ListTile(
-                        leading: Icon(Icons.shopping_bag_outlined,
-                            color: Colors.cyan.withValues(alpha: 0.5)),
-                        title: Text(widget.produto['descricao']),
-                        subtitle: Text(widget.produto['codBarras']),
+                      Hero(
+                        tag: 'listTileProdutosDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.shopping_bag_outlined,
+                              color: Colors.cyan.withAlpha(128),
+                            ),
+                            title: Text(widget.produto['descricao']),
+                            subtitle: Text(widget.produto['codBarras']),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -142,27 +166,47 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EstoquesDoProdutoPage(estoques: estoques),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.warehouse, color: Colors.green),
-                        title: Text('Estoques'),
+                      const Hero(
+                        tag: 'tituloEstoqueDoProduto',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(Icons.warehouse, color: Colors.green),
+                            title: Text('Estoques'),
+                          ),
+                        ),
                       ),
                       carregandoEstoques
                           ? const Center(child: CircularProgressIndicator())
                           : Column(
                               children: [
-                                for (var estoque in estoques)
-                                  ListTile(
-                                    leading: Icon(Icons.warehouse_outlined,
-                                        color: Colors.green
-                                            .withValues(alpha: 0.5)),
-                                    title: Text(estoque['estoque']),
-                                    trailing:
-                                        Text('${estoque['quantidade']} un.'),
+                                for (int i = 0; i < estoques.length; i++)
+                                  Hero(
+                                    tag: 'listTileComprasDoFornecedor$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.warehouse_outlined,
+                                          color: Colors.green
+                                              .withValues(alpha: 0.5),
+                                        ),
+                                        title: Text(estoques[i]['estoque']),
+                                        trailing: Text(
+                                            '${estoques[i]['quantidade']} un.'),
+                                      ),
+                                    ),
                                   ),
                               ],
                             )
@@ -172,14 +216,30 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MovimentacoesRecentesDoProdutoPage(
+                                movimentacoes: movimentacoesRecentes),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.history, color: Colors.yellow),
-                        title: Text('Movimentações Recentes'),
+                      const Hero(
+                        tag: 'tituloMovimentacoesRecentesDoProduto',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.history,
+                              color: Colors.yellow,
+                            ),
+                            title: Text('Movimentações'),
+                          ),
+                        ),
                       ),
                       carregandoMovimentacoes
                           ? const Center(child: CircularProgressIndicator())
@@ -191,19 +251,26 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
                                             ? 3
                                             : movimentacoesRecentes.length);
                                     i++)
-                                  ListTile(
-                                    leading: Icon(Icons.history_outlined,
-                                        color: Colors.yellow
-                                            .withValues(alpha: 0.5)),
-                                    title: Text(movimentacoesRecentes[i]
-                                        ['descricaoMovimentacaoEstoque']),
-                                    subtitle: Text(
-                                        DateFormat('dd/MM/yyyy HH:mm').format(
-                                            DateTime.parse(
-                                                movimentacoesRecentes[i]
-                                                    ['dataHora']))),
-                                    trailing: Text(
-                                        '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                  Hero(
+                                    tag:
+                                        'listTileMovimentacoesRecentesDoProduto$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(Icons.history_outlined,
+                                            color: Colors.yellow
+                                                .withValues(alpha: 0.5)),
+                                        title: Text(movimentacoesRecentes[i]
+                                            ['descricaoMovimentacaoEstoque']),
+                                        subtitle: Text(
+                                            DateFormat('dd/MM/yyyy HH:mm')
+                                                .format(DateTime.parse(
+                                                    movimentacoesRecentes[i]
+                                                        ['dataHora']))),
+                                        trailing: Text(
+                                            '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                      ),
+                                    ),
                                   ),
                                 if (movimentacoesRecentes.length > 3)
                                   ListTile(
@@ -222,12 +289,28 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
               Card(
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ComprasDoProdutoPage(compras: compras),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.shopping_cart, color: Colors.blue),
-                        title: Text('Compras'),
+                      const Hero(
+                        tag: 'tituloComprasDoProduto',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.shopping_cart,
+                              color: Colors.blue,
+                            ),
+                            title: Text('Compras'),
+                          ),
+                        ),
                       ),
                       carregandoCompras
                           ? const Center(child: CircularProgressIndicator())
@@ -240,16 +323,25 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
                                             ? 3
                                             : compras.length);
                                     i++)
-                                  ListTile(
-                                    leading: Icon(Icons.shopping_cart_outlined,
-                                        color:
-                                            Colors.blue.withValues(alpha: 0.5)),
-                                    title: Text(compras[i]['descricaoProduto']),
-                                    subtitle: Text(DateFormat('dd/MM/yyyy')
-                                        .format(DateTime.parse(
-                                            compras[i]['data']))),
-                                    trailing:
-                                        Text('${compras[i]['quantidade']} un.'),
+                                  Hero(
+                                    tag: 'listTileComprasDoProduto$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(
+                                            Icons.shopping_cart_outlined,
+                                            color: Colors.blue
+                                                .withValues(alpha: 0.5)),
+                                        title: Text(
+                                            compras[i]['descricaoProduto']),
+                                        subtitle: Text(
+                                            DateFormat('dd/MM/yyyy, HH:mm')
+                                                .format(DateTime.parse(
+                                                    compras[i]['data']))),
+                                        trailing: Text(
+                                            '${compras[i]['quantidade']} un.'),
+                                      ),
+                                    ),
                                   ),
                                 if (compras.length > 3)
                                   ListTile(

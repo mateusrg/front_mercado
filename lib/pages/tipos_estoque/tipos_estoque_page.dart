@@ -14,7 +14,7 @@ class TiposEstoquePage extends StatefulWidget {
 }
 
 class _TiposEstoquePageState extends State<TiposEstoquePage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _tiposEstoque = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
@@ -31,13 +31,19 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
     });
 
     try {
-      final response = await http
-          .get(Uri.http(
-              apiUrl,
-              query != null && query != ''
-                  ? '/TiposEstoque/descricao/$query'
-                  : '/TiposEstoque'))
-          .timeout(const Duration(seconds: 15));
+      final response = query != null && query != ''
+          ? await http
+              .post(
+                Uri.http(apiUrl, '/TiposEstoque/descricao'),
+                headers: {'Content-Type': 'application/json'},
+                body: json.encode({'query': query}),
+              )
+              .timeout(const Duration(seconds: 15))
+          : await http
+              .get(
+                Uri.http(apiUrl, '/TiposEstoque'),
+              )
+              .timeout(const Duration(seconds: 15));
 
       if (response.statusCode < 400) {
         setState(() {

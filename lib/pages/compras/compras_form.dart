@@ -13,7 +13,7 @@ class CompraFormPage extends StatefulWidget {
   State<CompraFormPage> createState() => _CompraFormPageState();
 }
 
-const String apiUrl = '${Params.ipApi}:5277';
+const String apiUrl = Params.apiUrl;
 
 class _CompraFormPageState extends State<CompraFormPage> {
   final _formKey = GlobalKey<FormState>();

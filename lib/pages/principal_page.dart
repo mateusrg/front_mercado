@@ -1,7 +1,6 @@
 import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:front_mercado/pages/compras/compras_form.dart';
-import 'package:front_mercado/pages/compras/compras_page.dart';
 import 'package:front_mercado/pages/login_page.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_page.dart';
@@ -15,12 +14,12 @@ class PrincipalPage extends StatefulWidget {
   const PrincipalPage({super.key});
 
   @override
-  _PrincipalPageState createState() => _PrincipalPageState();
+  State<PrincipalPage> createState() => _PrincipalPageState();
 }
 
 class _PrincipalPageState extends State<PrincipalPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
 
   Future<void> _deslogar(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -300,7 +299,8 @@ class _PrincipalPageState extends State<PrincipalPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const CompraFormPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const CompraFormPage()),
                   );
                 },
               ),
@@ -323,7 +323,7 @@ class _PrincipalPageState extends State<PrincipalPage> {
                       'Fenômenos SM',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        fontSize: 40, 
+                        fontSize: 40,
                         fontWeight: FontWeight.bold,
                         color: Colors.cyanAccent,
                         shadows: [
@@ -339,7 +339,7 @@ class _PrincipalPageState extends State<PrincipalPage> {
                       'A Rede 5 estrelas em atendimento onde qualidade e economia brilham muito!',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        fontSize: 18, 
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.cyan,
                         shadows: [

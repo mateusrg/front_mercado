@@ -17,7 +17,7 @@ class TransferenciaEstoquePage extends StatefulWidget {
 
 class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   final _formKey = GlobalKey<FormState>();
-  final urlApi = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   late TextEditingController _quantidadeController;
   late TextEditingController _horaController;
   bool _salvando = false;
@@ -52,7 +52,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   }
 
   Future<void> _carregarProdutos() async {
-    final response = await http.get(Uri.http(urlApi, '/Produtos'));
+    final response = await http.get(Uri.http(apiUrl, '/Produtos'));
     if (response.statusCode == 200) {
       setState(() {
         _produtos = List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -63,7 +63,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   }
 
   Future<void> _carregarEstoques() async {
-    final response = await http.get(Uri.http(urlApi, '/Estoques'));
+    final response = await http.get(Uri.http(apiUrl, '/Estoques'));
     if (response.statusCode == 200) {
       setState(() {
         _estoques = List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -74,7 +74,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   }
 
   Future<void> _carregarFuncionarios() async {
-    final response = await http.get(Uri.http(urlApi, '/Funcionarios'));
+    final response = await http.get(Uri.http(apiUrl, '/Funcionarios'));
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final usuarioLogadoString = prefs.getString('usuarioLogado');
@@ -119,7 +119,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
       try {
         final response = await http.post(
           Uri.http(
-              urlApi, 'MovimentacoesEstoque/movimentarProdutoEntreEstoques'),
+              apiUrl, 'MovimentacoesEstoque/movimentarProdutoEntreEstoques'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(movimentacao),
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/compras/compras_detalhes_data_page.dart';
 import 'package:front_mercado/pages/fornecedores/fornecedores_detalhes_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_detalhes_page.dart';
 import 'package:intl/intl.dart';
@@ -24,23 +25,41 @@ class CompraDetalhesPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {},
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ComprasDetalhesDataPage(compra: compra),
+                    ),
+                  );
+                },
                 child: Column(
                   children: [
-                    const ListTile(
-                      leading: Icon(Icons.calendar_month_rounded,
-                          color: Colors.cyan),
-                      title: Text('Data'),
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.calendar_month_outlined,
-                        color: Colors.cyan.withValues(alpha: 0.5),
+                    const Hero(
+                      tag: 'comprasDetalhesDataTitulo',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(Icons.calendar_month_rounded,
+                              color: Colors.cyan),
+                          title: Text('Data'),
+                        ),
                       ),
-                      title: Text(dataFormatada),
-                      subtitle: Text(horarioFormatado),
+                    ),
+                    Hero(
+                      tag: 'listTileCompraDetalhesData',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.calendar_month_outlined,
+                            color: Colors.cyan.withValues(alpha: 0.5),
+                          ),
+                          title: Text(dataFormatada),
+                          subtitle: Text(horarioFormatado),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -48,8 +67,7 @@ class CompraDetalhesPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
+              child: GestureDetector(
                 onTap: () async {
                   final produto = {
                     'idProduto': compra['idProduto'],
@@ -66,21 +84,33 @@ class CompraDetalhesPage extends StatelessWidget {
                 },
                 child: Column(
                   children: [
-                    const ListTile(
-                      leading: Icon(
-                        Icons.production_quantity_limits,
-                        color: Colors.green,
+                    const Hero(
+                      tag: 'tituloProdutosDetalhesCard',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.shopping_bag,
+                            color: Colors.green,
+                          ),
+                          title: Text('Produto'),
+                        ),
                       ),
-                      title: Text('Produto'),
                     ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.production_quantity_limits,
-                        color: Colors.green.withValues(alpha: 0.5),
+                    Hero(
+                      tag: 'listTileProdutosDetalhesCard',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.shopping_bag_outlined,
+                            color: Colors.green.withValues(alpha: 0.5),
+                          ),
+                          title: Text(compra['descricaoProduto']),
+                          subtitle: Text(compra['codBarrasProduto']),
+                          trailing: Text('${compra['quantidade']} un.'),
+                        ),
                       ),
-                      title: Text(compra['descricaoProduto']),
-                      subtitle: Text(compra['codBarrasProduto']),
-                      trailing: Text('${compra['quantidade']} un.'),
                     )
                   ],
                 ),
@@ -88,8 +118,7 @@ class CompraDetalhesPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
+              child: GestureDetector(
                 onTap: () async {
                   final fornecedor = {
                     'idFornecedor': compra['idFornecedor'],
@@ -106,20 +135,32 @@ class CompraDetalhesPage extends StatelessWidget {
                 },
                 child: Column(
                   children: [
-                    const ListTile(
-                      leading: Icon(
-                        Icons.business,
-                        color: Colors.yellow,
+                    const Hero(
+                      tag: 'tituloFornecedoresDetalhesCard',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.business,
+                            color: Colors.yellow,
+                          ),
+                          title: Text('Fornecedor'),
+                        ),
                       ),
-                      title: Text('Fornecedor'),
                     ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.business_outlined,
-                        color: Colors.yellow.withValues(alpha: 0.5),
+                    Hero(
+                      tag: 'listTileFornecedoresDetalhesCard',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.business_outlined,
+                            color: Colors.yellow.withValues(alpha: 0.5),
+                          ),
+                          title: Text(compra['nomeFornecedor']),
+                          subtitle: Text(compra['cnpjFornecedor']),
+                        ),
                       ),
-                      title: Text(compra['nomeFornecedor']),
-                      subtitle: Text(compra['cnpjFornecedor']),
                     ),
                   ],
                 ),

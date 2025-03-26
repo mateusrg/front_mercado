@@ -14,7 +14,7 @@ class FuncionariosPage extends StatefulWidget {
 }
 
 class _FuncionariosPageState extends State<FuncionariosPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _funcionarios = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
@@ -31,13 +31,15 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
     });
 
     try {
-      final response = await http
-          .get(Uri.http(
-              apiUrl,
-              query != null && query != ''
-                  ? '/Funcionarios/IdNomeSetorEmail/$query'
-                  : '/Funcionarios'))
-          .timeout(const Duration(seconds: 15));
+      final response = query != null && query != ''
+          ? await http
+              .post(Uri.http(apiUrl, '/Funcionarios/IdNomeSetorEmail'),
+                  headers: {'Content-Type': 'application/json'},
+                  body: json.encode({'query': query}))
+              .timeout(const Duration(seconds: 15))
+          : await http
+              .get(Uri.http(apiUrl, '/Funcionarios'))
+              .timeout(const Duration(seconds: 15));
 
       if (response.statusCode < 400) {
         setState(() {
@@ -59,7 +61,8 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
     }
   }
 
-  void _abrirFormularioFuncionarios({Map<String, dynamic>? funcionarios}) async {
+  void _abrirFormularioFuncionarios(
+      {Map<String, dynamic>? funcionarios}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FuncionariosFormPage(funcionarios: funcionarios),
@@ -126,15 +129,15 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
                               Text('${_funcionarios[index]['idFuncionario']}'),
                           trailing: Text(_funcionarios[index]['setor'] ?? ''),
                           onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FuncionariosDetalhesPage(
-                                funcionario: _funcionarios[index],
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => FuncionariosDetalhesPage(
+                                  funcionario: _funcionarios[index],
+                                ),
                               ),
-                            ),
-                          );
-                          _listarFuncionarios();
-                        },
+                            );
+                            _listarFuncionarios();
+                          },
                         ),
                       );
                     },

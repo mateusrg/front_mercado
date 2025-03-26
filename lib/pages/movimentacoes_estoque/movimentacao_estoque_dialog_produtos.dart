@@ -12,7 +12,7 @@ class DialogPesquisaProduto extends StatefulWidget {
 
 class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
   final TextEditingController _pesquisaController = TextEditingController();
-  final urlApi = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _resultadosPesquisa = [];
   bool _carregando = false;
 
@@ -22,7 +22,7 @@ class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
     });
 
     try {
-      final response = await http.get(Uri.http(urlApi, 'Produtos/tudo/$texto'));
+      final response = await http.get(Uri.http(apiUrl, 'Produtos/tudo/$texto'));
       if (response.statusCode == 200) {
         setState(() {
           _resultadosPesquisa =

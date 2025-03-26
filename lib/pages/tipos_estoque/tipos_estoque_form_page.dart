@@ -14,7 +14,7 @@ class TipoEstoqueFormPage extends StatefulWidget {
 }
 
 class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _descricaoController;
   bool _salvando = false;

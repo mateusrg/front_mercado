@@ -24,8 +24,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
     super.initState();
     _carregarTiposEstoque();
     if (widget.estoque != null) {
-       _preencherCamposParaEdicao();
-   }
+      _preencherCamposParaEdicao();
+    }
   }
 
   void _preencherCamposParaEdicao() {
@@ -39,16 +39,18 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   Future<void> _carregarTiposEstoque() async {
     try {
       final response = await http.get(
-        Uri.http('${Params.ipApi}:5277', '/TiposEstoque'),
+        Uri.http(Params.apiUrl, '/TiposEstoque'),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         setState(() {
-          _tiposEstoque = List<Map<String, dynamic>>.from(json.decode(response.body));
+          _tiposEstoque =
+              List<Map<String, dynamic>>.from(json.decode(response.body));
         });
       } else {
-        _mostrarErro('Erro ao carregar tipos de estoque: ${response.statusCode}');
+        _mostrarErro(
+            'Erro ao carregar tipos de estoque: ${response.statusCode}');
       }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
@@ -69,12 +71,12 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
       try {
         final response = widget.estoque == null
             ? await http.post(
-                Uri.http('${Params.ipApi}:5277', '/Estoques'),
+                Uri.http(Params.apiUrl, '/Estoques'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode(estoque),
               )
             : await http.put(
-                Uri.http('${Params.ipApi}:5277', '/Estoques/${widget.estoque!['id']}'),
+                Uri.http(Params.apiUrl, '/Estoques/${widget.estoque!['id']}'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode(estoque),
               );
@@ -82,7 +84,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
         if (response.statusCode < 400) {
           Navigator.of(context).pop(true); // Retorna sucesso
         } else {
-          _mostrarErro('Erro ao salvar/alterar estoque: ${response.statusCode}');
+          _mostrarErro(
+              'Erro ao salvar/alterar estoque: ${response.statusCode}');
         }
       } catch (e) {
         _mostrarErro('Não foi possível se conectar com a API.');
@@ -107,7 +110,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
+        title: Text(
+            widget.estoque == null ? 'Cadastro de Estoque' : 'Alterar Estoque'),
       ),
       body: _carregando
           ? const Center(child: CircularProgressIndicator())
@@ -130,7 +134,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                     const SizedBox(height: 16.0),
                     DropdownButtonFormField<String>(
                       value: _tipoSelecionado,
-                      decoration: const InputDecoration(labelText: 'Tipo de Estoque'),
+                      decoration:
+                          const InputDecoration(labelText: 'Tipo de Estoque'),
                       items: _tiposEstoque.map((tipo) {
                         return DropdownMenuItem<String>(
                           value: tipo['idTipoEstoque'].toString(),
@@ -152,7 +157,8 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: _salvarOuAlterarEstoque,
-                      child: Text(widget.estoque == null ? 'Salvar' : 'Alterar'),
+                      child:
+                          Text(widget.estoque == null ? 'Salvar' : 'Alterar'),
                     ),
                   ],
                 ),

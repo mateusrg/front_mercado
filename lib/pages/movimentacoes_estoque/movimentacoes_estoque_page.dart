@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_transferencia.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_vendas.dart';
-import 'package:front_mercado/pages/compras/compras_form.dart'; // Importe a página de cadastro de compras
+import 'package:front_mercado/pages/compras/compras_form.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,7 @@ import 'dart:convert';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 
-import 'movimentacao_estoque_detalhes.dart';
+import 'movimentacao_estoque_detalhes_page.dart';
 
 class MovimentacoesEstoquePage extends StatefulWidget {
   const MovimentacoesEstoquePage({super.key});
@@ -20,14 +21,64 @@ class MovimentacoesEstoquePage extends StatefulWidget {
 }
 
 class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
-  final String urlApi = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _movimentacoes = [];
+  List<Map<String, dynamic>> _produtos = [];
+  List<Map<String, dynamic>> _estoques = [];
+  List<Map<String, dynamic>> _tiposMovimentacaoEstoque = [];
   bool _carregando = false;
+  bool _mostrarFiltro = false;
+
+  Map<String, dynamic>? _produtoSelecionado;
+  Map<String, dynamic>? _estoqueSelecionado;
+  Map<String, dynamic>? _tipoMovimentacaoEstoqueSelecionado;
+  DateTime? _dataInicial;
+  DateTime? _dataFinal;
+  final TextEditingController _quantidadeInicialController =
+      TextEditingController();
+  final TextEditingController _quantidadeFinalController =
+      TextEditingController();
 
   @override
   void initState() {
-    _listarMovimentacoes();
+    _carregarDadosIniciais();
     super.initState();
+  }
+
+  Future<void> _carregarDadosIniciais() async {
+    await _carregarProdutos();
+    await _carregarEstoques();
+    await _carregarTiposEstoque();
+    await _listarMovimentacoes();
+  }
+
+  Future<void> _carregarProdutos() async {
+    final response = await http.get(Uri.http(apiUrl, '/Produtos'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _produtos = List<Map<String, dynamic>>.from(json.decode(response.body));
+      });
+    }
+  }
+
+  Future<void> _carregarEstoques() async {
+    final response = await http.get(Uri.http(apiUrl, '/Estoques'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _estoques = List<Map<String, dynamic>>.from(json.decode(response.body));
+      });
+    }
+  }
+
+  Future<void> _carregarTiposEstoque() async {
+    final response =
+        await http.get(Uri.http(apiUrl, '/TiposMovimentacaoEstoque'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _tiposMovimentacaoEstoque =
+            List<Map<String, dynamic>>.from(json.decode(response.body));
+      });
+    }
   }
 
   Future<void> _listarMovimentacoes() async {
@@ -35,9 +86,28 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
       _carregando = true;
     });
 
+    final parametros = {
+      'dataInicio': _dataInicial?.toIso8601String(),
+      'dataFim': _dataFinal?.toIso8601String(),
+      'quantidadeMinima': _quantidadeInicialController.text.isEmpty
+          ? null
+          : _quantidadeInicialController.text,
+      'quantidadeMaxima': _quantidadeFinalController.text.isEmpty
+          ? null
+          : _quantidadeFinalController.text,
+      'idProduto': _produtoSelecionado?['idProduto'],
+      'idEstoque': _estoqueSelecionado?['idEstoque'],
+      'idTipoMovimentacaoEstoque':
+          _tipoMovimentacaoEstoqueSelecionado?['idTipoMovimentacaoEstoque']
+    };
+
     try {
-      final response =
-          await http.get(Uri.http(urlApi, '/MovimentacoesEstoque/view'));
+      final response = await http.post(
+        Uri.http(apiUrl, '/MovimentacoesEstoque/filtrar'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(parametros),
+      );
+
       if (response.statusCode == 200) {
         setState(() {
           _movimentacoes =
@@ -91,15 +161,243 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
     _listarMovimentacoes();
   }
 
+  void _toggleFiltro() {
+    setState(() {
+      _mostrarFiltro = !_mostrarFiltro;
+    });
+  }
+
+  void _limparFiltros() {
+    setState(() {
+      _produtoSelecionado = null;
+      _estoqueSelecionado = null;
+      _tipoMovimentacaoEstoqueSelecionado = null;
+      _quantidadeInicialController.clear();
+      _quantidadeFinalController.clear();
+      _dataInicial = null;
+      _dataFinal = null;
+    });
+  }
+
+  void _limparProduto() {
+    setState(() {
+      _produtoSelecionado = null;
+    });
+  }
+
+  void _limparEstoque() {
+    setState(() {
+      _estoqueSelecionado = null;
+    });
+  }
+
+  void _limparTipoMovimentacao() {
+    setState(() {
+      _tipoMovimentacaoEstoqueSelecionado = null;
+    });
+  }
+
+  Future<void> _selecionarDataInicial(BuildContext context) async {
+    final DateTime? selecionado = await showDatePicker(
+      context: context,
+      initialDate: _dataInicial ?? DateTime.now(),
+      firstDate: DateTime(1),
+      lastDate: DateTime(9999),
+    );
+    if (selecionado != null) {
+      setState(() {
+        _dataInicial = selecionado;
+      });
+    }
+  }
+
+  Future<void> _selecionarDataFinal(BuildContext context) async {
+    final DateTime? selecionado = await showDatePicker(
+      context: context,
+      initialDate: _dataFinal ?? DateTime.now(),
+      firstDate: DateTime(1),
+      lastDate: DateTime(9999),
+    );
+    if (selecionado != null) {
+      setState(() {
+        _dataFinal = selecionado;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Movimentações de Estoque'),
+        actions: [
+          IconButton(
+            onPressed: _toggleFiltro,
+            icon: const Icon(Icons.filter_alt),
+          ),
+        ],
       ),
       drawer: const DrawerFenomenos('Movimentações de Estoque'),
       body: Column(
         children: [
+          if (_mostrarFiltro)
+            Card(
+              margin: const EdgeInsets.all(8),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    // Dropdown de Produto com botão de limpar
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Map<String, dynamic>>(
+                            value: _produtoSelecionado,
+                            decoration:
+                                const InputDecoration(labelText: 'Produto'),
+                            items: _produtos.map((produto) {
+                              return DropdownMenuItem(
+                                value: produto,
+                                child: Text(produto['descricao']),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _produtoSelecionado = value;
+                              });
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: _limparProduto,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Dropdown de Estoque com botão de limpar
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Map<String, dynamic>>(
+                            value: _estoqueSelecionado,
+                            decoration:
+                                const InputDecoration(labelText: 'Estoque'),
+                            items: _estoques.map((estoque) {
+                              return DropdownMenuItem(
+                                value: estoque,
+                                child: Text(estoque['descricao']),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _estoqueSelecionado = value;
+                              });
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: _limparEstoque,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Dropdown de Tipo de Movimentação de Estoque com botão de limpar
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Map<String, dynamic>>(
+                            value: _tipoMovimentacaoEstoqueSelecionado,
+                            decoration: const InputDecoration(
+                                labelText: 'Tipo de Movimentação Estoque'),
+                            items: _tiposMovimentacaoEstoque.map((tipo) {
+                              return DropdownMenuItem(
+                                value: tipo,
+                                child: Text(tipo['descricao']),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _tipoMovimentacaoEstoqueSelecionado = value;
+                              });
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: _limparTipoMovimentacao,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton.icon(
+                            icon: const Icon(Icons.calendar_today),
+                            label: Text(_dataInicial != null
+                                ? DateFormat('dd/MM/yyyy').format(_dataInicial!)
+                                : 'Data Inicial'),
+                            onPressed: () => _selecionarDataInicial(context),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextButton.icon(
+                            icon: const Icon(Icons.calendar_today),
+                            label: Text(_dataFinal != null
+                                ? DateFormat('dd/MM/yyyy').format(_dataFinal!)
+                                : 'Data Final'),
+                            onPressed: () => _selecionarDataFinal(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quantidadeInicialController,
+                            decoration: const InputDecoration(
+                                labelText: 'Quantidade Inicial'),
+                            keyboardType: const TextInputType.numberWithOptions(
+                                signed: true, decimal: false),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^-?(0|[1-9]\d*)?$'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quantidadeFinalController,
+                            decoration: const InputDecoration(
+                                labelText: 'Quantidade Final'),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: _listarMovimentacoes,
+                          child: const Text('Pesquisar'),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: _limparFiltros,
+                          child: const Text('Limpar'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
@@ -159,9 +457,7 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
             child: const Icon(Icons.add_shopping_cart),
             backgroundColor: const Color.fromARGB(255, 0, 39, 118),
             label: 'Cadastrar Compra',
-            onTap: () {
-              _abrirFormularioCompras();
-            },
+            onTap: _abrirFormularioCompras,
           ),
         ],
       ),

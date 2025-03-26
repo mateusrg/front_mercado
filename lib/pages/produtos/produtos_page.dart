@@ -17,7 +17,7 @@ class ProdutosPage extends StatefulWidget {
 }
 
 class _ProdutosPageState extends State<ProdutosPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _produtos = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
@@ -34,13 +34,19 @@ class _ProdutosPageState extends State<ProdutosPage> {
     });
 
     try {
-      final response = await http
-          .get(Uri.http(
-              apiUrl,
-              query != null && query != ''
-                  ? '/Produtos/descricaoECodBarras/$query'
-                  : '/Produtos'))
-          .timeout(const Duration(seconds: 15));
+      final response = query != null && query != ''
+          ? await http
+              .post(
+                Uri.http(apiUrl, '/Produtos/descricaoECodBarras'),
+                headers: {'Content-Type': 'application/json'},
+                body: json.encode({'query': query}),
+              )
+              .timeout(const Duration(seconds: 15))
+          : await http
+              .get(
+                Uri.http(apiUrl, '/Produtos'),
+              )
+              .timeout(const Duration(seconds: 15));
 
       if (response.statusCode < 400) {
         setState(() {

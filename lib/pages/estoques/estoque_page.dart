@@ -14,7 +14,7 @@ class EstoquePage extends StatefulWidget {
 }
 
 class _EstoquePageState extends State<EstoquePage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _estoque = [];
   List<Map<String, dynamic>> _estoqueFiltrado = [];
   List<Map<String, dynamic>> _tiposEstoque = [];
@@ -49,7 +49,8 @@ class _EstoquePageState extends State<EstoquePage> {
               List<Map<String, dynamic>>.from(json.decode(response.body)));
         });
       } else {
-        _mostrarErro('Erro ao carregar tipos de estoque: ${response.statusCode}');
+        _mostrarErro(
+            'Erro ao carregar tipos de estoque: ${response.statusCode}');
       }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
@@ -78,7 +79,7 @@ class _EstoquePageState extends State<EstoquePage> {
         setState(() {
           _estoque =
               List<Map<String, dynamic>>.from(json.decode(response.body));
-          _estoqueFiltrado = _estoque;  // Inicializa com todos os itens
+          _estoqueFiltrado = _estoque; // Inicializa com todos os itens
           _carregando = false;
         });
       } else {
@@ -100,9 +101,8 @@ class _EstoquePageState extends State<EstoquePage> {
 
     setState(() {
       _estoqueFiltrado = _estoque.where((estoque) {
-        final descricaoMatch = estoque['descricaoEstoque']
-            .toLowerCase()
-            .contains(query);
+        final descricaoMatch =
+            estoque['descricaoEstoque'].toLowerCase().contains(query);
         final tipoMatch = _tipoSelecionado == null ||
             _tipoSelecionado == 'Todos' || // Inclui todos os estoques
             estoque['descricaoTipoEstoque'] == _tipoSelecionado;
@@ -149,13 +149,15 @@ class _EstoquePageState extends State<EstoquePage> {
                       labelText: 'Pesquisar por Descrição',
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search),
-                        onPressed: _filtrarEstoque, // Pesquisa ao clicar na lupa
+                        onPressed:
+                            _filtrarEstoque, // Pesquisa ao clicar na lupa
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onSubmitted: (_) => _filtrarEstoque(), // Pesquisa ao pressionar Enter
+                    onSubmitted: (_) =>
+                        _filtrarEstoque(), // Pesquisa ao pressionar Enter
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -192,9 +194,12 @@ class _EstoquePageState extends State<EstoquePage> {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
-                          title: Text(_estoqueFiltrado[index]['descricaoEstoque']),
-                          leading: Text('${_estoqueFiltrado[index]['idEstoque']}'),
-                          trailing: Text(_estoqueFiltrado[index]['descricaoTipoEstoque']),
+                          title:
+                              Text(_estoqueFiltrado[index]['descricaoEstoque']),
+                          leading:
+                              Text('${_estoqueFiltrado[index]['idEstoque']}'),
+                          trailing: Text(
+                              _estoqueFiltrado[index]['descricaoTipoEstoque']),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(

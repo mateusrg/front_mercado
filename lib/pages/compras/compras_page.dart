@@ -15,7 +15,7 @@ class ComprasPage extends StatefulWidget {
   State<ComprasPage> createState() => _ComprasPageState();
 }
 
-const String apiUrl = '${Params.ipApi}:5277';
+const String apiUrl = Params.apiUrl;
 
 class _ComprasPageState extends State<ComprasPage> {
   List<Map<String, dynamic>> _compras = [];

@@ -14,7 +14,7 @@ class FornecedoresPage extends StatefulWidget {
 }
 
 class _FornecedoresPageState extends State<FornecedoresPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _fornecedores = [];
   final TextEditingController _pesquisaController = TextEditingController();
   bool _carregando = false;
@@ -31,13 +31,22 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
     });
 
     try {
-      final response = await http
-          .get(Uri.http(
-              apiUrl,
-              query != null && query != ''
-                  ? '/Fornecedores/nomeECnpj/$query'
-                  : '/Fornecedores'))
-          .timeout(const Duration(seconds: 15));
+      dynamic res;
+      if (query == null || query == '') {
+        res = await http
+            .get(Uri.http(apiUrl, '/Fornecedores'))
+            .timeout(const Duration(seconds: 15));
+      } else {
+        res = await http
+            .post(
+              Uri.http(apiUrl, '/Fornecedores/nomeECnpj'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'query': query}),
+            )
+            .timeout(const Duration(seconds: 15));
+        print(jsonEncode({'query': query}));
+      }
+      final response = res;
 
       if (response.statusCode < 400) {
         setState(() {

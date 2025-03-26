@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/fornecedores/compras_do_fornecedor_page.dart';
+import 'package:front_mercado/pages/fornecedores/fornecedores_detalhes_card_page.dart';
 import 'package:front_mercado/pages/fornecedores/fornecedores_form_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -15,7 +17,7 @@ class FornecedorDetalhesPage extends StatefulWidget {
 }
 
 class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<dynamic> compras = [];
   bool carregandoCompras = true;
 
@@ -106,22 +108,43 @@ class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => FornecedoresDetalhesCardPage(
+                            fornecedor: widget.fornecedor),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.business, color: Colors.cyan),
-                        title: Text('Fornecedor'),
-                      ),
-                      ListTile(
-                        leading: Icon(
-                          Icons.business,
-                          color: Colors.cyan.withValues(alpha: 0.5),
+                      const Hero(
+                        tag: 'tituloFornecedoresDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.business,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Fornecedor'),
+                          ),
                         ),
-                        title: Text(widget.fornecedor['nome']),
-                        subtitle: Text(widget.fornecedor['cnpj']),
+                      ),
+                      Hero(
+                        tag: 'listTileFornecedoresDetalhesCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.business_outlined,
+                              color: Colors.cyan.withAlpha(128),
+                            ),
+                            title: Text(widget.fornecedor['nome']),
+                            subtitle: Text(widget.fornecedor['cnpj']),
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -129,14 +152,31 @@ class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ComprasDoFornecedorPage(compras: compras),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.shopping_cart, color: Colors.green),
-                        title: Text('Compras do Fornecedor'),
+                      const Hero(
+                        tag: 'tituloComprasDoFornecedor',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.shopping_cart,
+                              color: Colors.green,
+                            ),
+                            title: Text(
+                              'Compras do Fornecedor',
+                            ),
+                          ),
+                        ),
                       ),
                       carregandoCompras
                           ? const Center(child: CircularProgressIndicator())
@@ -149,19 +189,26 @@ class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
                                             ? 3
                                             : compras.length);
                                     i++)
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.shopping_cart_outlined,
-                                      color:
-                                          Colors.green.withValues(alpha: 0.5),
+                                  Hero(
+                                    tag: 'listTileComprasDoFornecedor$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.shopping_cart_outlined,
+                                          color: Colors.green
+                                              .withValues(alpha: 0.5),
+                                        ),
+                                        title: Text(
+                                            compras[i]['descricaoProduto']),
+                                        subtitle: Text(
+                                            DateFormat('dd/MM/yyyy, HH:mm')
+                                                .format(DateTime.parse(
+                                                    compras[i]['data']))),
+                                        trailing: Text(
+                                            '${compras[i]['quantidade']} un.'),
+                                      ),
                                     ),
-                                    title: Text(compras[i]['descricaoProduto']),
-                                    subtitle: Text(
-                                        DateFormat('dd/MM/yyyy, HH:mm').format(
-                                            DateTime.parse(
-                                                compras[i]['data']))),
-                                    trailing:
-                                        Text('${compras[i]['quantidade']} un.'),
                                   ),
                                 if (compras.length > 3)
                                   ListTile(

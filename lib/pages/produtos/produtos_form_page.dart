@@ -15,7 +15,7 @@ class ProdutosFormPage extends StatefulWidget {
 }
 
 class _ProdutosFormPageState extends State<ProdutosFormPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _descricaoController;
   late MaskedTextController _codbarrasController;

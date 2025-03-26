@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/tipos_estoque/tipo_estoque_estoques_page.dart';
+import 'package:front_mercado/pages/tipos_estoque/tipos_estoque_card_page.dart';
 import 'package:front_mercado/pages/tipos_estoque/tipos_estoque_form_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -15,7 +17,7 @@ class TiposEstoqueDetalhesPage extends StatefulWidget {
 }
 
 class _TiposEstoqueDetalhesPageState extends State<TiposEstoqueDetalhesPage> {
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   List<dynamic> estoques = [];
   bool carregandoEstoques = true;
 
@@ -70,56 +72,108 @@ class _TiposEstoqueDetalhesPageState extends State<TiposEstoqueDetalhesPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Card(
-                child: Column(
-                  children: [
-                    const ListTile(
-                      leading:
-                          Icon(Icons.inventory_rounded, color: Colors.cyan),
-                      title: Text('Tipo de Estoque'),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TiposEstoqueCardPage(tipoEstoque: widget.tipoEstoque),
                     ),
-                    ListTile(
-                      leading: Icon(Icons.inventory_rounded,
-                          color: Colors.cyan.withValues(alpha: 0.5)),
-                      title: Text(widget.tipoEstoque['descricao']),
-                    ),
-                  ],
+                  );
+                },
+                child: Card(
+                  child: Column(
+                    children: [
+                      const Hero(
+                        tag: 'tituloTiposEstoqueCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.inventory_rounded,
+                              color: Colors.cyan,
+                            ),
+                            title: Text('Tipo de Estoque'),
+                          ),
+                        ),
+                      ),
+                      Hero(
+                        tag: 'listTileTiposEstoqueCard',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.inventory_outlined,
+                              color: Colors.cyan.withAlpha(128),
+                            ),
+                            title: Text(widget.tipoEstoque['descricao']),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              Card(
-                child: Column(
-                  children: [
-                    const ListTile(
-                      leading: Icon(Icons.history, color: Colors.green),
-                      title: Text('Estoques desse Tipo'),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EstoquesDoTipoEstoquePage(estoques: estoques),
                     ),
-                    carregandoEstoques
-                        ? const Center(child: CircularProgressIndicator())
-                        : Column(
-                            children: [
-                              for (int i = 0;
-                                  i <
-                                      (estoques.length > 3
-                                          ? 3
-                                          : estoques.length);
-                                  i++)
-                                ListTile(
-                                  leading: Icon(Icons.history_outlined,
-                                      color:
-                                          Colors.green.withValues(alpha: 0.5)),
-                                  title: Text(estoques[i]['descricaoEstoque']),
-                                ),
-                              if (estoques.length > 3)
-                                ListTile(
-                                  leading: Icon(Icons.add,
-                                      color:
-                                          Colors.grey.withValues(alpha: 0.5)),
-                                  title: const Text('E mais...'),
-                                ),
-                            ],
+                  );
+                },
+                child: Card(
+                  child: Column(
+                    children: [
+                      const Hero(
+                        tag: 'tituloEstoqueDoTipoEstoque',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.history,
+                              color: Colors.green,
+                            ),
+                            title: Text('Estoques'),
                           ),
-                  ],
+                        ),
+                      ),
+                      carregandoEstoques
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        (estoques.length > 3
+                                            ? 3
+                                            : estoques.length);
+                                    i++)
+                                  Hero(
+                                    tag: 'listTileComprasDoTipoEstoque$i',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(Icons.history_outlined,
+                                            color: Colors.green
+                                                .withValues(alpha: 0.5)),
+                                        title: Text(
+                                            estoques[i]['descricaoEstoque']),
+                                      ),
+                                    ),
+                                  ),
+                                if (estoques.length > 3)
+                                  ListTile(
+                                    leading: Icon(Icons.add,
+                                        color:
+                                            Colors.grey.withValues(alpha: 0.5)),
+                                    title: const Text('E mais...'),
+                                  ),
+                              ],
+                            ),
+                    ],
+                  ),
                 ),
               ),
             ],

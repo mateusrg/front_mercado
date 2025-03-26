@@ -15,7 +15,7 @@ class FuncionariosFormPage extends StatefulWidget {
 
 class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final String apiUrl = '${Params.ipApi}:5277';
+  static const String apiUrl = Params.apiUrl;
   late TextEditingController _nomeController;
   late TextEditingController _emailController;
   late TextEditingController _setorController;
