@@ -5,7 +5,10 @@ import 'package:front_mercado/pages/compras/modais/dialog_pesquisa_produtos.dart
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'dart:convert';
+
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class CompraFormPage extends StatefulWidget {
   const CompraFormPage({super.key});
@@ -149,6 +152,39 @@ class _CompraFormPageState extends State<CompraFormPage> {
     }
   }
 
+  Future<String?> _lerCodigoDeBarras() async {
+    String? res = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Ler Código de Barras',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 500,
+      cameraFace: CameraFace.back,
+      cancelButtonText: 'Cancelar',
+    );
+
+    return res != null && res.length > 5 ? res : null;
+  }
+
+  _consultarPorLeitor() async {
+    final codBarras = await _lerCodigoDeBarras();
+    if (codBarras != null) {
+      final encontrado = _produtos.firstWhere(
+        (p) => p['codBarras'] == codBarras,
+        orElse: () => {},
+      );
+      if (encontrado.isNotEmpty) {
+        setState(() => _produtoSelecionado = encontrado);
+      } else {
+        _mostrarErro('Produto não encontrado.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_carregando) {
@@ -156,7 +192,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
         appBar: AppBar(
           title: const Row(children: [
             Hero(tag: 'hero-compras', child: Icon(Icons.add_shopping_cart)),
-            SizedBox(width: 8),
+            SizedBox(width: 12),
             Text('Compras'),
           ]),
         ),
@@ -168,7 +204,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
       appBar: AppBar(
         title: const Row(children: [
           Hero(tag: 'hero-compras', child: Icon(Icons.add_shopping_cart)),
-          SizedBox(width: 8),
+          SizedBox(width: 12),
           Text('Compras'),
         ]),
       ),
@@ -247,7 +283,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
                                       maxWidth:
                                           MediaQuery.of(context).size.width *
                                                   0.8 -
-                                              32,
+                                              96,
                                     ),
                                     child: Text(
                                       '${produto['descricao']} - ${produto['codBarras']}',
@@ -262,6 +298,9 @@ class _CompraFormPageState extends State<CompraFormPage> {
                             value == null ? 'Selecione um produto' : null,
                       ),
                     ),
+                    IconButton(
+                        onPressed: _consultarPorLeitor,
+                        icon: const Icon(Symbols.barcode_scanner)),
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {

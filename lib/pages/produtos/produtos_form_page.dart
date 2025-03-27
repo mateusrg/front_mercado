@@ -141,6 +141,7 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
                 },
                 onFieldSubmitted: (_) => _salvar(),
               ),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _codbarrasController,
                 decoration:
@@ -161,6 +162,9 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _salvando ? null : _salvar,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
                 child: _salvando
                     ? const SizedBox(
                         width: 20,
@@ -171,7 +175,10 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
                           strokeWidth: 2.0,
                         ),
                       )
-                    : Text(widget.produto == null ? 'Cadastrar' : 'Alterar'),
+                    : Text(
+                        widget.produto == null ? 'Cadastrar' : 'Alterar',
+                        style: const TextStyle(fontSize: 16),
+                      ),
               ),
             ],
           ),

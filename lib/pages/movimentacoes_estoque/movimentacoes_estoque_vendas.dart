@@ -6,8 +6,10 @@ import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class VendaPage extends StatefulWidget {
   const VendaPage({super.key});
@@ -112,6 +114,39 @@ class _VendaPageState extends State<VendaPage> {
         SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
   }
 
+  Future<String?> _lerCodigoDeBarras() async {
+    String? res = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Ler Código de Barras',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 500,
+      cameraFace: CameraFace.back,
+      cancelButtonText: 'Cancelar',
+    );
+
+    return res != null && res.length > 5 ? res : null;
+  }
+
+  _consultarPorLeitor() async {
+    final codBarras = await _lerCodigoDeBarras();
+    if (codBarras != null) {
+      final encontrado = _produtos.firstWhere(
+        (p) => p['codBarras'] == codBarras,
+        orElse: () => {},
+      );
+      if (encontrado.isNotEmpty) {
+        setState(() => _produtoSelecionado = encontrado);
+      } else {
+        _mostrarErro('Produto não encontrado.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_carregando) {
@@ -144,7 +179,7 @@ class _VendaPageState extends State<VendaPage> {
                                       maxWidth:
                                           MediaQuery.of(context).size.width *
                                                   0.8 -
-                                              32,
+                                              96,
                                     ),
                                     child: Text(
                                       '${produto['descricao']} - ${produto['codBarras']}',
@@ -158,6 +193,10 @@ class _VendaPageState extends State<VendaPage> {
                         validator: (value) =>
                             value == null ? 'Selecione um produto' : null,
                       ),
+                    ),
+                    IconButton(
+                      onPressed: _consultarPorLeitor,
+                      icon: const Icon(Symbols.barcode_scanner),
                     ),
                     IconButton(
                       icon: const Icon(Icons.search),
@@ -179,6 +218,7 @@ class _VendaPageState extends State<VendaPage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 TextFormField(
                   controller: _quantidadeController,
                   decoration: const InputDecoration(labelText: 'Quantidade'),
@@ -193,6 +233,7 @@ class _VendaPageState extends State<VendaPage> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -212,6 +253,7 @@ class _VendaPageState extends State<VendaPage> {
                             value == null ? 'Selecione o solicitador' : null,
                       ),
                     ),
+                    const SizedBox(height: 8),
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {
@@ -237,6 +279,7 @@ class _VendaPageState extends State<VendaPage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -281,6 +324,7 @@ class _VendaPageState extends State<VendaPage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -329,6 +373,9 @@ class _VendaPageState extends State<VendaPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _salvando ? null : _salvar,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
                   child: _salvando
                       ? const SizedBox(
                           width: 20,
@@ -339,7 +386,10 @@ class _VendaPageState extends State<VendaPage> {
                             strokeWidth: 2.0,
                           ),
                         )
-                      : const Text('Vender'),
+                      : const Text(
+                          'Vender',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),

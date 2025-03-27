@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:front_mercado/pages/compras/compras_detalhes_page.dart';
 import 'package:front_mercado/pages/compras/compras_form.dart';
+import 'package:front_mercado/pages/compras/modais/dialog_pesquisa_fornecedor.dart';
+import 'package:front_mercado/pages/compras/modais/dialog_pesquisa_produtos.dart';
 import 'package:front_mercado/params.dart';
 import 'package:front_mercado/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class ComprasPage extends StatefulWidget {
   const ComprasPage({super.key});
@@ -191,6 +195,39 @@ class _ComprasPageState extends State<ComprasPage> {
     });
   }
 
+  Future<String?> _lerCodigoDeBarras() async {
+    String? res = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Ler Código de Barras',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 500,
+      cameraFace: CameraFace.back,
+      cancelButtonText: 'Cancelar',
+    );
+
+    return res != null && res.length > 5 ? res : null;
+  }
+
+  _consultarPorLeitor() async {
+    final codBarras = await _lerCodigoDeBarras();
+    if (codBarras != null) {
+      final encontrado = _produtos.firstWhere(
+        (p) => p['codBarras'] == codBarras,
+        orElse: () => {},
+      );
+      if (encontrado.isNotEmpty) {
+        setState(() => _produtoSelecionado = encontrado);
+      } else {
+        _mostrarErro('Produto não encontrado.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -259,9 +296,36 @@ class _ComprasPageState extends State<ComprasPage> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: _limparProduto,
+                          onPressed: _consultarPorLeitor,
+                          icon: const Icon(Symbols.barcode_scanner),
                         ),
+                        if (_produtoSelecionado == null)
+                          IconButton(
+                            onPressed: () async {
+                              final produto =
+                                  await showDialog<Map<String, dynamic>>(
+                                context: context,
+                                builder: (context) =>
+                                    const DialogPesquisaProduto(),
+                              );
+                              if (produto != null) {
+                                final encontrado = _produtos.firstWhere(
+                                  (p) => p['idProduto'] == produto['idProduto'],
+                                  orElse: () => {},
+                                );
+                                if (encontrado != {}) {
+                                  setState(
+                                      () => _produtoSelecionado = encontrado);
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.search),
+                          ),
+                        if (_produtoSelecionado != null)
+                          IconButton(
+                            onPressed: _limparProduto,
+                            icon: const Icon(Icons.clear),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -310,10 +374,35 @@ class _ComprasPageState extends State<ComprasPage> {
                             },
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: _limparFornecedor,
-                        ),
+                        if (_fornecedorSelecionado == null)
+                          IconButton(
+                            onPressed: () async {
+                              final fornecedor =
+                                  await showDialog<Map<String, dynamic>>(
+                                context: context,
+                                builder: (context) =>
+                                    const DialogPesquisaFornecedores(),
+                              );
+                              if (fornecedor != null) {
+                                final encontrado = _fornecedores.firstWhere(
+                                  (f) =>
+                                      f['idFornecedor'] ==
+                                      fornecedor['idFornecedor'],
+                                  orElse: () => {},
+                                );
+                                if (encontrado != {}) {
+                                  setState(() =>
+                                      _fornecedorSelecionado = encontrado);
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.search),
+                          ),
+                        if (_fornecedorSelecionado != null)
+                          IconButton(
+                            onPressed: _limparFornecedor,
+                            icon: const Icon(Icons.clear),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),

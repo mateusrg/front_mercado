@@ -183,6 +183,9 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _salvando ? null : _salvar,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
                   child: _salvando
                       ? const SizedBox(
                           width: 20,
@@ -193,9 +196,10 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
                             strokeWidth: 2.0,
                           ),
                         )
-                      : Text(widget.funcionarios == null
-                          ? 'Cadastrar'
-                          : 'Alterar'),
+                      : Text(
+                          widget.funcionarios == null ? 'Cadastrar' : 'Alterar',
+                          style: const TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),

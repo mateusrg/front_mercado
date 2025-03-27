@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
@@ -95,7 +94,8 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
                   }
                   return null;
                 },
-                onFieldSubmitted: (_) => _salvar(), // Adicionado para executar ao pressionar Enter
+                onFieldSubmitted: (_) =>
+                    _salvar(), // Adicionado para executar ao pressionar Enter
               ),
               TextFormField(
                 controller: _cnpjController,
@@ -111,11 +111,15 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
                   }
                   return null;
                 },
-                onFieldSubmitted: (_) => _salvar(), // Adicionado para executar ao pressionar Enter
+                onFieldSubmitted: (_) =>
+                    _salvar(), // Adicionado para executar ao pressionar Enter
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _salvando ? null : _salvar,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
                 child: _salvando
                     ? const SizedBox(
                         width: 20,
@@ -126,7 +130,10 @@ class _FornecedorFormPageState extends State<FornecedorFormPage> {
                           strokeWidth: 2.0,
                         ),
                       )
-                    : Text(widget.fornecedor == null ? 'Cadastrar' : 'Alterar'),
+                    : Text(
+                        widget.fornecedor == null ? 'Cadastrar' : 'Alterar',
+                        style: const TextStyle(fontSize: 16),
+                      ),
               ),
             ],
           ),

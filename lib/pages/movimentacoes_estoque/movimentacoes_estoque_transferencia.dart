@@ -6,10 +6,12 @@ import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_autenticador.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class TransferenciaEstoquePage extends StatefulWidget {
   const TransferenciaEstoquePage({super.key});
@@ -174,6 +176,39 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
     }
   }
 
+  Future<String?> _lerCodigoDeBarras() async {
+    String? res = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Ler Código de Barras',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 500,
+      cameraFace: CameraFace.back,
+      cancelButtonText: 'Cancelar',
+    );
+
+    return res != null && res.length > 5 ? res : null;
+  }
+
+  _consultarPorLeitor() async {
+    final codBarras = await _lerCodigoDeBarras();
+    if (codBarras != null) {
+      final encontrado = _produtos.firstWhere(
+        (p) => p['codBarras'] == codBarras,
+        orElse: () => {},
+      );
+      if (encontrado.isNotEmpty) {
+        setState(() => _produtoSelecionado = encontrado);
+      } else {
+        _mostrarErro('Produto não encontrado.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_carregando) {
@@ -206,7 +241,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                                       maxWidth:
                                           MediaQuery.of(context).size.width *
                                                   0.8 -
-                                              32,
+                                              96,
                                     ),
                                     child: Text(
                                       '${produto['descricao']} - ${produto['codBarras']}',
@@ -222,25 +257,32 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                       ),
                     ),
                     IconButton(
+                      onPressed: _consultarPorLeitor,
+                      icon: const Icon(Symbols.barcode_scanner),
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: _abrirDialogPesquisaProduto,
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 TextFormField(
                   controller: _quantidadeController,
                   decoration: const InputDecoration(labelText: 'Quantidade'),
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Insira a quantidade';
+                    }
                     final qtd = int.tryParse(value);
                     if (qtd == null) return 'Número inválido';
                     if (qtd <= 0) return 'Quantidade deve ser maior que zero';
                     return null;
                   },
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -257,8 +299,9 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                         onChanged: (value) =>
                             setState(() => _estoqueOrigemSelecionado = value),
                         validator: (value) {
-                          if (value == null)
+                          if (value == null) {
                             return 'Selecione o estoque origem';
+                          }
                           if (_estoqueDestinoSelecionado != null &&
                               value['idEstoque'] ==
                                   _estoqueDestinoSelecionado!['idEstoque']) {
@@ -290,6 +333,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -306,8 +350,9 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                         onChanged: (value) =>
                             setState(() => _estoqueDestinoSelecionado = value),
                         validator: (value) {
-                          if (value == null)
+                          if (value == null) {
                             return 'Selecione o estoque destino';
+                          }
                           if (_estoqueOrigemSelecionado != null &&
                               value['idEstoque'] ==
                                   _estoqueOrigemSelecionado!['idEstoque']) {
@@ -339,6 +384,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -383,6 +429,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -427,6 +474,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -463,8 +511,9 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                           }),
                         ],
                         validator: (value) {
-                          if (value == null || value.isEmpty)
+                          if (value == null || value.isEmpty) {
                             return 'Insira a hora';
+                          }
                           if (value.length != 5) return 'Horário inválido';
                           return null;
                         },
@@ -475,6 +524,9 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _salvando ? null : _salvar,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
                   child: _salvando
                       ? const SizedBox(
                           width: 20,
@@ -485,7 +537,10 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                             strokeWidth: 2.0,
                           ),
                         )
-                      : const Text('Transferir'),
+                      : const Text(
+                          'Transferir',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),

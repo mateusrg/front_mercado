@@ -128,13 +128,18 @@ class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
                 },
                 onFieldSubmitted: (_) => _salvar(),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 20.0),
               _salvando
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _salvar,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
                       child: Text(
-                          widget.tipoEstoque == null ? 'Cadastrar' : 'Alterar'),
+                        widget.tipoEstoque == null ? 'Cadastrar' : 'Alterar',
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
             ],
           ),

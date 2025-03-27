@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/estoques/modais/dialog_pesquisa_tipo_estoque.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,7 +16,7 @@ class EstoquesFormPage extends StatefulWidget {
 class _EstoquesFormPageState extends State<EstoquesFormPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _descricaoController = TextEditingController();
-  String? _tipoSelecionado;
+  Map<String, dynamic>? _tipoSelecionado;
   List<Map<String, dynamic>> _tiposEstoque = [];
   bool _carregando = false;
   bool _tiposCarregados = false;
@@ -24,14 +25,6 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   void initState() {
     super.initState();
     _carregarTiposEstoque();
-    if (widget.estoque != null) {
-      _preencherCamposParaEdicao();
-    }
-  }
-
-  void _preencherCamposParaEdicao() {
-    _descricaoController.text = widget.estoque!['descricaoEstoque'] ?? '';
-    _tipoSelecionado = widget.estoque!['idTipoEstoque']?.toString();
   }
 
   Future<void> _carregarTiposEstoque() async {
@@ -42,15 +35,25 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          final dynamic decodedBody = json.decode(response.body);
-          _tiposEstoque = decodedBody is List
-              ? List<Map<String, dynamic>>.from(decodedBody)
-              : [decodedBody as Map<String, dynamic>];
+        final dynamic decodedBody = json.decode(response.body);
+        final List<Map<String, dynamic>> tipos = decodedBody is List
+            ? List<Map<String, dynamic>>.from(decodedBody)
+            : [decodedBody as Map<String, dynamic>];
 
+        setState(() {
+          _tiposEstoque = tipos;
           _tiposCarregados = true;
+
           if (widget.estoque != null) {
-            _tipoSelecionado = widget.estoque!['idTipoEstoque']?.toString();
+            final idTipo = widget.estoque!['idTipoEstoque'];
+            if (idTipo != null) {
+              _tipoSelecionado = tipos.firstWhere(
+                (tipo) => tipo['idTipoEstoque'] == idTipo,
+                orElse: () => {},
+              );
+            }
+            _descricaoController.text =
+                widget.estoque!['descricaoEstoque'] ?? '';
           }
         });
       } else {
@@ -64,16 +67,19 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
 
   Future<void> _salvarOuAlterarEstoque() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _carregando = true;
-      });
+      setState(() => _carregando = true);
 
-      final estoque = {
-        'idEstoque': widget.estoque?['idEstoque'],
+      Map<String, dynamic> estoque = {
         'descricao': _descricaoController.text,
-        'idTipoEstoque':
-            _tipoSelecionado != null ? int.tryParse(_tipoSelecionado!) : null,
+        'idTipoEstoque': _tipoSelecionado?['idTipoEstoque'],
       };
+      if (widget.estoque?['idEstoque'] != null) {
+        estoque = {
+          'idEstoque': widget.estoque?['idEstoque'],
+          'descricao': _descricaoController.text,
+          'idTipoEstoque': _tipoSelecionado?['idTipoEstoque'],
+        };
+      }
 
       try {
         final response = widget.estoque == null
@@ -88,28 +94,22 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                 body: jsonEncode(estoque),
               );
 
+        print(jsonEncode(estoque));
+
         if (response.statusCode >= 200 && response.statusCode < 300) {
-          final tipoEstoqueSelecionado = _tiposEstoque.firstWhere(
-            (tipo) => tipo['idTipoEstoque'].toString() == _tipoSelecionado,
-            orElse: () => {},
-          )['descricao'];
           Navigator.of(context).pop({
             'estoque': _descricaoController.text,
-            'idTipoEstoque': _tipoSelecionado,
-            'tipoEstoque': tipoEstoqueSelecionado,
+            'idTipoEstoque': _tipoSelecionado?['idTipoEstoque'],
+            'tipoEstoque': _tipoSelecionado?['descricao'],
           });
         } else {
           final erro = json.decode(response.body);
-          final mensagem = erro['message'] ?? 'Erro desconhecido';
-          _mostrarErro(
-              'Erro ao salvar/alterar estoque: $mensagem (${response.statusCode})');
+          _mostrarErro('Erro: ${erro['message'] ?? 'Erro desconhecido'}');
         }
       } catch (e) {
-        _mostrarErro('Não foi possível se conectar com a API: ${e.toString()}');
+        _mostrarErro('Erro na conexão: ${e.toString()}');
       } finally {
-        setState(() {
-          _carregando = false;
-        });
+        setState(() => _carregando = false);
       }
     }
   }
@@ -141,45 +141,63 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                     TextFormField(
                       controller: _descricaoController,
                       decoration: const InputDecoration(labelText: 'Descrição'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira a descrição';
-                        }
-                        return null;
-                      },
+                      validator: (value) =>
+                          value?.isEmpty ?? true ? 'Insira a descrição' : null,
                     ),
-                    const SizedBox(height: 16.0),
+                    const SizedBox(height: 16),
                     _tiposCarregados
-                        ? DropdownButtonFormField<String>(
-                            value: _tipoSelecionado,
-                            decoration: const InputDecoration(
-                                labelText: 'Tipo de Estoque'),
-                            items: _tiposEstoque.map((tipo) {
-                              final value =
-                                  tipo['idTipoEstoque']?.toString() ?? '';
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(tipo['descricao'] ?? ''),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _tipoSelecionado = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor, selecione um tipo de estoque';
-                              }
-                              return null;
-                            },
+                        ? Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<
+                                    Map<String, dynamic>>(
+                                  value: _tipoSelecionado,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Tipo de Estoque'),
+                                  items: _tiposEstoque.map((tipo) {
+                                    return DropdownMenuItem(
+                                      value: tipo,
+                                      child: Text(tipo['descricao'] ?? ''),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) =>
+                                      setState(() => _tipoSelecionado = value),
+                                  validator: (value) => value == null
+                                      ? 'Selecione um tipo'
+                                      : null,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.search),
+                                onPressed: () async {
+                                  final tipo =
+                                      await showDialog<Map<String, dynamic>>(
+                                    context: context,
+                                    builder: (context) =>
+                                        const DialogPesquisaTipoEstoque(),
+                                  );
+                                  if (tipo != null) {
+                                    final encontrado = _tiposEstoque.firstWhere(
+                                      (t) =>
+                                          t['idTipoEstoque'] ==
+                                          tipo['idTipoEstoque'],
+                                      orElse: () => {},
+                                    );
+                                    if (encontrado != {}) {
+                                      setState(
+                                          () => _tipoSelecionado = encontrado);
+                                    }
+                                  }
+                                },
+                              ),
+                            ],
                           )
                         : const Center(child: CircularProgressIndicator()),
-                    const SizedBox(height: 16.0),
+                    const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _salvarOuAlterarEstoque,
-                      child:
-                          Text(widget.estoque == null ? 'Salvar' : 'Alterar'),
+                      child: Text(
+                          widget.estoque == null ? 'Cadastrar' : 'Alterar'),
                     ),
                   ],
                 ),

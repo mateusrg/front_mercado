@@ -155,12 +155,12 @@ class _ProdutosPageState extends State<ProdutosPage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _pesquisarProdutos,
-                ),
-                IconButton(
                   icon: const Icon(Symbols.barcode_scanner),
                   onPressed: _consultarPorLeitor,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: _pesquisarProdutos,
                 ),
               ],
             ),
