@@ -93,9 +93,27 @@ class _TiposMovimentacoesEstoquePageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tipos Movimentações Estoque'),
+        title: const Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.move_down_rounded,
+                color: Colors.blue,
+              ),
+              SizedBox(width: 12),
+              Flexible(
+                child: Text(
+                  'Tipos de Movimentação de Estoque',
+                  style: TextStyle(fontSize: 22),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      drawer: const DrawerFenomenos('Tipos de Movimentações de Estoque'),
+      drawer: const DrawerFenomenos('Tipos de Movimentação de Estoque'),
       body: Column(
         children: [
           Padding(
@@ -126,6 +144,10 @@ class _TiposMovimentacoesEstoquePageState
                     itemCount: _tiposMovimentacoesEstoque.length,
                     itemBuilder: (context, index) {
                       return ListTile(
+                        leading: Icon(
+                          Icons.move_down_rounded,
+                          color: Colors.blue.withAlpha(128),
+                        ),
                         title: Text(
                             _tiposMovimentacoesEstoque[index]['descricao']),
                         onTap: () async {

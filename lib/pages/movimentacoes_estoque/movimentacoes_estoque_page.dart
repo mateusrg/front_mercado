@@ -229,7 +229,23 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Movimentações de Estoque'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.forklift,
+              color: Colors.blue,
+            ),
+            SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                'Movimentações de Estoque',
+                style: TextStyle(fontSize: 22),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: _toggleFiltro,
@@ -247,7 +263,6 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    // Dropdown de Produto com botão de limpar
                     Row(
                       children: [
                         Expanded(
@@ -402,8 +417,11 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: _movimentacoes.length,
+                    itemCount: _movimentacoes.length + 1,
                     itemBuilder: (context, index) {
+                      if (index == _movimentacoes.length) {
+                        return const ListTile();
+                      }
                       final movimentacao = _movimentacoes[index];
                       return ListTile(
                         onTap: () {

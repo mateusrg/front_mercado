@@ -1,10 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:front_mercado/pages/compras/modais/dialog_pesquisa_fornecedor.dart';
+import 'package:front_mercado/pages/compras/modais/dialog_pesquisa_produtos.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'dart:convert';
 
 class CompraFormPage extends StatefulWidget {
   const CompraFormPage({super.key});
@@ -13,10 +14,9 @@ class CompraFormPage extends StatefulWidget {
   State<CompraFormPage> createState() => _CompraFormPageState();
 }
 
-const String apiUrl = Params.apiUrl;
-
 class _CompraFormPageState extends State<CompraFormPage> {
   final _formKey = GlobalKey<FormState>();
+  static const String apiUrl = Params.apiUrl;
   late TextEditingController _quantidadeController;
   late TextEditingController _horaController;
   bool _salvando = false;
@@ -40,18 +40,14 @@ class _CompraFormPageState extends State<CompraFormPage> {
   Future<void> _carregarFornecedoresEProdutos() async {
     await _carregarFornecedores();
     await _carregarProdutos();
-    setState(() {
-      _carregando = false;
-    });
+    setState(() => _carregando = false);
   }
 
   Future<void> _carregarFornecedores() async {
     final response = await http.get(Uri.http(apiUrl, '/Fornecedores'));
     if (response.statusCode == 200) {
-      setState(() {
-        _fornecedores =
-            List<Map<String, dynamic>>.from(json.decode(response.body));
-      });
+      setState(() => _fornecedores =
+          List<Map<String, dynamic>>.from(json.decode(response.body)));
     } else {
       _mostrarErro('Erro ao carregar fornecedores: ${response.statusCode}');
     }
@@ -60,9 +56,8 @@ class _CompraFormPageState extends State<CompraFormPage> {
   Future<void> _carregarProdutos() async {
     final response = await http.get(Uri.http(apiUrl, '/Produtos'));
     if (response.statusCode == 200) {
-      setState(() {
-        _produtos = List<Map<String, dynamic>>.from(json.decode(response.body));
-      });
+      setState(() => _produtos =
+          List<Map<String, dynamic>>.from(json.decode(response.body)));
     } else {
       _mostrarErro('Erro ao carregar produtos: ${response.statusCode}');
     }
@@ -159,35 +154,23 @@ class _CompraFormPageState extends State<CompraFormPage> {
     if (_carregando) {
       return Scaffold(
         appBar: AppBar(
-          title: const Row(
-            children: [
-              Hero(
-                tag: 'hero-compras',
-                child: Icon(Icons.add_shopping_cart),
-              ),
-              SizedBox(width: 8),
-              Text('Compras'),
-            ],
-          ),
+          title: const Row(children: [
+            Hero(tag: 'hero-compras', child: Icon(Icons.add_shopping_cart)),
+            SizedBox(width: 8),
+            Text('Compras'),
+          ]),
         ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Hero(
-              tag: 'hero-compras',
-              child: Icon(Icons.add_shopping_cart),
-            ),
-            SizedBox(width: 8),
-            Text('Compras'),
-          ],
-        ),
+        title: const Row(children: [
+          Hero(tag: 'hero-compras', child: Icon(Icons.add_shopping_cart)),
+          SizedBox(width: 8),
+          Text('Compras'),
+        ]),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -195,65 +178,111 @@ class _CompraFormPageState extends State<CompraFormPage> {
           child: Form(
             key: _formKey,
             child: Column(
-              children: <Widget>[
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _fornecedorSelecionado,
-                  decoration: const InputDecoration(labelText: 'Fornecedor'),
-                  items: _fornecedores.map((fornecedor) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: fornecedor,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.8,
-                        ),
-                        child: Text(
-                          '${fornecedor['nome']} - ${fornecedor['cnpj']}',
-                          overflow: TextOverflow.ellipsis,
-                        ),
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _fornecedorSelecionado,
+                        decoration:
+                            const InputDecoration(labelText: 'Fornecedor'),
+                        items: _fornecedores
+                            .map((fornecedor) => DropdownMenuItem(
+                                  value: fornecedor,
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                                  0.8 -
+                                              32,
+                                    ),
+                                    child: Text(
+                                      '${fornecedor['nome']} - ${fornecedor['cnpj']}',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _fornecedorSelecionado = value),
+                        validator: (value) =>
+                            value == null ? 'Selecione um fornecedor' : null,
                       ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _fornecedorSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um fornecedor';
-                    }
-                    return null;
-                  },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final fornecedor =
+                            await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) =>
+                              const DialogPesquisaFornecedores(),
+                        );
+                        if (fornecedor != null) {
+                          final encontrado = _fornecedores.firstWhere(
+                            (f) =>
+                                f['idFornecedor'] == fornecedor['idFornecedor'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(() => _fornecedorSelecionado = encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _produtoSelecionado,
-                  decoration: const InputDecoration(labelText: 'Produto'),
-                  items: _produtos.map((produto) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: produto,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.8,
-                        ),
-                        child: Text(
-                          '${produto['descricao']} - ${produto['codBarras']}',
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _produtoSelecionado,
+                        decoration: const InputDecoration(labelText: 'Produto'),
+                        items: _produtos
+                            .map((produto) => DropdownMenuItem(
+                                  value: produto,
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                                  0.8 -
+                                              32,
+                                    ),
+                                    child: Text(
+                                      '${produto['descricao']} - ${produto['codBarras']}',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _produtoSelecionado = value),
+                        validator: (value) =>
+                            value == null ? 'Selecione um produto' : null,
                       ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _produtoSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um produto';
-                    }
-                    return null;
-                  },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final produto = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) => const DialogPesquisaProduto(),
+                        );
+                        if (produto != null) {
+                          final encontrado = _produtos.firstWhere(
+                            (p) => p['idProduto'] == produto['idProduto'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(() => _produtoSelecionado = encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _quantidadeController,
                   decoration: const InputDecoration(labelText: 'Quantidade'),
@@ -261,19 +290,19 @@ class _CompraFormPageState extends State<CompraFormPage> {
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor, insira a quantidade';
+                      return 'Insira a quantidade';
                     }
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: TextButton.icon(
                         icon: const Icon(Icons.calendar_today),
-                        label: Text(_dataSelecionada != null
-                            ? DateFormat('dd/MM/yyyy').format(_dataSelecionada!)
-                            : 'Selecione a data'),
+                        label: Text(
+                            DateFormat('dd/MM/yyyy').format(_dataSelecionada!)),
                         onPressed: () => _selecionarData(context),
                       ),
                     ),
@@ -286,65 +315,39 @@ class _CompraFormPageState extends State<CompraFormPage> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(4),
-                          TextInputFormatter.withFunction((va, vn) {
-                            final valorAntigo = va.text;
-                            final valorNovo = vn.text;
-                            final quantidade = valorNovo.length;
-
-                            if (quantidade == 1) {
-                              if (int.parse(valorNovo) <= 2) {
-                                return vn;
-                              }
-                              return const TextEditingValue(text: '');
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            final text =
+                                newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+                            final buffer = StringBuffer();
+                            for (int i = 0; i < text.length; i++) {
+                              if (i == 2) buffer.write(':');
+                              if (i >= 4) break;
+                              buffer.write(text[i]);
                             }
-
-                            if (quantidade == 2) {
-                              if (valorAntigo == '$valorNovo:') {
-                                return TextEditingValue(text: valorNovo[0]);
-                              }
-
-                              if (valorNovo[0] == '2') {
-                                if (int.parse(valorNovo[1]) < 4) {
-                                  return TextEditingValue(text: '$valorNovo:');
-                                }
-                                return va;
-                              }
-                              return TextEditingValue(text: '$valorNovo:');
-                            }
-
-                            if (quantidade == 3) {
-                              if (int.parse(valorNovo[2]) > 5) {
-                                return va;
-                              }
-                              return TextEditingValue(
-                                  text:
-                                      '${valorNovo.substring(0, 2)}:${valorNovo[2]}');
-                            }
-
-                            if (quantidade == 4) {
-                              return TextEditingValue(
-                                  text:
-                                      '${valorNovo.substring(0, 2)}:${valorNovo.substring(2)}');
-                            }
-                            return vn;
+                            return TextEditingValue(
+                              text: buffer.toString(),
+                              selection: TextSelection.collapsed(
+                                  offset: buffer.length),
+                            );
                           }),
                         ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Insira a hora';
                           }
-                          if (value.length != 5) {
-                            return 'Insira um horário válido';
-                          }
+                          if (value.length != 5) return 'Horário inválido';
                           return null;
                         },
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _salvando ? null : _salvar,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
                   child: _salvando
                       ? const SizedBox(
                           width: 20,
@@ -355,7 +358,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
                             strokeWidth: 2.0,
                           ),
                         )
-                      : const Text('Comprar'),
+                      : const Text('Comprar', style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),

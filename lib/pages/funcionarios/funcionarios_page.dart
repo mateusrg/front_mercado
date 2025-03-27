@@ -88,7 +88,21 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Funcionários'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.group,
+              color: Colors.yellow,
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Funcionários',
+              style: TextStyle(fontSize: 22),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
       drawer: const DrawerFenomenos('Funcionarios'),
       body: Column(
@@ -125,8 +139,10 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
                         child: ListTile(
                           title: Text(_funcionarios[index]['nome']),
                           subtitle: Text(_funcionarios[index]['email']),
-                          leading:
-                              Text('${_funcionarios[index]['idFuncionario']}'),
+                          leading: Icon(
+                            Icons.group_outlined,
+                            color: Colors.yellow.withAlpha(128),
+                          ),
                           trailing: Text(_funcionarios[index]['setor'] ?? ''),
                           onTap: () async {
                             await Navigator.of(context).push(

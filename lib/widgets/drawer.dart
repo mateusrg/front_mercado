@@ -72,7 +72,7 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.inventory,
+            icon: Icons.warehouse_rounded,
             text: 'Estoques',
             isSelected: pagina == 'Estoques',
             onTap: () => Navigator.pushReplacement(
@@ -113,7 +113,7 @@ class DrawerFenomenos extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.sell,
+            icon: Icons.shopping_bag,
             text: 'Produtos',
             isSelected: pagina == 'Produtos',
             onTap: () => Navigator.pushReplacement(
@@ -135,7 +135,7 @@ class DrawerFenomenos extends StatelessWidget {
             context,
             icon: Icons.move_down_rounded,
             text: 'Tipos de Movimentação de Estoque',
-            isSelected: pagina == 'Tipos de Movimentações de Estoque',
+            isSelected: pagina == 'Tipos de Movimentação de Estoque',
             onTap: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -154,17 +154,47 @@ class DrawerFenomenos extends StatelessWidget {
     required bool isSelected,
     required GestureTapCallback onTap,
   }) {
+    Color corItemSelecionado = Colors.cyan;
+    switch (pagina) {
+      case 'Compras':
+        corItemSelecionado = Colors.yellow;
+        break;
+      case 'Estoques':
+        corItemSelecionado = Colors.blue;
+        break;
+      case 'Fornecedores':
+        corItemSelecionado = Colors.green;
+        break;
+      case 'Funcionarios':
+        corItemSelecionado = Colors.yellow;
+        break;
+      case 'Movimentações de Estoque':
+        corItemSelecionado = Colors.blue;
+        break;
+      case 'Produtos':
+        corItemSelecionado = Colors.green;
+        break;
+      case 'Tipos de Estoque':
+        corItemSelecionado = Colors.yellow;
+        break;
+      case 'Tipos de Movimentação de Estoque':
+        corItemSelecionado = Colors.blue;
+        break;
+      default:
+        corItemSelecionado = Colors.cyan;
+    }
+
     return ListTile(
       title: Text(
         text,
         style: TextStyle(
-          color: isSelected ? Colors.cyan : null,
+          color: isSelected ? corItemSelecionado : null,
           fontWeight: isSelected ? FontWeight.bold : null,
         ),
       ),
       leading: Icon(
         icon,
-        color: isSelected ? Colors.cyan : null,
+        color: isSelected ? corItemSelecionado : null,
       ),
       onTap: isSelected ? null : onTap,
     );

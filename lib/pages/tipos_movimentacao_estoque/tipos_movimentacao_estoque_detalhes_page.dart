@@ -106,7 +106,7 @@ class _TiposMovimentacaoDetalhesPageState
                           color: Colors.transparent,
                           child: ListTile(
                             leading: Icon(
-                              Icons.move_down_outlined,
+                              Icons.move_down_rounded,
                               color: Colors.cyan.withAlpha(128),
                             ),
                             title: Text(widget.tipoMovimentacao['descricao']),

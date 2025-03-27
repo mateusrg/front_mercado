@@ -3,33 +3,40 @@ import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DialogPesquisaProduto extends StatefulWidget {
-  const DialogPesquisaProduto({super.key});
+class DialogPesquisaEstoqueDestino extends StatefulWidget {
+  const DialogPesquisaEstoqueDestino({super.key});
 
   @override
-  State<DialogPesquisaProduto> createState() => _DialogPesquisaProdutoState();
+  State<DialogPesquisaEstoqueDestino> createState() =>
+      _DialogPesquisaEstoqueDestinoState();
 }
 
-class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
+class _DialogPesquisaEstoqueDestinoState
+    extends State<DialogPesquisaEstoqueDestino> {
   final TextEditingController _pesquisaController = TextEditingController();
   static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _resultadosPesquisa = [];
   bool _carregando = false;
 
-  Future<void> _pesquisarProdutos(String texto) async {
+  Future<void> _pesquisarEstoques(String texto) async {
     setState(() {
       _carregando = true;
     });
 
     try {
-      final response = await http.get(Uri.http(apiUrl, 'Produtos/tudo/$texto'));
+      final response = await http.post(
+        Uri.http(apiUrl, 'Estoques/tipo-estoque'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'descricaoEstoque': texto}),
+      );
+
       if (response.statusCode == 200) {
         setState(() {
           _resultadosPesquisa =
               List<Map<String, dynamic>>.from(json.decode(response.body));
         });
       } else {
-        _mostrarErro('Erro ao pesquisar produtos: ${response.statusCode}');
+        _mostrarErro('Erro ao pesquisar estoques: ${response.statusCode}');
       }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
@@ -50,9 +57,15 @@ class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
   }
 
   @override
+  void initState() {
+    _pesquisarEstoques('');
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Pesquisar Produto'),
+      title: const Text('Pesquisar Estoque de Destino'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -62,7 +75,7 @@ class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
               labelText: 'Pesquisar',
               suffixIcon: IconButton(
                   onPressed: () {
-                    _pesquisarProdutos(_pesquisaController.text);
+                    _pesquisarEstoques(_pesquisaController.text);
                   },
                   icon: const Icon(Icons.search)),
             ),
@@ -75,12 +88,12 @@ class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
                     shrinkWrap: true,
                     itemCount: _resultadosPesquisa.length,
                     itemBuilder: (context, index) {
-                      final produto = _resultadosPesquisa[index];
+                      final estoque = _resultadosPesquisa[index];
                       return ListTile(
-                        title: Text(produto['descricao']),
-                        subtitle: Text(produto['codBarras']),
+                        title: Text(estoque['descricaoEstoque']),
+                        subtitle: Text(estoque['descricaoTipoEstoque']),
                         onTap: () {
-                          Navigator.pop(context, produto);
+                          Navigator.pop(context, estoque);
                         },
                       );
                     },

@@ -116,7 +116,21 @@ class _EstoquePageState extends State<EstoquePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Estoques'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.warehouse_rounded,
+              color: Colors.blue,
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Estoques',
+              style: TextStyle(fontSize: 22),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
       drawer: const DrawerFenomenos('Estoques'),
       body: Column(
@@ -177,7 +191,10 @@ class _EstoquePageState extends State<EstoquePage> {
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
                             title: Text(estoque['descricaoEstoque']),
-                            leading: Text('${estoque['idEstoque']}'),
+                            leading: Icon(
+                              Icons.warehouse_outlined,
+                              color: Colors.blue.withAlpha(128),
+                            ),
                             trailing: Text(estoque['descricaoTipoEstoque']),
                             onTap: () async {
                               await Navigator.push(

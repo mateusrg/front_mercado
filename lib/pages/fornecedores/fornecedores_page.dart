@@ -44,7 +44,6 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
               body: jsonEncode({'query': query}),
             )
             .timeout(const Duration(seconds: 15));
-        print(jsonEncode({'query': query}));
       }
       final response = res;
 
@@ -142,7 +141,21 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fornecedores'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.fire_truck,
+              color: Colors.green,
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Fornecedores',
+              style: TextStyle(fontSize: 22),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
       drawer: const DrawerFenomenos('Fornecedores'),
       body: Column(
@@ -176,6 +189,10 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
                     itemCount: _fornecedores.length,
                     itemBuilder: (context, index) {
                       return ListTile(
+                        leading: Icon(
+                          Icons.fire_truck_outlined,
+                          color: Colors.green.withAlpha(128),
+                        ),
                         title: Text(_fornecedores[index]['nome']),
                         subtitle: Text(_fornecedores[index]['cnpj']),
                         onTap: () async {

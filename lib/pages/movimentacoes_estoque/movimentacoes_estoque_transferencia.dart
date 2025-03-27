@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:front_mercado/pages/movimentacoes_estoque/movimentacao_estoque_dialog_produtos.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_produtos.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_estoque_origem.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_estoque_destino.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_solicitador.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_autenticador.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -46,17 +50,14 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
     await _carregarProdutos();
     await _carregarEstoques();
     await _carregarFuncionarios();
-    setState(() {
-      _carregando = false;
-    });
+    setState(() => _carregando = false);
   }
 
   Future<void> _carregarProdutos() async {
     final response = await http.get(Uri.http(apiUrl, '/Produtos'));
     if (response.statusCode == 200) {
-      setState(() {
-        _produtos = List<Map<String, dynamic>>.from(json.decode(response.body));
-      });
+      setState(() => _produtos =
+          List<Map<String, dynamic>>.from(json.decode(response.body)));
     } else {
       _mostrarErro('Erro ao carregar produtos: ${response.statusCode}');
     }
@@ -65,9 +66,8 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   Future<void> _carregarEstoques() async {
     final response = await http.get(Uri.http(apiUrl, '/Estoques'));
     if (response.statusCode == 200) {
-      setState(() {
-        _estoques = List<Map<String, dynamic>>.from(json.decode(response.body));
-      });
+      setState(() => _estoques =
+          List<Map<String, dynamic>>.from(json.decode(response.body)));
     } else {
       _mostrarErro('Erro ao carregar estoques: ${response.statusCode}');
     }
@@ -80,15 +80,18 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
       final usuarioLogadoString = prefs.getString('usuarioLogado');
       if (usuarioLogadoString != null) {
         final usuarioLogado = json.decode(usuarioLogadoString);
-
         setState(() {
           _funcionarios =
               List<Map<String, dynamic>>.from(json.decode(response.body));
           _funcionarioSolicitadorSelecionado = _funcionarios.firstWhere(
-              (funcionario) =>
-                  funcionario['idFuncionario'] ==
-                  usuarioLogado['idFuncionario']);
+            (funcionario) =>
+                funcionario['idFuncionario'] == usuarioLogado['idFuncionario'],
+            orElse: () => {},
+          );
         });
+        if (_funcionarioSolicitadorSelecionado == {}) {
+          _mostrarErro('Funcionário logado não encontrado na lista');
+        }
       }
     } else {
       _mostrarErro('Erro ao carregar funcionários: ${response.statusCode}');
@@ -97,26 +100,23 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
 
   Future<void> _salvar() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _salvando = true;
-      });
-
-      final movimentacao = {
-        'idProduto': _produtoSelecionado!['idProduto'],
-        'quantidade': int.parse(_quantidadeController.text),
-        'idEstoqueOrigem': _estoqueOrigemSelecionado!['idEstoque'],
-        'idEstoqueDestino': _estoqueDestinoSelecionado!['idEstoque'],
-        'idFuncionarioSolicitador':
-            _funcionarioSolicitadorSelecionado!['idFuncionario'],
-        'idFuncionarioAutenticador':
-            _funcionarioAutenticadorSelecionado!['idFuncionario'],
-        'idTipoMovimentacaoOrigem': 6,
-        'idTipoMovimentacaoDestino': 7,
-        'dataHora':
-            '${DateFormat('yyyy-MM-dd').format(_dataSelecionada!)}T${_horaController.text}:00.000Z',
-      };
-
+      setState(() => _salvando = true);
       try {
+        final movimentacao = {
+          'idProduto': _produtoSelecionado!['idProduto'],
+          'quantidade': int.parse(_quantidadeController.text),
+          'idEstoqueOrigem': _estoqueOrigemSelecionado!['idEstoque'],
+          'idEstoqueDestino': _estoqueDestinoSelecionado!['idEstoque'],
+          'idFuncionarioSolicitador':
+              _funcionarioSolicitadorSelecionado!['idFuncionario'],
+          'idFuncionarioAutenticador':
+              _funcionarioAutenticadorSelecionado!['idFuncionario'],
+          'idTipoMovimentacaoOrigem': 6,
+          'idTipoMovimentacaoDestino': 7,
+          'dataHora':
+              '${DateFormat('yyyy-MM-dd').format(_dataSelecionada!)}T${_horaController.text}:00.000Z',
+        };
+
         final response = await http.post(
           Uri.http(
               apiUrl, 'MovimentacoesEstoque/movimentarProdutoEntreEstoques'),
@@ -135,9 +135,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
       } catch (e) {
         _mostrarErro('Não foi possível se conectar com a API.');
       } finally {
-        setState(() {
-          _salvando = false;
-        });
+        setState(() => _salvando = false);
       }
     }
   }
@@ -151,37 +149,28 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
       locale: const Locale('pt', 'BR'),
     );
     if (selecionado != null && selecionado != _dataSelecionada) {
-      setState(() {
-        _dataSelecionada = selecionado;
-      });
+      setState(() => _dataSelecionada = selecionado);
     }
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mensagem),
+      backgroundColor: Colors.red,
+    ));
   }
 
   void _abrirDialogPesquisaProduto() async {
-    Map<String, dynamic>? produtoSelecionado = await showDialog(
+    final produtoSelecionado = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (BuildContext context) {
-        return DialogPesquisaProduto();
-      },
+      builder: (context) => const DialogPesquisaProduto(),
     );
     if (produtoSelecionado != null) {
-      for (var produto in _produtos) {
-        if (produto['idProduto'] == produtoSelecionado['idProduto']) {
-          setState(() {
-            _produtoSelecionado = produto;
-          });
-          break;
-        }
-      }
+      final produto = _produtos.firstWhere(
+        (p) => p['idProduto'] == produtoSelecionado['idProduto'],
+        orElse: () => {},
+      );
+      if (produto != {}) setState(() => _produtoSelecionado = produto);
     }
   }
 
@@ -189,60 +178,47 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   Widget build(BuildContext context) {
     if (_carregando) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Transferência de Estoque'),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        appBar: AppBar(title: const Text('Transferência de Estoque')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transferência de Estoque'),
-      ),
+      appBar: AppBar(title: const Text('Transferência de Estoque')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
-              children: <Widget>[
+              children: [
                 Row(
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<Map<String, dynamic>>(
                         value: _produtoSelecionado,
                         decoration: const InputDecoration(labelText: 'Produto'),
-                        items: _produtos.map((produto) {
-                          return DropdownMenuItem<Map<String, dynamic>>(
-                            value: produto,
-                            child: Container(
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.8 -
-                                        32,
-                              ),
-                              child: Text(
-                                '${produto['descricao']} - ${produto['codBarras']}',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          print(value);
-                          setState(() {
-                            _produtoSelecionado = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Por favor, selecione um produto';
-                          }
-                          return null;
-                        },
+                        items: _produtos
+                            .map((produto) => DropdownMenuItem(
+                                  value: produto,
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                                  0.8 -
+                                              32,
+                                    ),
+                                    child: Text(
+                                      '${produto['descricao']} - ${produto['codBarras']}',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _produtoSelecionado = value),
+                        validator: (value) =>
+                            value == null ? 'Selecione um produto' : null,
                       ),
                     ),
                     IconButton(
@@ -255,120 +231,209 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                   controller: _quantidadeController,
                   decoration: const InputDecoration(labelText: 'Quantidade'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira a quantidade';
-                    }
-                    if (int.tryParse(value) == null) {
-                      return 'Por favor, insira um número válido';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _estoqueOrigemSelecionado,
-                  decoration:
-                      const InputDecoration(labelText: 'Estoque de Origem'),
-                  items: _estoques.map((estoque) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: estoque,
-                      child: Text(estoque['descricao']),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _estoqueOrigemSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um estoque de origem';
-                    }
-                    if (value == _estoqueDestinoSelecionado) {
-                      return 'O estoque de origem e o de destino devem ser diferentes';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _estoqueDestinoSelecionado,
-                  decoration:
-                      const InputDecoration(labelText: 'Estoque de Destino'),
-                  items: _estoques.map((estoque) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: estoque,
-                      child: Text(estoque['descricao']),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _estoqueDestinoSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um estoque de destino';
-                    }
-
-                    if (value == _estoqueOrigemSelecionado) {
-                      return 'O estoque de origem e o de destino devem ser diferentes';
-                    }
-
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _funcionarioSolicitadorSelecionado,
-                  decoration: const InputDecoration(
-                      labelText: 'Funcionário Solicitador'),
-                  items: _funcionarios.map((funcionario) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: funcionario,
-                      child: Text(funcionario['nome']),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _funcionarioSolicitadorSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um funcionário solicitador';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<Map<String, dynamic>>(
-                  value: _funcionarioAutenticadorSelecionado,
-                  decoration: const InputDecoration(
-                      labelText: 'Funcionário Autenticador'),
-                  items: _funcionarios.map((funcionario) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: funcionario,
-                      child: Text(funcionario['nome']),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _funcionarioAutenticadorSelecionado = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor, selecione um funcionário autenticador';
-                    }
+                    if (value == null || value.isEmpty)
+                      return 'Insira a quantidade';
+                    final qtd = int.tryParse(value);
+                    if (qtd == null) return 'Número inválido';
+                    if (qtd <= 0) return 'Quantidade deve ser maior que zero';
                     return null;
                   },
                 ),
                 Row(
                   children: [
                     Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _estoqueOrigemSelecionado,
+                        decoration:
+                            const InputDecoration(labelText: 'Estoque Origem'),
+                        items: _estoques
+                            .map((estoque) => DropdownMenuItem(
+                                  value: estoque,
+                                  child: Text(estoque['descricao']),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _estoqueOrigemSelecionado = value),
+                        validator: (value) {
+                          if (value == null)
+                            return 'Selecione o estoque origem';
+                          if (_estoqueDestinoSelecionado != null &&
+                              value['idEstoque'] ==
+                                  _estoqueDestinoSelecionado!['idEstoque']) {
+                            return 'Estoques devem ser diferentes';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final estoque = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) =>
+                              const DialogPesquisaEstoqueOrigem(),
+                        );
+                        if (estoque != null) {
+                          final encontrado = _estoques.firstWhere(
+                            (e) => e['idEstoque'] == estoque['idEstoque'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(
+                                () => _estoqueOrigemSelecionado = encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _estoqueDestinoSelecionado,
+                        decoration:
+                            const InputDecoration(labelText: 'Estoque Destino'),
+                        items: _estoques
+                            .map((estoque) => DropdownMenuItem(
+                                  value: estoque,
+                                  child: Text(estoque['descricao']),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _estoqueDestinoSelecionado = value),
+                        validator: (value) {
+                          if (value == null)
+                            return 'Selecione o estoque destino';
+                          if (_estoqueOrigemSelecionado != null &&
+                              value['idEstoque'] ==
+                                  _estoqueOrigemSelecionado!['idEstoque']) {
+                            return 'Estoques devem ser diferentes';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final estoque = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) =>
+                              const DialogPesquisaEstoqueDestino(),
+                        );
+                        if (estoque != null) {
+                          final encontrado = _estoques.firstWhere(
+                            (e) => e['idEstoque'] == estoque['idEstoque'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(
+                                () => _estoqueDestinoSelecionado = encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _funcionarioSolicitadorSelecionado,
+                        decoration: const InputDecoration(
+                            labelText: 'Funcionário Solicitador'),
+                        items: _funcionarios
+                            .map((funcionario) => DropdownMenuItem(
+                                  value: funcionario,
+                                  child: Text(funcionario['nome']),
+                                ))
+                            .toList(),
+                        onChanged: (value) => setState(
+                            () => _funcionarioSolicitadorSelecionado = value),
+                        validator: (value) =>
+                            value == null ? 'Selecione o solicitador' : null,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final funcionario =
+                            await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) =>
+                              const DialogPesquisaFuncionarioSolicitador(),
+                        );
+                        if (funcionario != null) {
+                          final encontrado = _funcionarios.firstWhere(
+                            (f) =>
+                                f['idFuncionario'] ==
+                                funcionario['idFuncionario'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(() => _funcionarioSolicitadorSelecionado =
+                                encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _funcionarioAutenticadorSelecionado,
+                        decoration: const InputDecoration(
+                            labelText: 'Funcionário Autenticador'),
+                        items: _funcionarios
+                            .map((funcionario) => DropdownMenuItem(
+                                  value: funcionario,
+                                  child: Text(funcionario['nome']),
+                                ))
+                            .toList(),
+                        onChanged: (value) => setState(
+                            () => _funcionarioAutenticadorSelecionado = value),
+                        validator: (value) =>
+                            value == null ? 'Selecione o autenticador' : null,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final funcionario =
+                            await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) =>
+                              const DialogPesquisaFuncionarioAutenticador(),
+                        );
+                        if (funcionario != null) {
+                          final encontrado = _funcionarios.firstWhere(
+                            (f) =>
+                                f['idFuncionario'] ==
+                                funcionario['idFuncionario'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(() => _funcionarioAutenticadorSelecionado =
+                                encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
                       child: TextButton.icon(
                         icon: const Icon(Icons.calendar_today),
-                        label: Text(_dataSelecionada != null
-                            ? DateFormat('dd/MM/yyyy').format(_dataSelecionada!)
-                            : 'Selecione a data'),
+                        label: Text(
+                            DateFormat('dd/MM/yyyy').format(_dataSelecionada!)),
                         onPressed: () => _selecionarData(context),
                       ),
                     ),
@@ -381,56 +446,26 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(4),
-                          TextInputFormatter.withFunction((va, vn) {
-                            final valorAntigo = va.text;
-                            final valorNovo = vn.text;
-                            final quantidade = valorNovo.length;
-
-                            if (quantidade == 1) {
-                              if (int.parse(valorNovo) <= 2) {
-                                return vn;
-                              }
-                              return const TextEditingValue(text: '');
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            final text =
+                                newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+                            final buffer = StringBuffer();
+                            for (int i = 0; i < text.length; i++) {
+                              if (i == 2) buffer.write(':');
+                              if (i >= 4) break;
+                              buffer.write(text[i]);
                             }
-
-                            if (quantidade == 2) {
-                              if (valorAntigo == '$valorNovo:') {
-                                return TextEditingValue(text: valorNovo[0]);
-                              }
-
-                              if (valorNovo[0] == '2') {
-                                if (int.parse(valorNovo[1]) < 4) {
-                                  return TextEditingValue(text: '$valorNovo:');
-                                }
-                                return va;
-                              }
-                              return TextEditingValue(text: '$valorNovo:');
-                            }
-
-                            if (quantidade == 3) {
-                              if (int.parse(valorNovo[2]) > 5) {
-                                return va;
-                              }
-                              return TextEditingValue(
-                                  text:
-                                      '${valorNovo.substring(0, 2)}:${valorNovo[2]}');
-                            }
-
-                            if (quantidade == 4) {
-                              return TextEditingValue(
-                                  text:
-                                      '${valorNovo.substring(0, 2)}:${valorNovo.substring(2)}');
-                            }
-                            return vn;
+                            return TextEditingValue(
+                              text: buffer.toString(),
+                              selection: TextSelection.collapsed(
+                                  offset: buffer.length),
+                            );
                           }),
                         ],
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null || value.isEmpty)
                             return 'Insira a hora';
-                          }
-                          if (value.length != 5) {
-                            return 'Insira um horário válido';
-                          }
+                          if (value.length != 5) return 'Horário inválido';
                           return null;
                         },
                       ),

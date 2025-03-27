@@ -195,7 +195,21 @@ class _ComprasPageState extends State<ComprasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Compras'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.shopping_cart,
+              color: Colors.yellow,
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Compras',
+              style: TextStyle(fontSize: 22),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: _toggleFiltro,
@@ -393,6 +407,10 @@ class _ComprasPageState extends State<ComprasPage> {
                       final dataFormatada =
                           DateFormat('dd/MM/yyyy, HH:mm').format(data);
                       return ListTile(
+                        leading: Icon(
+                          Icons.shopping_cart_outlined,
+                          color: Colors.yellow.withAlpha(128),
+                        ),
                         title: Text(_compras[index]['descricaoProduto']),
                         subtitle: Text(
                             '${_compras[index]['nomeFornecedor']}\n$dataFormatada'),

@@ -121,7 +121,21 @@ class _ProdutosPageState extends State<ProdutosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Produtos'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.shopping_bag,
+              color: Colors.green,
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Produtos',
+              style: TextStyle(fontSize: 22),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
       drawer: const DrawerFenomenos('Produtos'),
       body: Column(
@@ -158,6 +172,10 @@ class _ProdutosPageState extends State<ProdutosPage> {
                     itemCount: _produtos.length,
                     itemBuilder: (context, index) {
                       return ListTile(
+                        leading: Icon(
+                          Icons.shopping_bag_outlined,
+                          color: Colors.green.withAlpha(128),
+                        ),
                         title: Text(_produtos[index]['descricao']),
                         subtitle: Text(_produtos[index]['codBarras']),
                         onTap: () async {
