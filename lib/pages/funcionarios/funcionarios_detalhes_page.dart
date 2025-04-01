@@ -186,12 +186,12 @@ class _FuncionariosDetalhesPageState extends State<FuncionariosDetalhesPage> {
                                                     widget.funcionario[
                                                         'idFuncionario']
                                                 ? Icon(
-                                                    Icons.vpn_key_outlined,
-                                                    color: Colors.yellow
+                                                    Icons.description,
+                                                    color: Colors.green
                                                         .withValues(alpha: 0.5),
                                                   )
                                                 : Icon(
-                                                    Icons.description_outlined,
+                                                    Icons.vpn_key_outlined,
                                                     color: Colors.green
                                                         .withValues(alpha: 0.5),
                                                   ),

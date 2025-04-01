@@ -239,7 +239,7 @@ class _PrincipalPageState extends State<PrincipalPage> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.person_rounded),
-        title: Text('${userInfo['idFuncionario']} - ${userInfo['nome']}'),
+        title: Text(userInfo['nome']),
         subtitle: Text(userInfo['email']),
         trailing: Text(userInfo['setor']),
       ),
