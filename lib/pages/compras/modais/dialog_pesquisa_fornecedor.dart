@@ -41,8 +41,14 @@ class _DialogPesquisaFornecedoresState
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -72,20 +78,30 @@ class _DialogPesquisaFornecedoresState
           const SizedBox(height: 16),
           _carregando
               ? const CircularProgressIndicator()
-              : Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _resultados.length,
-                    itemBuilder: (context, index) {
-                      final fornecedor = _resultados[index];
-                      return ListTile(
-                        title: Text(fornecedor['nome']),
-                        subtitle: Text(fornecedor['cnpj']),
-                        onTap: () => Navigator.pop(context, fornecedor),
-                      );
-                    },
-                  ),
-                ),
+              : _resultados.isEmpty
+                  ? const Center(
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            'Nenhum fornecedor encontrado.',
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _resultados.length,
+                        itemBuilder: (context, index) {
+                          final fornecedor = _resultados[index];
+                          return ListTile(
+                            title: Text(fornecedor['nome']),
+                            subtitle: Text(fornecedor['cnpj']),
+                            onTap: () => Navigator.pop(context, fornecedor),
+                          );
+                        },
+                      ),
+                    ),
         ],
       ),
       actions: [

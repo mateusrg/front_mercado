@@ -33,7 +33,7 @@ class _ComprasPageState extends State<ComprasPage> {
   DateTime? _dataFinal;
   Map<String, dynamic>? _produtoSelecionado;
   Map<String, dynamic>? _fornecedorSelecionado;
-  bool _carregando = false;
+  bool _carregando = true;
   bool _mostrarFiltro = false;
 
   @override
@@ -158,12 +158,14 @@ class _ComprasPageState extends State<ComprasPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   void _toggleFiltro() {
@@ -250,7 +252,8 @@ class _ComprasPageState extends State<ComprasPage> {
         actions: [
           IconButton(
             onPressed: _toggleFiltro,
-            icon: const Icon(Icons.filter_alt),
+            icon:
+                Icon(_mostrarFiltro ? Icons.filter_alt_off : Icons.filter_alt),
           ),
         ],
       ),
@@ -274,9 +277,17 @@ class _ComprasPageState extends State<ComprasPage> {
                             items: _produtos.map((produto) {
                               return DropdownMenuItem<Map<String, dynamic>>(
                                 value: produto,
-                                child: Text(
-                                  produto['descricao'],
-                                  overflow: TextOverflow.ellipsis,
+                                child: Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                                0.8 -
+                                            96,
+                                  ),
+                                  child: Text(
+                                    produto['descricao'],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -486,36 +497,47 @@ class _ComprasPageState extends State<ComprasPage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _compras.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == _compras.length) {
-                        return const SizedBox(height: 64);
-                      }
-                      final data = DateTime.parse(_compras[index]['data']);
-                      final dataFormatada =
-                          DateFormat('dd/MM/yyyy, HH:mm').format(data);
-                      return ListTile(
-                        leading: Icon(
-                          Icons.shopping_cart_outlined,
-                          color: Colors.yellow.withAlpha(128),
+                : _compras.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.only(bottom: 16.0),
+                        child: Center(
+                          child: Text(
+                            'Nenhuma compra encontrada.',
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
-                        title: Text(_compras[index]['descricaoProduto']),
-                        subtitle: Text(
-                            '${_compras[index]['nomeFornecedor']}\n$dataFormatada'),
-                        trailing: Text('${_compras[index]['quantidade']} un.'),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => CompraDetalhesPage(
-                                compra: _compras[index],
-                              ),
+                      )
+                    : ListView.builder(
+                        itemCount: _compras.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _compras.length) {
+                            return const ListTile();
+                          }
+                          final data = DateTime.parse(_compras[index]['data']);
+                          final dataFormatada =
+                              DateFormat('dd/MM/yyyy, HH:mm').format(data);
+                          return ListTile(
+                            leading: Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Colors.yellow.withAlpha(128),
                             ),
+                            title: Text(_compras[index]['descricaoProduto']),
+                            subtitle: Text(
+                                '${_compras[index]['nomeFornecedor']}\n$dataFormatada'),
+                            trailing:
+                                Text('${_compras[index]['quantidade']} un.'),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => CompraDetalhesPage(
+                                    compra: _compras[index],
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
           ),
         ],
       ),

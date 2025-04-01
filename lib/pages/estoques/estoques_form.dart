@@ -94,14 +94,14 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
                 body: jsonEncode(estoque),
               );
 
-        print(jsonEncode(estoque));
-
         if (response.statusCode >= 200 && response.statusCode < 300) {
-          Navigator.of(context).pop({
-            'estoque': _descricaoController.text,
-            'idTipoEstoque': _tipoSelecionado?['idTipoEstoque'],
-            'tipoEstoque': _tipoSelecionado?['descricao'],
-          });
+          if (mounted) {
+            Navigator.of(context).pop({
+              'estoque': _descricaoController.text,
+              'idTipoEstoque': _tipoSelecionado?['idTipoEstoque'],
+              'tipoEstoque': _tipoSelecionado?['descricao'],
+            });
+          }
         } else {
           final erro = json.decode(response.body);
           _mostrarErro('Erro: ${erro['message'] ?? 'Erro desconhecido'}');
@@ -115,12 +115,14 @@ class _EstoquesFormPageState extends State<EstoquesFormPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override

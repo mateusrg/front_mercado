@@ -1,13 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:front_mercado/pages/funcionarios/dialog_verificacao_funcionario.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FuncionariosFormPage extends StatefulWidget {
-  final Map<String, dynamic>? funcionarios;
+  final Map<String, dynamic>? funcionario;
 
-  const FuncionariosFormPage({super.key, this.funcionarios});
+  const FuncionariosFormPage({super.key, this.funcionario});
 
   @override
   State<FuncionariosFormPage> createState() => _FuncionariosFormPageState();
@@ -26,16 +28,16 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
   void initState() {
     super.initState();
     _nomeController = TextEditingController(
-      text: widget.funcionarios != null ? widget.funcionarios!['nome'] : '',
+      text: widget.funcionario != null ? widget.funcionario!['nome'] : '',
     );
     _emailController = TextEditingController(
-      text: widget.funcionarios != null ? widget.funcionarios!['email'] : '',
+      text: widget.funcionario != null ? widget.funcionario!['email'] : '',
     );
     _setorController = TextEditingController(
-      text: widget.funcionarios != null ? widget.funcionarios!['setor'] : '',
+      text: widget.funcionario != null ? widget.funcionario!['setor'] : '',
     );
     _senhaController = TextEditingController(
-      text: widget.funcionarios != null ? widget.funcionarios!['senha'] : '',
+      text: widget.funcionario != null ? widget.funcionario!['senha'] : '',
     );
   }
 
@@ -48,18 +50,22 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
     super.dispose();
   }
 
-  Future<void> _adicionarFuncionario(Map<String, dynamic> funcionarios) async {
+  Future<void> _salvarFuncionario(Map<String, dynamic> funcionario) async {
     try {
-      final response = await http
-          .post(
-            Uri.http(apiUrl, '/Funcionarios'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(funcionarios),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = widget.funcionario == null
+          ? await http.post(
+              Uri.http(apiUrl, '/Funcionarios'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(funcionario),
+            )
+          : await http.put(
+              Uri.http(apiUrl, '/Funcionarios'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(funcionario),
+            );
 
       if (response.statusCode >= 400) {
-        _mostrarErro('Erro ao adicionar funcionários: ${response.statusCode}');
+        _mostrarErro('Erro ao salvar funcionário: ${response.statusCode}');
       }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
@@ -79,21 +85,45 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
         'senha': _senhaController.text,
       };
 
-      if (widget.funcionarios != null) {
+      if (widget.funcionario != null) {
         funcionario['idFuncionario'] =
-            widget.funcionarios!['idFuncionario'].toString();
+            widget.funcionario!['idFuncionario'].toString();
+
+        final senhaValida = await showDialog<bool>(
+          context: context,
+          builder: (context) => DialogVerificacaoFuncionario(
+            funcionario: widget.funcionario!,
+          ),
+        );
+
+        if (senhaValida != true) {
+          return;
+        }
       }
 
       try {
-        await _adicionarFuncionario(funcionario);
-        Navigator.of(context).pop();
+        await _salvarFuncionario(funcionario);
+
+        final prefs = await SharedPreferences.getInstance();
+        final usuarioLogadoString = prefs.getString('usuarioLogado');
+        if (usuarioLogadoString != null) {
+          final usuarioLogado = json.decode(usuarioLogadoString);
+          if (usuarioLogado['idFuncionario'].toString() ==
+              funcionario['idFuncionario']) {
+            await prefs.setString('usuarioLogado', json.encode(funcionario));
+          }
+        }
+
+        if (mounted) Navigator.of(context).pop(funcionario);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erro ao cadastrar funcionário.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Erro ao salvar funcionário.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } finally {
         setState(() {
           _salvando = false;
@@ -103,19 +133,23 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Funcionários'),
+        title: Text(widget.funcionario == null
+            ? 'Adicionar Funcionário'
+            : 'Editar Funcionário'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -197,7 +231,7 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
                           ),
                         )
                       : Text(
-                          widget.funcionarios == null ? 'Cadastrar' : 'Alterar',
+                          widget.funcionario == null ? 'Cadastrar' : 'Alterar',
                           style: const TextStyle(fontSize: 16),
                         ),
                 ),

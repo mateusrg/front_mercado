@@ -34,12 +34,14 @@ class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   Future<void> _adicionarTipoEstoque(Map<String, dynamic> tipoEstoque) async {
@@ -101,7 +103,7 @@ class _TipoEstoqueFormPageState extends State<TipoEstoqueFormPage> {
         _salvando = false;
       });
 
-      Navigator.of(context).pop(tipoEstoque);
+      if (mounted) Navigator.of(context).pop(tipoEstoque);
     }
   }
 

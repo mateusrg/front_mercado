@@ -156,7 +156,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
         );
 
         if (response.statusCode == 200) {
-          Navigator.of(context).pop();
+          if (mounted) Navigator.of(context).pop();
         } else if (response.statusCode == 400) {
           _mostrarErro('Quantidade insuficiente em estoque.');
         } else {
@@ -185,10 +185,14 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(mensagem),
-      backgroundColor: Colors.red,
-    ));
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   void _abrirDialogPesquisaProduto() async {

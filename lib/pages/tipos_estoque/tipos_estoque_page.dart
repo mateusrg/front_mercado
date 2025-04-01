@@ -79,12 +79,14 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -134,28 +136,45 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _tiposEstoque.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: Icon(
-                          Icons.inventory_rounded,
-                          color: Colors.yellow.withAlpha(128),
-                        ),
-                        title: Text(_tiposEstoque[index]['descricao']),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => TiposEstoqueDetalhesPage(
-                                tipoEstoque: _tiposEstoque[index],
+                : _tiposEstoque.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 40.0),
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                'Nenhum tipo de estoque encontrado.',
                               ),
                             ),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _tiposEstoque.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _tiposEstoque.length) {
+                            return const ListTile();
+                          }
+                          return ListTile(
+                            leading: Icon(
+                              Icons.inventory_rounded,
+                              color: Colors.yellow.withAlpha(128),
+                            ),
+                            title: Text(_tiposEstoque[index]['descricao']),
+                            onTap: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TiposEstoqueDetalhesPage(
+                                    tipoEstoque: _tiposEstoque[index],
+                                  ),
+                                ),
+                              );
+                              _listarTiposEstoque();
+                            },
                           );
-                          _listarTiposEstoque();
                         },
-                      );
-                    },
-                  ),
+                      ),
           ),
         ],
       ),

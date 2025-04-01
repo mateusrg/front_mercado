@@ -48,12 +48,14 @@ class _DialogPesquisaFuncionarioAutenticadorState
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -83,23 +85,33 @@ class _DialogPesquisaFuncionarioAutenticadorState
           const SizedBox(height: 16.0),
           _carregando
               ? const CircularProgressIndicator()
-              : Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _resultadosPesquisa.length,
-                    itemBuilder: (context, index) {
-                      final funcionario = _resultadosPesquisa[index];
-                      return ListTile(
-                        title: Text(funcionario['nome']),
-                        subtitle: Text(funcionario['email']),
-                        trailing: Text(funcionario['setor']),
-                        onTap: () {
-                          Navigator.pop(context, funcionario);
+              : _resultadosPesquisa.isEmpty
+                  ? const Center(
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            'Nenhum funcionário encontrado.',
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _resultadosPesquisa.length,
+                        itemBuilder: (context, index) {
+                          final funcionario = _resultadosPesquisa[index];
+                          return ListTile(
+                            title: Text(funcionario['nome']),
+                            subtitle: Text(funcionario['email']),
+                            trailing: Text(funcionario['setor']),
+                            onTap: () {
+                              Navigator.pop(context, funcionario);
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    ),
         ],
       ),
       actions: [

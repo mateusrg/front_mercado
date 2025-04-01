@@ -30,7 +30,7 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
   List<Map<String, dynamic>> _produtos = [];
   List<Map<String, dynamic>> _estoques = [];
   List<Map<String, dynamic>> _tiposMovimentacaoEstoque = [];
-  bool _carregando = false;
+  bool _carregando = true;
   bool _mostrarFiltro = false;
 
   Map<String, dynamic>? _produtoSelecionado;
@@ -130,12 +130,14 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   void _abrirFormularioVenda() async {
@@ -262,7 +264,8 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
         actions: [
           IconButton(
             onPressed: _toggleFiltro,
-            icon: const Icon(Icons.filter_alt),
+            icon:
+                Icon(_mostrarFiltro ? Icons.filter_alt_off : Icons.filter_alt),
           ),
         ],
       ),
@@ -500,38 +503,53 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _movimentacoes.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == _movimentacoes.length) {
-                        return const ListTile();
-                      }
-                      final movimentacao = _movimentacoes[index];
-                      return ListTile(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => MovimentacaoDetalhesPage(
-                                movimentacao: movimentacao,
+                : _movimentacoes.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 24.0),
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                'Nenhuma movimentação encontrada.',
                               ),
                             ),
-                          );
-                        },
-                        title: Text(movimentacao['descricaoProduto']),
-                        subtitle: Text('${movimentacao['descricaoEstoque']}'),
-                        leading: Text(
-                          '${movimentacao['quantidade'] >= 0 ? '+' : '-'}${movimentacao['quantidade'].abs()}',
-                          style: TextStyle(
-                            color: movimentacao['quantidade'] >= 0
-                                ? Colors.green
-                                : Colors.red,
                           ),
                         ),
-                        trailing: Text(
-                            '${movimentacao['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yyyy, HH:mm').format(DateTime.parse(movimentacao['dataHora']))}'),
-                      );
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        itemCount: _movimentacoes.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _movimentacoes.length) {
+                            return const ListTile();
+                          }
+                          final movimentacao = _movimentacoes[index];
+                          return ListTile(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      MovimentacaoDetalhesPage(
+                                    movimentacao: movimentacao,
+                                  ),
+                                ),
+                              );
+                            },
+                            title: Text(movimentacao['descricaoProduto']),
+                            subtitle:
+                                Text('${movimentacao['descricaoEstoque']}'),
+                            leading: Text(
+                              '${movimentacao['quantidade'] >= 0 ? '+' : '-'}${movimentacao['quantidade'].abs()}',
+                              style: TextStyle(
+                                color: movimentacao['quantidade'] >= 0
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                            trailing: Text(
+                                '${movimentacao['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yyyy, HH:mm').format(DateTime.parse(movimentacao['dataHora']))}'),
+                          );
+                        },
+                      ),
           ),
         ],
       ),

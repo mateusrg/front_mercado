@@ -200,9 +200,11 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('usuarioLogado', jsonEncode(jsonResposta));
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (ctx) => const PrincipalPage()),
-      );
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (ctx) => const PrincipalPage()),
+        );
+      }
     } catch (e) {
       setState(() {
         _estaCarregando = false;
@@ -212,11 +214,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 }

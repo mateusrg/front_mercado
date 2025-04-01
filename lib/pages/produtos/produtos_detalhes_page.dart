@@ -317,52 +317,71 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
                       ),
                       carregandoMovimentacoes
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (movimentacoesRecentes.length > 3
-                                            ? 3
-                                            : movimentacoesRecentes.length);
-                                    i++)
-                                  Hero(
-                                    tag:
-                                        'listTileMovimentacoesRecentesDoProduto$i',
+                          : movimentacoesRecentes.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumaMovimentacao',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
-                                        leading: Icon(Icons.history_outlined,
-                                            color: Colors.yellow
-                                                .withValues(alpha: 0.5)),
-                                        title: Text(movimentacoesRecentes[i]
-                                            ['descricaoMovimentacaoEstoque']),
-                                        subtitle: Text(
-                                            DateFormat('dd/MM/yyyy HH:mm')
-                                                .format(DateTime.parse(
-                                                    movimentacoesRecentes[i]
-                                                        ['dataHora']))),
-                                        trailing: Text(
-                                            '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                        leading: Icon(
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
+                                        ),
+                                        title: const Text(
+                                          'Nenhuma movimentação',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (movimentacoesRecentes.length > 3)
-                                  ListTile(
-                                    leading: Icon(Icons.add,
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.5)),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            ),
+                                )
+                              : Column(
+                                  children: [
+                                    for (int i = 0;
+                                        i <
+                                            (movimentacoesRecentes.length > 3
+                                                ? 3
+                                                : movimentacoesRecentes.length);
+                                        i++)
+                                      Hero(
+                                        tag:
+                                            'listTileMovimentacoesRecentesDoProduto$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                                Icons.history_outlined,
+                                                color: Colors.yellow
+                                                    .withValues(alpha: 0.5)),
+                                            title: Text(movimentacoesRecentes[i]
+                                                [
+                                                'descricaoMovimentacaoEstoque']),
+                                            subtitle: Text(
+                                                DateFormat('dd/MM/yyyy HH:mm')
+                                                    .format(DateTime.parse(
+                                                        movimentacoesRecentes[i]
+                                                            ['dataHora']))),
+                                            trailing: Text(
+                                                '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                          ),
+                                        ),
+                                      ),
+                                    if (movimentacoesRecentes.length > 3)
+                                      ListTile(
+                                        leading: Icon(Icons.add,
+                                            color: Colors.grey
+                                                .withValues(alpha: 0.5)),
+                                        title: const Text('E mais...'),
+                                      ),
+                                  ],
+                                ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -388,44 +407,62 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
                       ),
                       carregandoCompras
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (compras.length > 3
-                                            ? 3
-                                            : compras.length);
-                                    i++)
-                                  Hero(
-                                    tag: 'listTileComprasDoProduto$i',
+                          : compras.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumaCompra',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
                                         leading: Icon(
-                                            Icons.shopping_cart_outlined,
-                                            color: Colors.blue
-                                                .withValues(alpha: 0.5)),
-                                        title: Text(
-                                            compras[i]['descricaoProduto']),
-                                        subtitle: Text(
-                                            DateFormat('dd/MM/yyyy, HH:mm')
-                                                .format(DateTime.parse(
-                                                    compras[i]['data']))),
-                                        trailing: Text(
-                                            '${compras[i]['quantidade']} un.'),
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
+                                        ),
+                                        title: const Text(
+                                          'Nenhuma compra',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (compras.length > 3)
-                                  ListTile(
-                                    leading: Icon(Icons.add,
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.5)),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            ),
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    for (int i = 0;
+                                        i <
+                                            (compras.length > 3
+                                                ? 3
+                                                : compras.length);
+                                        i++)
+                                      Hero(
+                                        tag: 'listTileComprasDoProduto$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                                Icons.shopping_cart_outlined,
+                                                color: Colors.blue
+                                                    .withValues(alpha: 0.5)),
+                                            title: Text(
+                                                compras[i]['descricaoProduto']),
+                                            subtitle: Text(
+                                                DateFormat('dd/MM/yyyy, HH:mm')
+                                                    .format(DateTime.parse(
+                                                        compras[i]['data']))),
+                                            trailing: Text(
+                                                '${compras[i]['quantidade']} un.'),
+                                          ),
+                                        ),
+                                      ),
+                                    if (compras.length > 3)
+                                      ListTile(
+                                        leading: Icon(Icons.add,
+                                            color: Colors.grey
+                                                .withValues(alpha: 0.5)),
+                                        title: const Text('E mais...'),
+                                      ),
+                                  ],
+                                ),
                     ],
                   ),
                 ),

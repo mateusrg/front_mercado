@@ -96,12 +96,14 @@ class _EstoquePageState extends State<EstoquePage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   void _abrirFormularioEstoque() async {
@@ -183,32 +185,48 @@ class _EstoquePageState extends State<EstoquePage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _estoques.length,
-                    itemBuilder: (context, index) {
-                      final estoque = _estoques[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                            title: Text(estoque['descricaoEstoque']),
-                            leading: Icon(
-                              Icons.warehouse_outlined,
-                              color: Colors.blue.withAlpha(128),
+                : _estoques.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.only(bottom: 40.0),
+                        child: Center(
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                'Nenhum estoque encontrado.',
+                              ),
                             ),
-                            trailing: Text(estoque['descricaoTipoEstoque']),
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EstoqueDetalhesPage(estoque: estoque),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _estoques.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _estoques.length) {
+                            return const ListTile();
+                          }
+                          final estoque = _estoques[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                                title: Text(estoque['descricaoEstoque']),
+                                leading: Icon(
+                                  Icons.warehouse_outlined,
+                                  color: Colors.blue.withAlpha(128),
                                 ),
-                              );
-                              _listarEstoques();
-                            }),
-                      );
-                    },
-                  ),
+                                trailing: Text(estoque['descricaoTipoEstoque']),
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EstoqueDetalhesPage(estoque: estoque),
+                                    ),
+                                  );
+                                  _listarEstoques();
+                                }),
+                          );
+                        },
+                      ),
           ),
         ],
       ),

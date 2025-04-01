@@ -61,11 +61,10 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
     }
   }
 
-  void _abrirFormularioFuncionarios(
-      {Map<String, dynamic>? funcionarios}) async {
+  void _abrirFormularioFuncionarios({Map<String, dynamic>? funcionario}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FuncionariosFormPage(funcionarios: funcionarios),
+        builder: (context) => FuncionariosFormPage(funcionario: funcionario),
       ),
     );
     _listarFuncionarios();
@@ -76,12 +75,14 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -131,33 +132,51 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _funcionarios.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(_funcionarios[index]['nome']),
-                          subtitle: Text(_funcionarios[index]['email']),
-                          leading: Icon(
-                            Icons.group_outlined,
-                            color: Colors.yellow.withAlpha(128),
-                          ),
-                          trailing: Text(_funcionarios[index]['setor'] ?? ''),
-                          onTap: () async {
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => FuncionariosDetalhesPage(
-                                  funcionario: _funcionarios[index],
-                                ),
+                : _funcionarios.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 40.0),
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                'Nenhum funcionário encontrado.',
                               ),
-                            );
-                            _listarFuncionarios();
-                          },
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        itemCount: _funcionarios.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _funcionarios.length) {
+                            return const ListTile();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(_funcionarios[index]['nome']),
+                              subtitle: Text(_funcionarios[index]['email']),
+                              leading: Icon(
+                                Icons.group_outlined,
+                                color: Colors.yellow.withAlpha(128),
+                              ),
+                              trailing:
+                                  Text(_funcionarios[index]['setor'] ?? ''),
+                              onTap: () async {
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        FuncionariosDetalhesPage(
+                                      funcionario: _funcionarios[index],
+                                    ),
+                                  ),
+                                );
+                                _listarFuncionarios();
+                              },
+                            ),
+                          );
+                        },
+                      ),
           ),
         ],
       ),

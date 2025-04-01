@@ -34,6 +34,24 @@ class MovimentacoesRecentesDoProdutoPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (movimentacoes.isEmpty)
+              Center(
+                child: Hero(
+                  tag: 'nenhumaMovimentacao',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.remove,
+                        color: Colors.grey.withAlpha(128),
+                      ),
+                      title: const Text(
+                        'Nenhuma movimentação',
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             for (int i = 0; i < movimentacoes.length; i++)
               Hero(
                 tag: 'listTileMovimentacoesRecentesDoProduto$i',

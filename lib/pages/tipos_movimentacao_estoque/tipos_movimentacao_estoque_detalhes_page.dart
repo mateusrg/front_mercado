@@ -145,40 +145,60 @@ class _TiposMovimentacaoDetalhesPageState
                       ),
                       carregandoMovimentacoes
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (movimentacoes.length > 3
-                                            ? 3
-                                            : movimentacoes.length);
-                                    i++)
-                                  Hero(
-                                    tag: 'listTileMovimentacoesDoTipoEstoque$i',
+                          : movimentacoes.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumaMovimentacao',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
-                                        leading: Icon(Icons.history_outlined,
-                                            color: Colors.green
-                                                .withValues(alpha: 0.5)),
-                                        title: Text(movimentacoes[i]
-                                            ['descricaoProduto']),
-                                        subtitle: Text(
-                                            '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoes[i]['dataHora']))}'),
-                                        trailing: Text(
-                                            '${movimentacoes[i]['quantidade']} un.'),
+                                        leading: Icon(
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
+                                        ),
+                                        title: const Text(
+                                          'Nenhuma movimentação',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (movimentacoes.length > 3)
-                                  ListTile(
-                                    leading: Icon(Icons.add,
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.5)),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            ),
+                                )
+                              : Column(
+                                  children: [
+                                    for (int i = 0;
+                                        i <
+                                            (movimentacoes.length > 3
+                                                ? 3
+                                                : movimentacoes.length);
+                                        i++)
+                                      Hero(
+                                        tag:
+                                            'listTileMovimentacoesDoTipoEstoque$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                                Icons.history_outlined,
+                                                color: Colors.green
+                                                    .withValues(alpha: 0.5)),
+                                            title: Text(movimentacoes[i]
+                                                ['descricaoProduto']),
+                                            subtitle: Text(
+                                                '${movimentacoes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoes[i]['dataHora']))}'),
+                                            trailing: Text(
+                                                '${movimentacoes[i]['quantidade']} un.'),
+                                          ),
+                                        ),
+                                      ),
+                                    if (movimentacoes.length > 3)
+                                      ListTile(
+                                        leading: Icon(Icons.add,
+                                            color: Colors.grey
+                                                .withValues(alpha: 0.5)),
+                                        title: const Text('E mais...'),
+                                      ),
+                                  ],
+                                ),
                     ],
                   ),
                 ),

@@ -48,12 +48,14 @@ class _DialogPesquisaEstoqueOrigemState
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -83,22 +85,32 @@ class _DialogPesquisaEstoqueOrigemState
           const SizedBox(height: 16.0),
           _carregando
               ? const CircularProgressIndicator()
-              : Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _resultadosPesquisa.length,
-                    itemBuilder: (context, index) {
-                      final estoque = _resultadosPesquisa[index];
-                      return ListTile(
-                        title: Text(estoque['descricaoEstoque']),
-                        subtitle: Text(estoque['descricaoTipoEstoque']),
-                        onTap: () {
-                          Navigator.pop(context, estoque);
+              : _resultadosPesquisa.isEmpty
+                  ? const Center(
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            'Nenhum estoque encontrado.',
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _resultadosPesquisa.length,
+                        itemBuilder: (context, index) {
+                          final estoque = _resultadosPesquisa[index];
+                          return ListTile(
+                            title: Text(estoque['descricaoEstoque']),
+                            subtitle: Text(estoque['descricaoTipoEstoque']),
+                            onTap: () {
+                              Navigator.pop(context, estoque);
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    ),
         ],
       ),
       actions: [

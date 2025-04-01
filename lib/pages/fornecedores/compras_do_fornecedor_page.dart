@@ -34,6 +34,24 @@ class ComprasDoFornecedorPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (compras.isEmpty)
+              Center(
+                child: Hero(
+                  tag: 'nenhumaCompra',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.remove,
+                        color: Colors.grey.withAlpha(128),
+                      ),
+                      title: const Text(
+                        'Nenhuma compra',
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             for (int i = 0; i < compras.length; i++)
               Hero(
                 tag: 'listTileComprasDoFornecedor$i',

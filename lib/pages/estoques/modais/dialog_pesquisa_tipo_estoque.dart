@@ -40,8 +40,14 @@ class _DialogPesquisaTipoEstoqueState extends State<DialogPesquisaTipoEstoque> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -71,19 +77,29 @@ class _DialogPesquisaTipoEstoqueState extends State<DialogPesquisaTipoEstoque> {
           const SizedBox(height: 16),
           _carregando
               ? const CircularProgressIndicator()
-              : Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _resultados.length,
-                    itemBuilder: (context, index) {
-                      final tipoEstoque = _resultados[index];
-                      return ListTile(
-                        title: Text(tipoEstoque['descricao']),
-                        onTap: () => Navigator.pop(context, tipoEstoque),
-                      );
-                    },
-                  ),
-                ),
+              : _resultados.isEmpty
+                  ? const Center(
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            'Nenhum tipo de estoque encontrado.',
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _resultados.length,
+                        itemBuilder: (context, index) {
+                          final tipoEstoque = _resultados[index];
+                          return ListTile(
+                            title: Text(tipoEstoque['descricao']),
+                            onTap: () => Navigator.pop(context, tipoEstoque),
+                          );
+                        },
+                      ),
+                    ),
         ],
       ),
       actions: [

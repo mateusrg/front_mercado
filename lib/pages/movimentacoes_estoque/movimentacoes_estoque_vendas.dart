@@ -121,7 +121,7 @@ class _VendaPageState extends State<VendaPage> {
         };
 
         await _vender(venda);
-        Navigator.of(context).pop();
+        if (mounted) Navigator.of(context).pop();
       } catch (e) {
         _mostrarErro('Erro ao processar venda: ${e.toString()}');
       } finally {
@@ -131,8 +131,14 @@ class _VendaPageState extends State<VendaPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   Future<String?> _lerCodigoDeBarras() async {

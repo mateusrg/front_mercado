@@ -112,7 +112,9 @@ class _CompraFormPageState extends State<CompraFormPage> {
 
       try {
         await _adicionarCompra(compra);
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       } catch (e) {
         _mostrarErro('Não foi possível se conectar com a API.');
       } finally {
@@ -126,12 +128,14 @@ class _CompraFormPageState extends State<CompraFormPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   Future<void> _adicionarCompra(Map<String, dynamic> compra) async {
@@ -191,9 +195,8 @@ class _CompraFormPageState extends State<CompraFormPage> {
       return Scaffold(
         appBar: AppBar(
           title: const Row(children: [
-            Hero(tag: 'hero-compras', child: Icon(Icons.add_shopping_cart)),
             SizedBox(width: 12),
-            Text('Compras'),
+            Text('Comprar'),
           ]),
         ),
         body: const Center(child: CircularProgressIndicator()),
@@ -203,9 +206,8 @@ class _CompraFormPageState extends State<CompraFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Row(children: [
-          Hero(tag: 'hero-compras', child: Icon(Icons.add_shopping_cart)),
           SizedBox(width: 12),
-          Text('Compras'),
+          Text('Comprar'),
         ]),
       ),
       body: Padding(
@@ -299,8 +301,9 @@ class _CompraFormPageState extends State<CompraFormPage> {
                       ),
                     ),
                     IconButton(
-                        onPressed: _consultarPorLeitor,
-                        icon: const Icon(Symbols.barcode_scanner),),
+                      onPressed: _consultarPorLeitor,
+                      icon: const Icon(Symbols.barcode_scanner),
+                    ),
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {
@@ -330,6 +333,12 @@ class _CompraFormPageState extends State<CompraFormPage> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Insira a quantidade';
+                    }
+                    final qtd = int.tryParse(value);
+                    if (qtd == null) return 'Número inválido';
+                    if (qtd <= 0) return 'Quantidade deve ser maior que zero';
+                    if (qtd >= 2147483648) {
+                      return 'Quantidadade deve ser menor que 2147483648';
                     }
                     return null;
                   },

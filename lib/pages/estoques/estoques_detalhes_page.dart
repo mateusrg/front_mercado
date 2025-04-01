@@ -153,40 +153,59 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
                       ),
                       carregandoProdutos
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (produtos.length > 3
-                                            ? 3
-                                            : produtos.length);
-                                    i++)
-                                  Hero(
-                                    tag: 'listTileProdutosNoEstoque$i',
+                          : produtos.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumProduto',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
                                         leading: Icon(
-                                          Icons.shopping_bag_outlined,
-                                          color: Colors.green.withAlpha(128),
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
                                         ),
-                                        title: Text(produtos[i]['produto']),
-                                        trailing: Text(
-                                            '${produtos[i]['quantidade']} un.'),
+                                        title: const Text(
+                                          'Nenhum produto',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (produtos.length > 3)
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.add,
-                                      color: Colors.grey.withAlpha(128),
-                                    ),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            )
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    for (int i = 0;
+                                        i <
+                                            (produtos.length > 3
+                                                ? 3
+                                                : produtos.length);
+                                        i++)
+                                      Hero(
+                                        tag: 'listTileProdutosNoEstoque$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                              Icons.shopping_bag_outlined,
+                                              color:
+                                                  Colors.green.withAlpha(128),
+                                            ),
+                                            title: Text(produtos[i]['produto']),
+                                            trailing: Text(
+                                                '${produtos[i]['quantidade']} un.'),
+                                          ),
+                                        ),
+                                      ),
+                                    if (produtos.length > 3)
+                                      ListTile(
+                                        leading: Icon(
+                                          Icons.add,
+                                          color: Colors.grey.withAlpha(128),
+                                        ),
+                                        title: const Text('E mais...'),
+                                      ),
+                                  ],
+                                )
                     ],
                   ),
                 ),
@@ -220,44 +239,67 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
                       ),
                       carregandoMovimentacoes
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (movimentacoesRecentes.length > 3
-                                            ? 3
-                                            : movimentacoesRecentes.length);
-                                    i++)
-                                  Hero(
-                                    tag:
-                                        'listTileMovimentacoesRecentesDoEstoque$i',
+                          : movimentacoesRecentes.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumaMovimentacao',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
                                         leading: Icon(
-                                          Icons.history_outlined,
-                                          color: Colors.yellow.withAlpha(128),
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
                                         ),
-                                        title: Text(movimentacoesRecentes[i]
-                                            ['descricaoProduto']),
-                                        subtitle: Text(
-                                            '${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}'),
-                                        trailing: Text(
-                                            '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                        title: const Text(
+                                          'Nenhuma movimentação',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (movimentacoesRecentes.length > 3)
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.add,
-                                      color: Colors.grey.withAlpha(128),
-                                    ),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            )
+                                )
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        for (int i = 0;
+                                            i <
+                                                (movimentacoesRecentes.length >
+                                                        3
+                                                    ? 3
+                                                    : movimentacoesRecentes
+                                                        .length);
+                                            i++)
+                                          Hero(
+                                            tag:
+                                                'listTileMovimentacoesRecentesDoEstoque$i',
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: ListTile(
+                                                leading: Icon(
+                                                  Icons.history_outlined,
+                                                  color: Colors.yellow
+                                                      .withAlpha(128),
+                                                ),
+                                                title: Text(
+                                                    movimentacoesRecentes[i]
+                                                        ['descricaoProduto']),
+                                                subtitle: Text(
+                                                    '${movimentacoesRecentes[i]['descricaoMovimentacaoEstoque']}\n${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(movimentacoesRecentes[i]['dataHora']))}'),
+                                                trailing: Text(
+                                                    '${movimentacoesRecentes[i]['quantidade'].abs()} un.'),
+                                              ),
+                                            ),
+                                          ),
+                                        if (movimentacoesRecentes.length > 3)
+                                          ListTile(
+                                            leading: Icon(
+                                              Icons.add,
+                                              color: Colors.grey.withAlpha(128),
+                                            ),
+                                            title: const Text('E mais...'),
+                                          ),
+                                      ],
+                                    )
                     ],
                   ),
                 ),

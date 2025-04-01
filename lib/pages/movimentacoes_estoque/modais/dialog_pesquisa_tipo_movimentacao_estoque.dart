@@ -41,8 +41,14 @@ class _DialogPesquisaTipoMovimentacaoEstoqueState
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -72,20 +78,30 @@ class _DialogPesquisaTipoMovimentacaoEstoqueState
           const SizedBox(height: 16),
           _carregando
               ? const CircularProgressIndicator()
-              : Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _resultados.length,
-                    itemBuilder: (context, index) {
-                      final tipoMovimentacaoEstoque = _resultados[index];
-                      return ListTile(
-                        title: Text(tipoMovimentacaoEstoque['descricao']),
-                        onTap: () =>
-                            Navigator.pop(context, tipoMovimentacaoEstoque),
-                      );
-                    },
-                  ),
-                ),
+              : _resultados.isEmpty
+                  ? const Center(
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            'Nenhum tipo de movimentação de estoque encontrado.',
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _resultados.length,
+                        itemBuilder: (context, index) {
+                          final tipoMovimentacaoEstoque = _resultados[index];
+                          return ListTile(
+                            title: Text(tipoMovimentacaoEstoque['descricao']),
+                            onTap: () =>
+                                Navigator.pop(context, tipoMovimentacaoEstoque),
+                          );
+                        },
+                      ),
+                    ),
         ],
       ),
       actions: [

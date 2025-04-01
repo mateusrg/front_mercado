@@ -168,29 +168,45 @@ class _ProdutosPageState extends State<ProdutosPage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _produtos.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: Icon(
-                          Icons.shopping_bag_outlined,
-                          color: Colors.green.withAlpha(128),
-                        ),
-                        title: Text(_produtos[index]['descricao']),
-                        subtitle: Text(_produtos[index]['codBarras']),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ProdutosDetalhesPage(
-                                produto: _produtos[index],
+                : _produtos.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 32.0),
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                'Nenhum produto encontrado.',
                               ),
                             ),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _produtos.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _produtos.length) {
+                            return const ListTile();
+                          }
+                          return ListTile(
+                            leading: Icon(
+                              Icons.shopping_bag_outlined,
+                              color: Colors.green.withAlpha(128),
+                            ),
+                            title: Text(_produtos[index]['descricao']),
+                            subtitle: Text(_produtos[index]['codBarras']),
+                            onTap: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ProdutosDetalhesPage(
+                                    produto: _produtos[index],
+                                  ),
+                                ),
+                              );
+                              _listarProdutos();
+                            },
                           );
-                          _listarProdutos();
                         },
-                      );
-                    },
-                  ),
+                      ),
           ),
         ],
       ),

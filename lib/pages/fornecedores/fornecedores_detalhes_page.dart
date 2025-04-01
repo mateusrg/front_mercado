@@ -43,12 +43,14 @@ class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   Future<void> _editarFornecedor(Map<String, dynamic> fornecedor) async {
@@ -180,46 +182,65 @@ class _FornecedorDetalhesPageState extends State<FornecedorDetalhesPage> {
                       ),
                       carregandoCompras
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (compras.length > 3
-                                            ? 3
-                                            : compras.length);
-                                    i++)
-                                  Hero(
-                                    tag: 'listTileComprasDoFornecedor$i',
+                          : compras.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumaCompra',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
                                         leading: Icon(
-                                          Icons.shopping_cart_outlined,
-                                          color: Colors.green
-                                              .withValues(alpha: 0.5),
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
                                         ),
-                                        title: Text(
-                                            compras[i]['descricaoProduto']),
-                                        subtitle: Text(
-                                            DateFormat('dd/MM/yyyy, HH:mm')
-                                                .format(DateTime.parse(
-                                                    compras[i]['data']))),
-                                        trailing: Text(
-                                            '${compras[i]['quantidade']} un.'),
+                                        title: const Text(
+                                          'Nenhuma compra',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (compras.length > 3)
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.add,
-                                      color: Colors.grey.withValues(alpha: 0.5),
-                                    ),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            )
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    for (int i = 0;
+                                        i <
+                                            (compras.length > 3
+                                                ? 3
+                                                : compras.length);
+                                        i++)
+                                      Hero(
+                                        tag: 'listTileComprasDoFornecedor$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                              Icons.shopping_cart_outlined,
+                                              color: Colors.green
+                                                  .withValues(alpha: 0.5),
+                                            ),
+                                            title: Text(
+                                                compras[i]['descricaoProduto']),
+                                            subtitle: Text(
+                                                DateFormat('dd/MM/yyyy, HH:mm')
+                                                    .format(DateTime.parse(
+                                                        compras[i]['data']))),
+                                            trailing: Text(
+                                                '${compras[i]['quantidade']} un.'),
+                                          ),
+                                        ),
+                                      ),
+                                    if (compras.length > 3)
+                                      ListTile(
+                                        leading: Icon(
+                                          Icons.add,
+                                          color: Colors.grey
+                                              .withValues(alpha: 0.5),
+                                        ),
+                                        title: const Text('E mais...'),
+                                      ),
+                                  ],
+                                )
                     ],
                   ),
                 ),

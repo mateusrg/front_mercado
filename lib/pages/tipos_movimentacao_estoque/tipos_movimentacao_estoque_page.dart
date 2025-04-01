@@ -81,12 +81,14 @@ class _TiposMovimentacoesEstoquePageState
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -139,8 +141,11 @@ class _TiposMovimentacoesEstoquePageState
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: _tiposMovimentacoesEstoque.length,
+                    itemCount: _tiposMovimentacoesEstoque.length + 1,
                     itemBuilder: (context, index) {
+                      if (index == _tiposMovimentacoesEstoque.length) {
+                        return const ListTile();
+                      }
                       return ListTile(
                         leading: Icon(
                           Icons.move_down_rounded,

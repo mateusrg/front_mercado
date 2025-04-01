@@ -129,12 +129,14 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -185,29 +187,45 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
           Expanded(
             child: _carregando
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _fornecedores.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: Icon(
-                          Icons.fire_truck_outlined,
-                          color: Colors.green.withAlpha(128),
-                        ),
-                        title: Text(_fornecedores[index]['nome']),
-                        subtitle: Text(_fornecedores[index]['cnpj']),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FornecedorDetalhesPage(
-                                fornecedor: _fornecedores[index],
+                : _fornecedores.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.only(bottom: 48.0),
+                        child: Center(
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                'Nenhum fornecedor encontrado.',
                               ),
                             ),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _fornecedores.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _fornecedores.length) {
+                            return const ListTile();
+                          }
+                          return ListTile(
+                            leading: Icon(
+                              Icons.fire_truck_outlined,
+                              color: Colors.green.withAlpha(128),
+                            ),
+                            title: Text(_fornecedores[index]['nome']),
+                            subtitle: Text(_fornecedores[index]['cnpj']),
+                            onTap: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => FornecedorDetalhesPage(
+                                    fornecedor: _fornecedores[index],
+                                  ),
+                                ),
+                              );
+                              _listarFornecedores();
+                            },
                           );
-                          _listarFornecedores();
                         },
-                      );
-                    },
-                  ),
+                      ),
           ),
         ],
       ),

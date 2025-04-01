@@ -45,12 +45,14 @@ class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -80,22 +82,32 @@ class _DialogPesquisaProdutoState extends State<DialogPesquisaProduto> {
           const SizedBox(height: 16.0),
           _carregando
               ? const CircularProgressIndicator()
-              : Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _resultadosPesquisa.length,
-                    itemBuilder: (context, index) {
-                      final produto = _resultadosPesquisa[index];
-                      return ListTile(
-                        title: Text(produto['descricao']),
-                        subtitle: Text(produto['codBarras']),
-                        onTap: () {
-                          Navigator.pop(context, produto);
+              : _resultadosPesquisa.isEmpty
+                  ? const Center(
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            'Nenhum produto encontrado.',
+                          ),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _resultadosPesquisa.length,
+                        itemBuilder: (context, index) {
+                          final produto = _resultadosPesquisa[index];
+                          return ListTile(
+                            title: Text(produto['descricao']),
+                            subtitle: Text(produto['codBarras']),
+                            onTap: () {
+                              Navigator.pop(context, produto);
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    ),
         ],
       ),
       actions: [

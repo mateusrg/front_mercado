@@ -27,6 +27,24 @@ class ProdutosNoEstoquePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (produtos.isEmpty)
+              Center(
+                child: Hero(
+                  tag: 'nenhumProduto',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.remove,
+                        color: Colors.grey.withAlpha(128),
+                      ),
+                      title: const Text(
+                        'Nenhum produto',
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             for (int i = 0; i < produtos.length; i++)
               Hero(
                 tag: 'listTileProdutosNoEstoque$i',

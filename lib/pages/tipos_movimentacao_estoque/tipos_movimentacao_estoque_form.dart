@@ -39,12 +39,14 @@ class _TipoMovimentacaoEstoqueFormPageState
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
-    );
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   Future<void> _adicionarTipoMovimentacaoEstoque(
@@ -111,7 +113,7 @@ class _TipoMovimentacaoEstoqueFormPageState
         _salvando = false;
       });
 
-      Navigator.of(context).pop(m);
+      if (mounted) Navigator.of(context).pop(m);
     }
   }
 

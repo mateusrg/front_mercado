@@ -142,36 +142,55 @@ class _TiposEstoqueDetalhesPageState extends State<TiposEstoqueDetalhesPage> {
                       ),
                       carregandoEstoques
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (estoques.length > 3
-                                            ? 3
-                                            : estoques.length);
-                                    i++)
-                                  Hero(
-                                    tag: 'listTileComprasDoTipoEstoque$i',
+                          : estoques.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumEstoque',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
-                                        leading: Icon(Icons.history_outlined,
-                                            color: Colors.green
-                                                .withValues(alpha: 0.5)),
-                                        title: Text(
-                                            estoques[i]['descricaoEstoque']),
+                                        leading: Icon(
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
+                                        ),
+                                        title: const Text(
+                                          'Nenhum estoque',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                if (estoques.length > 3)
-                                  ListTile(
-                                    leading: Icon(Icons.add,
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.5)),
-                                    title: const Text('E mais...'),
-                                  ),
-                              ],
-                            ),
+                                )
+                              : Column(
+                                  children: [
+                                    for (int i = 0;
+                                        i <
+                                            (estoques.length > 3
+                                                ? 3
+                                                : estoques.length);
+                                        i++)
+                                      Hero(
+                                        tag: 'listTileComprasDoTipoEstoque$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                                Icons.history_outlined,
+                                                color: Colors.green
+                                                    .withValues(alpha: 0.5)),
+                                            title: Text(estoques[i]
+                                                ['descricaoEstoque']),
+                                          ),
+                                        ),
+                                      ),
+                                    if (estoques.length > 3)
+                                      ListTile(
+                                        leading: Icon(Icons.add,
+                                            color: Colors.grey
+                                                .withValues(alpha: 0.5)),
+                                        title: const Text('E mais...'),
+                                      ),
+                                  ],
+                                ),
                     ],
                   ),
                 ),

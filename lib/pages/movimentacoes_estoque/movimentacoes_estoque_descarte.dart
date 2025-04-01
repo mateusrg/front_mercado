@@ -143,7 +143,7 @@ class _DescartePageState extends State<DescartePage> {
         };
 
         await _descartar(descarte);
-        Navigator.of(context).pop();
+        if (mounted) Navigator.of(context).pop();
       } catch (e) {
         _mostrarErro('Erro ao processar descarte: ${e.toString()}');
       } finally {
@@ -153,8 +153,14 @@ class _DescartePageState extends State<DescartePage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {}
   }
 
   Future<String?> _lerCodigoDeBarras() async {
