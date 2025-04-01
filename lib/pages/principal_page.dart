@@ -66,119 +66,147 @@ class _PrincipalPageState extends State<PrincipalPage> {
   }
 
   void _editarFuncionario(BuildContext context, Map<String, dynamic> userInfo) {
-    final TextEditingController nomeController =
-        TextEditingController(text: userInfo['nome']);
-    final TextEditingController emailController =
-        TextEditingController(text: userInfo['email']);
-    final TextEditingController setorController =
-        TextEditingController(text: userInfo['setor']);
-    final TextEditingController senhaController = TextEditingController();
+  final TextEditingController nomeController =
+      TextEditingController(text: userInfo['nome']);
+  final TextEditingController emailController =
+      TextEditingController(text: userInfo['email']);
+  final TextEditingController setorController =
+      TextEditingController(text: userInfo['setor']);
+  final TextEditingController senhaAtualController = TextEditingController();
+  final TextEditingController novaSenhaController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Editar Funcionário'),
-          content: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: nomeController,
-                    decoration: const InputDecoration(labelText: 'Nome'),
-                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                        context,
-                        userInfo,
-                        nomeController,
-                        emailController,
-                        setorController,
-                        senhaController),
-                  ),
-                  TextFormField(
-                    controller: emailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    maxLength: 100,
-                    validator: (String? email) {
-                      final RegExp emailRegex = RegExp(
-                          r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Editar Funcionário'),
+        content: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nomeController,
+                  decoration: const InputDecoration(labelText: 'Nome'),
+                ),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  maxLength: 100,
+                  validator: (String? email) {
+                    final RegExp emailRegex = RegExp(
+                        r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
 
-                      if (email == null || email.isEmpty) {
-                        return 'Digite um e-mail';
-                      }
+                    if (email == null || email.isEmpty) {
+                      return 'Digite um e-mail';
+                    }
 
-                      if (!emailRegex.hasMatch(email)) {
-                        return 'Digite um e-mail válido';
-                      }
+                    if (!emailRegex.hasMatch(email)) {
+                      return 'Digite um e-mail válido';
+                    }
 
-                      return null;
-                    },
-                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                        context,
-                        userInfo,
-                        nomeController,
-                        emailController,
-                        setorController,
-                        senhaController),
-                  ),
-                  TextFormField(
-                    controller: setorController,
-                    decoration: const InputDecoration(labelText: 'Setor'),
-                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                        context,
-                        userInfo,
-                        nomeController,
-                        emailController,
-                        setorController,
-                        senhaController),
-                  ),
-                  TextFormField(
-                    controller: senhaController,
-                    decoration: const InputDecoration(labelText: 'Senha'),
-                    obscureText: true,
-                    validator: (String? senha) {
-                      if (senha != null &&
-                          senha.isNotEmpty &&
-                          senha.length < 6) {
-                        return 'A senha deve ter pelo menos 6 caracteres';
-                      }
-                      return null;
-                    },
-                    onFieldSubmitted: (_) => _salvarEdicaoFuncionario(
-                        context,
-                        userInfo,
-                        nomeController,
-                        emailController,
-                        setorController,
-                        senhaController),
-                  ),
-                ],
-              ),
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: setorController,
+                  decoration: const InputDecoration(labelText: 'Setor'),
+                ),
+                TextFormField(
+                  controller: senhaAtualController,
+                  decoration: const InputDecoration(labelText: 'Senha Atual'),
+                  obscureText: true,
+                  validator: (String? senha) {
+                    if (senha == null || senha.isEmpty) {
+                      return 'Digite a senha atual';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: novaSenhaController,
+                  decoration: const InputDecoration(labelText: 'Nova Senha'),
+                  obscureText: true,
+                  validator: (String? senha) {
+                    if (senha != null && senha.isNotEmpty && senha.length < 6) {
+                      return 'A nova senha deve ter pelo menos 6 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+              ],
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => _salvarEdicaoFuncionario(
-                  context,
-                  userInfo,
-                  nomeController,
-                  emailController,
-                  setorController,
-                  senhaController),
-              child: const Text('Salvar'),
-            ),
-          ],
-        );
-      },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                if (senhaAtualController.text == userInfo['senha']) {
+                  _salvarEdicaoFuncionario(
+                    context,
+                    userInfo,
+                    nomeController,
+                    emailController,
+                    setorController,
+                    novaSenhaController,
+                  );
+                } else {
+                  _mostrarErro('Senha atual incorreta.');
+                }
+              }
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _validarSenhaAtual(
+  BuildContext context,
+  Map<String, dynamic> userInfo,
+  String senhaAtual,
+  TextEditingController nomeController,
+  TextEditingController emailController,
+  TextEditingController setorController,
+  TextEditingController novaSenhaController,
+) async {
+  try {
+    final response = await http.post(
+      Uri.http(apiUrl, '/Funcionarios/validarSenha'),
+      headers: {'Content-Type': 'application/json'},
+      body: convert.jsonEncode({
+        'idFuncionario': userInfo['idFuncionario'],
+        'senha': senhaAtual,
+      }),
     );
+
+    if (response.statusCode == 200) {
+      // Senha válida, prosseguir com a edição
+      _salvarEdicaoFuncionario(
+        context,
+        userInfo,
+        nomeController,
+        emailController,
+        setorController,
+        novaSenhaController,
+      );
+    } else {
+      _mostrarErro('Senha atual incorreta.');
+    }
+  } catch (e) {
+    _mostrarErro('Não foi possível validar a senha.');
   }
+}
 
   Future<void> _salvarEdicaoFuncionario(
       BuildContext context,
