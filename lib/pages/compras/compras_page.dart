@@ -298,9 +298,17 @@ class _ComprasPageState extends State<ComprasPage> {
                             },
                             selectedItemBuilder: (BuildContext context) {
                               return _produtos.map<Widget>((produto) {
-                                return Text(
-                                  produto['descricao'],
-                                  overflow: TextOverflow.ellipsis,
+                                return Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                                0.65 -
+                                            48,
+                                  ),
+                                  child: Text(
+                                    produto['descricao'],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 );
                               }).toList();
                             },

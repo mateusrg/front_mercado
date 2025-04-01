@@ -1,5 +1,5 @@
 class Params {
-  static const String apiUrl = apiLocal;
+  static const String apiUrl = apiRique;
 }
 
 const apiRique = 'apimercado.rostirolla.work';
