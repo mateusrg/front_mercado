@@ -33,6 +33,24 @@ class EstoquesDoProdutoPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (estoques.isEmpty)
+              Center(
+                child: Hero(
+                  tag: 'nenhumEstoque',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.remove,
+                        color: Colors.grey.withAlpha(128),
+                      ),
+                      title: const Text(
+                        'Nenhum estoque',
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             for (int i = 0; i < estoques.length; i++)
               Hero(
                 tag: 'listTileComprasDoFornecedor$i',

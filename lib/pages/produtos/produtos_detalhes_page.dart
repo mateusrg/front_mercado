@@ -263,27 +263,45 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
                       ),
                       carregandoEstoques
                           ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              children: [
-                                for (int i = 0; i < estoques.length; i++)
-                                  Hero(
-                                    tag: 'listTileComprasDoFornecedor$i',
+                          : estoques.isEmpty
+                              ? Center(
+                                  child: Hero(
+                                    tag: 'nenhumEstoque',
                                     child: Material(
                                       color: Colors.transparent,
                                       child: ListTile(
                                         leading: Icon(
-                                          Icons.warehouse_outlined,
-                                          color: Colors.green
-                                              .withValues(alpha: 0.5),
+                                          Icons.remove,
+                                          color: Colors.grey.withAlpha(128),
                                         ),
-                                        title: Text(estoques[i]['estoque']),
-                                        trailing: Text(
-                                            '${estoques[i]['quantidade']} un.'),
+                                        title: const Text(
+                                          'Nenhum estoque',
+                                        ),
                                       ),
                                     ),
                                   ),
-                              ],
-                            )
+                                )
+                              : Column(
+                                  children: [
+                                    for (int i = 0; i < estoques.length; i++)
+                                      Hero(
+                                        tag: 'listTileComprasDoFornecedor$i',
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: ListTile(
+                                            leading: Icon(
+                                              Icons.warehouse_outlined,
+                                              color: Colors.green
+                                                  .withValues(alpha: 0.5),
+                                            ),
+                                            title: Text(estoques[i]['estoque']),
+                                            trailing: Text(
+                                                '${estoques[i]['quantidade']} un.'),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                )
                     ],
                   ),
                 ),
