@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_estoque.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_produtos.dart';
-import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_estoque_origem.dart';
-import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_estoque_destino.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_solicitador.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_autenticador.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_verificacao_funcionario_autenticador.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
-class TransferenciaEstoquePage extends StatefulWidget {
-  const TransferenciaEstoquePage({super.key, this.produto, this.estoque});
+class DescartePage extends StatefulWidget {
+  const DescartePage({super.key, this.produto, this.estoque});
 
   final Map<String, dynamic>? produto;
   final Map<String, dynamic>? estoque;
 
   @override
-  State<TransferenciaEstoquePage> createState() =>
-      _TransferenciaEstoquePageState();
+  State<DescartePage> createState() => _DescartePageState();
 }
 
-class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
+class _DescartePageState extends State<DescartePage> {
   final _formKey = GlobalKey<FormState>();
   static const String apiUrl = Params.apiUrl;
   late TextEditingController _quantidadeController;
@@ -35,27 +33,27 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   List<Map<String, dynamic>> _produtos = [];
   List<Map<String, dynamic>> _estoques = [];
   List<Map<String, dynamic>> _funcionarios = [];
+
   Map<String, dynamic>? _produtoSelecionado;
-  Map<String, dynamic>? _estoqueOrigemSelecionado;
-  Map<String, dynamic>? _estoqueDestinoSelecionado;
+  Map<String, dynamic>? _estoqueSelecionado;
   Map<String, dynamic>? _funcionarioSolicitadorSelecionado;
   Map<String, dynamic>? _funcionarioAutenticadorSelecionado;
   DateTime? _dataSelecionada;
 
   @override
   void initState() {
+    super.initState();
     _quantidadeController = TextEditingController();
     _horaController =
         TextEditingController(text: DateFormat('HH:mm').format(DateTime.now()));
     _dataSelecionada = DateTime.now();
     _carregarDados();
-    super.initState();
   }
 
   Future<void> _carregarDados() async {
     await _carregarProdutos();
-    await _carregarEstoques();
     await _carregarFuncionarios();
+    await _carregarEstoques();
     if (widget.produto != null) {
       final encontrado = _produtos.firstWhere(
         (p) => p['idProduto'] == widget.produto!['idProduto'],
@@ -68,9 +66,18 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
         (e) => e['idEstoque'] == widget.estoque!['idEstoque'],
         orElse: () => {},
       );
-      _estoqueOrigemSelecionado = encontrado;
+      _estoqueSelecionado = encontrado;
     }
     setState(() => _carregando = false);
+  }
+
+  Future<void> _carregarEstoques() async {
+    final response = await http.get(Uri.http(apiUrl, '/Estoques'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _estoques = List<Map<String, dynamic>>.from(json.decode(response.body));
+      });
+    }
   }
 
   Future<void> _carregarProdutos() async {
@@ -80,16 +87,6 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
           List<Map<String, dynamic>>.from(json.decode(response.body)));
     } else {
       _mostrarErro('Erro ao carregar produtos: ${response.statusCode}');
-    }
-  }
-
-  Future<void> _carregarEstoques() async {
-    final response = await http.get(Uri.http(apiUrl, '/Estoques'));
-    if (response.statusCode == 200) {
-      setState(() => _estoques =
-          List<Map<String, dynamic>>.from(json.decode(response.body)));
-    } else {
-      _mostrarErro('Erro ao carregar estoques: ${response.statusCode}');
     }
   }
 
@@ -109,7 +106,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
             orElse: () => {},
           );
         });
-        if (_funcionarioSolicitadorSelecionado == {}) {
+        if (_funcionarioSolicitadorSelecionado == null) {
           _mostrarErro('Funcionário logado não encontrado na lista');
         }
       }
@@ -118,7 +115,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
     }
   }
 
-  Future<void> _salvar() async {
+  void _salvar() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _salvando = true);
       try {
@@ -133,76 +130,31 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
           return;
         }
 
-        final movimentacao = {
+        final descarte = {
           'idProduto': _produtoSelecionado!['idProduto'],
           'quantidade': int.parse(_quantidadeController.text),
-          'idEstoqueOrigem': _estoqueOrigemSelecionado!['idEstoque'],
-          'idEstoqueDestino': _estoqueDestinoSelecionado!['idEstoque'],
           'idFuncionarioSolicitador':
               _funcionarioSolicitadorSelecionado!['idFuncionario'],
           'idFuncionarioAutenticador':
               _funcionarioAutenticadorSelecionado!['idFuncionario'],
-          'idTipoMovimentacaoOrigem': 6,
-          'idTipoMovimentacaoDestino': 7,
           'dataHora':
               '${DateFormat('yyyy-MM-dd').format(_dataSelecionada!)}T${_horaController.text}:00.000Z',
+          'idEstoque': _estoqueSelecionado!['idEstoque'],
         };
 
-        final response = await http.post(
-          Uri.http(
-              apiUrl, 'MovimentacoesEstoque/movimentarProdutoEntreEstoques'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(movimentacao),
-        );
-
-        if (response.statusCode == 200) {
-          Navigator.of(context).pop();
-        } else if (response.statusCode == 400) {
-          _mostrarErro('Quantidade insuficiente em estoque.');
-        } else {
-          _mostrarErro(
-              'Erro ao realizar transferência: ${response.statusCode}');
-        }
+        await _descartar(descarte);
+        Navigator.of(context).pop();
       } catch (e) {
-        _mostrarErro('Não foi possível se conectar com a API.');
+        _mostrarErro('Erro ao processar descarte: ${e.toString()}');
       } finally {
         setState(() => _salvando = false);
       }
     }
   }
 
-  Future<void> _selecionarData(BuildContext context) async {
-    final DateTime? selecionado = await showDatePicker(
-      context: context,
-      initialDate: _dataSelecionada ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-      locale: const Locale('pt', 'BR'),
-    );
-    if (selecionado != null && selecionado != _dataSelecionada) {
-      setState(() => _dataSelecionada = selecionado);
-    }
-  }
-
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(mensagem),
-      backgroundColor: Colors.red,
-    ));
-  }
-
-  void _abrirDialogPesquisaProduto() async {
-    final produtoSelecionado = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => const DialogPesquisaProduto(),
-    );
-    if (produtoSelecionado != null) {
-      final produto = _produtos.firstWhere(
-        (p) => p['idProduto'] == produtoSelecionado['idProduto'],
-        orElse: () => {},
-      );
-      if (produto != {}) setState(() => _produtoSelecionado = produto);
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensagem), backgroundColor: Colors.red));
   }
 
   Future<String?> _lerCodigoDeBarras() async {
@@ -242,13 +194,13 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
   Widget build(BuildContext context) {
     if (_carregando) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Transferência de Estoque')),
+        appBar: AppBar(title: const Text('Descarte')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Transferência de Estoque')),
+      appBar: AppBar(title: const Text('Descarte')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -291,11 +243,67 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.search),
-                      onPressed: _abrirDialogPesquisaProduto,
+                      onPressed: () async {
+                        final produto = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) => const DialogPesquisaProduto(),
+                        );
+                        if (produto != null) {
+                          final encontrado = _produtos.firstWhere(
+                            (p) => p['idProduto'] == produto['idProduto'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(() => _produtoSelecionado = encontrado);
+                          }
+                        }
+                      },
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _estoqueSelecionado,
+                        decoration: const InputDecoration(labelText: 'Estoque'),
+                        items: _estoques
+                            .map((estoque) => DropdownMenuItem(
+                                  value: estoque,
+                                  child: Text(estoque['descricao']),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _estoqueSelecionado = value),
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Selecione o estoque';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final estoque = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) => const DialogPesquisaEstoque(),
+                        );
+                        if (estoque != null) {
+                          final encontrado = _estoques.firstWhere(
+                            (e) => e['idEstoque'] == estoque['idEstoque'],
+                            orElse: () => {},
+                          );
+                          if (encontrado != {}) {
+                            setState(() => _estoqueSelecionado = encontrado);
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                ),
                 TextFormField(
                   controller: _quantidadeController,
                   decoration: const InputDecoration(labelText: 'Quantidade'),
@@ -319,108 +327,6 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<Map<String, dynamic>>(
-                        value: _estoqueOrigemSelecionado,
-                        decoration:
-                            const InputDecoration(labelText: 'Estoque Origem'),
-                        items: _estoques
-                            .map((estoque) => DropdownMenuItem(
-                                  value: estoque,
-                                  child: Text(estoque['descricao']),
-                                ))
-                            .toList(),
-                        onChanged: (value) =>
-                            setState(() => _estoqueOrigemSelecionado = value),
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Selecione o estoque origem';
-                          }
-                          if (_estoqueDestinoSelecionado != null &&
-                              value['idEstoque'] ==
-                                  _estoqueDestinoSelecionado!['idEstoque']) {
-                            return 'Estoques devem ser diferentes';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () async {
-                        final estoque = await showDialog<Map<String, dynamic>>(
-                          context: context,
-                          builder: (context) =>
-                              const DialogPesquisaEstoqueOrigem(),
-                        );
-                        if (estoque != null) {
-                          final encontrado = _estoques.firstWhere(
-                            (e) => e['idEstoque'] == estoque['idEstoque'],
-                            orElse: () => {},
-                          );
-                          if (encontrado != {}) {
-                            setState(
-                                () => _estoqueOrigemSelecionado = encontrado);
-                          }
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<Map<String, dynamic>>(
-                        value: _estoqueDestinoSelecionado,
-                        decoration:
-                            const InputDecoration(labelText: 'Estoque Destino'),
-                        items: _estoques
-                            .map((estoque) => DropdownMenuItem(
-                                  value: estoque,
-                                  child: Text(estoque['descricao']),
-                                ))
-                            .toList(),
-                        onChanged: (value) =>
-                            setState(() => _estoqueDestinoSelecionado = value),
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Selecione o estoque destino';
-                          }
-                          if (_estoqueOrigemSelecionado != null &&
-                              value['idEstoque'] ==
-                                  _estoqueOrigemSelecionado!['idEstoque']) {
-                            return 'Estoques devem ser diferentes';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () async {
-                        final estoque = await showDialog<Map<String, dynamic>>(
-                          context: context,
-                          builder: (context) =>
-                              const DialogPesquisaEstoqueDestino(),
-                        );
-                        if (estoque != null) {
-                          final encontrado = _estoques.firstWhere(
-                            (e) => e['idEstoque'] == estoque['idEstoque'],
-                            orElse: () => {},
-                          );
-                          if (encontrado != {}) {
-                            setState(
-                                () => _estoqueDestinoSelecionado = encontrado);
-                          }
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<Map<String, dynamic>>(
                         value: _funcionarioSolicitadorSelecionado,
                         decoration: const InputDecoration(
                             labelText: 'Funcionário Solicitador'),
@@ -436,6 +342,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                             value == null ? 'Selecione o solicitador' : null,
                       ),
                     ),
+                    const SizedBox(height: 8),
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {
@@ -570,7 +477,7 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
                           ),
                         )
                       : const Text(
-                          'Transferir',
+                          'Descartar',
                           style: TextStyle(fontSize: 16),
                         ),
                 ),
@@ -580,5 +487,36 @@ class _TransferenciaEstoquePageState extends State<TransferenciaEstoquePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _selecionarData(BuildContext context) async {
+    final DateTime? selecionado = await showDatePicker(
+      context: context,
+      initialDate: _dataSelecionada ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      locale: const Locale('pt', 'BR'),
+    );
+    if (selecionado != null && selecionado != _dataSelecionada) {
+      setState(() => _dataSelecionada = selecionado);
+    }
+  }
+
+  Future<void> _descartar(Map<String, dynamic> descarte) async {
+    try {
+      final response = await http
+          .post(
+            Uri.http(apiUrl, 'MovimentacoesEstoque/descartarProduto'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(descarte),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode >= 400) {
+        _mostrarErro(response.body);
+      }
+    } catch (e) {
+      _mostrarErro('Erro de conexão: ${e.toString()}');
+    }
   }
 }

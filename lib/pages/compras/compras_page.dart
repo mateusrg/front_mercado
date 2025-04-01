@@ -205,7 +205,7 @@ class _ComprasPageState extends State<ComprasPage> {
         backButtonIcon: Icon(Icons.arrow_back_ios),
       ),
       isShowFlashIcon: true,
-      delayMillis: 500,
+      delayMillis: 2000,
       cameraFace: CameraFace.back,
       cancelButtonText: 'Cancelar',
     );

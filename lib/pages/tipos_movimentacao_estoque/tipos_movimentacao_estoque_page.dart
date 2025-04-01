@@ -93,24 +93,22 @@ class _TiposMovimentacoesEstoquePageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Flexible(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.move_down_rounded,
-                color: Colors.blue,
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.move_down_rounded,
+              color: Colors.blue,
+            ),
+            SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                'Tipos de Movimentação de Estoque',
+                style: TextStyle(fontSize: 22),
+                overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(width: 12),
-              Flexible(
-                child: Text(
-                  'Tipos de Movimentação de Estoque',
-                  style: TextStyle(fontSize: 22),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       drawer: const DrawerFenomenos('Tipos de Movimentação de Estoque'),
@@ -124,7 +122,7 @@ class _TiposMovimentacoesEstoquePageState
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: const InputDecoration(
-                      labelText: 'Pesquisar',
+                      labelText: 'Tipo de Movimentação de Estoque',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => _pesquisarTiposMovimentacoesEstoque(),

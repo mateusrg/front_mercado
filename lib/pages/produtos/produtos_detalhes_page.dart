@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_descarte.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_transferencia.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_vendas.dart';
 import 'package:front_mercado/pages/produtos/compras_produtos_card_page.dart';
 import 'package:front_mercado/pages/produtos/estoques_produtos_card_page.dart';
 import 'package:front_mercado/pages/produtos/produtos_detalhes_card_page.dart';
@@ -96,24 +100,94 @@ class _ProdutosDetalhesPageState extends State<ProdutosDetalhesPage> {
       appBar: AppBar(
         title: const Text('Detalhes do Produto'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final produtoRecebido = await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ProdutosFormPage(
-                produto: widget.produto,
-              ),
-            ),
-          );
+      floatingActionButton: SpeedDial(
+        icon: Icons.more_vert,
+        activeIcon: Icons.close,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        foregroundColor: Colors.white,
+        activeBackgroundColor: Colors.red,
+        activeForegroundColor: Colors.white,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.shopping_cart),
+            backgroundColor: const Color.fromARGB(255, 0, 156, 59),
+            label: 'Vender',
+            onTap: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => VendaPage(produto: widget.produto),
+                ),
+              );
+              setState(() {
+                carregandoEstoques = true;
+                carregandoMovimentacoes = true;
+                carregandoCompras = true;
+              });
+              await carregarDetalhes();
+              setState(() {});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.swap_horiz),
+            backgroundColor: const Color.fromARGB(255, 240, 222, 57),
+            label: 'Transferir para Outro Estoque',
+            onTap: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      TransferenciaEstoquePage(produto: widget.produto),
+                ),
+              );
+              setState(() {
+                carregandoEstoques = true;
+                carregandoMovimentacoes = true;
+                carregandoCompras = true;
+              });
+              await carregarDetalhes();
+              setState(() {});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.edit),
+            backgroundColor: const Color.fromARGB(255, 0, 39, 118),
+            label: 'Editar',
+            onTap: () async {
+              final produtoRecebido = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProdutosFormPage(
+                    produto: widget.produto,
+                  ),
+                ),
+              );
 
-          if (produtoRecebido == null) return;
+              if (produtoRecebido == null) return;
 
-          setState(() {
-            widget.produto['codBarras'] = produtoRecebido['codBarras'];
-            widget.produto['descricao'] = produtoRecebido['descricao'];
-          });
-        },
-        child: const Icon(Icons.edit),
+              setState(() {
+                widget.produto['codBarras'] = produtoRecebido['codBarras'];
+                widget.produto['descricao'] = produtoRecebido['descricao'];
+              });
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.delete),
+            backgroundColor: const Color.fromARGB(255, 0, 134, 151),
+            label: 'Descartar',
+            onTap: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DescartePage(produto: widget.produto),
+                ),
+              );
+              setState(() {
+                carregandoEstoques = true;
+                carregandoMovimentacoes = true;
+                carregandoCompras = true;
+              });
+              await carregarDetalhes();
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

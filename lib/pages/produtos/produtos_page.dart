@@ -102,7 +102,7 @@ class _ProdutosPageState extends State<ProdutosPage> {
         backButtonIcon: Icon(Icons.arrow_back_ios),
       ),
       isShowFlashIcon: true,
-      delayMillis: 500,
+      delayMillis: 2000,
       cameraFace: CameraFace.back,
       cancelButtonText: 'Cancelar',
     );
@@ -148,7 +148,7 @@ class _ProdutosPageState extends State<ProdutosPage> {
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: const InputDecoration(
-                      labelText: 'Pesquisar',
+                      labelText: 'Descrição ou Código de Barras',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => _pesquisarProdutos(),

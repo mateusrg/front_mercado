@@ -155,34 +155,6 @@ class DrawerFenomenos extends StatelessWidget {
     required GestureTapCallback onTap,
   }) {
     Color corItemSelecionado = Colors.cyan;
-    switch (pagina) {
-      case 'Compras':
-        corItemSelecionado = Colors.yellow;
-        break;
-      case 'Estoques':
-        corItemSelecionado = Colors.blue;
-        break;
-      case 'Fornecedores':
-        corItemSelecionado = Colors.green;
-        break;
-      case 'Funcionarios':
-        corItemSelecionado = Colors.yellow;
-        break;
-      case 'Movimentações de Estoque':
-        corItemSelecionado = Colors.blue;
-        break;
-      case 'Produtos':
-        corItemSelecionado = Colors.green;
-        break;
-      case 'Tipos de Estoque':
-        corItemSelecionado = Colors.yellow;
-        break;
-      case 'Tipos de Movimentação de Estoque':
-        corItemSelecionado = Colors.blue;
-        break;
-      default:
-        corItemSelecionado = Colors.cyan;
-    }
 
     return ListTile(
       title: Text(

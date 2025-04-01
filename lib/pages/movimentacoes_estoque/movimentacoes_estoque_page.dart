@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_estoque.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_produtos.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_tipo_movimentacao_estoque.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_descarte.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_transferencia.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_vendas.dart';
 import 'package:front_mercado/pages/compras/compras_form.dart';
@@ -161,6 +165,15 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
     _listarMovimentacoes();
   }
 
+  void _abrirFormularioDescarte() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const DescartePage(),
+      ),
+    );
+    _listarMovimentacoes();
+  }
+
   void _toggleFiltro() {
     setState(() {
       _mostrarFiltro = !_mostrarFiltro;
@@ -258,7 +271,7 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
         children: [
           if (_mostrarFiltro)
             Card(
-              margin: const EdgeInsets.all(8),
+              margin: const EdgeInsets.fromLTRB(8, 2, 8, 4),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -283,14 +296,36 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
                             },
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: _limparProduto,
-                        ),
+                        if (_produtoSelecionado == null)
+                          IconButton(
+                            onPressed: () async {
+                              final produto =
+                                  await showDialog<Map<String, dynamic>>(
+                                context: context,
+                                builder: (context) =>
+                                    const DialogPesquisaProduto(),
+                              );
+                              if (produto != null) {
+                                final encontrado = _produtos.firstWhere(
+                                  (p) => p['idProduto'] == produto['idProduto'],
+                                  orElse: () => {},
+                                );
+                                if (encontrado != {}) {
+                                  setState(
+                                      () => _produtoSelecionado = encontrado);
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.search),
+                          ),
+                        if (_produtoSelecionado != null)
+                          IconButton(
+                            onPressed: _limparProduto,
+                            icon: const Icon(Icons.clear),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    // Dropdown de Estoque com botão de limpar
                     Row(
                       children: [
                         Expanded(
@@ -311,21 +346,43 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
                             },
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: _limparEstoque,
-                        ),
+                        if (_estoqueSelecionado == null)
+                          IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: () async {
+                              final estoque =
+                                  await showDialog<Map<String, dynamic>>(
+                                context: context,
+                                builder: (context) =>
+                                    const DialogPesquisaEstoque(),
+                              );
+                              if (estoque != null) {
+                                final encontrado = _estoques.firstWhere(
+                                  (e) => e['idEstoque'] == estoque['idEstoque'],
+                                  orElse: () => {},
+                                );
+                                if (encontrado != {}) {
+                                  setState(
+                                      () => _estoqueSelecionado = encontrado);
+                                }
+                              }
+                            },
+                          ),
+                        if (_estoqueSelecionado != null)
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: _limparEstoque,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    // Dropdown de Tipo de Movimentação de Estoque com botão de limpar
                     Row(
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<Map<String, dynamic>>(
                             value: _tipoMovimentacaoEstoqueSelecionado,
                             decoration: const InputDecoration(
-                                labelText: 'Tipo de Movimentação Estoque'),
+                                labelText: 'Tipo de Movimentação'),
                             items: _tiposMovimentacaoEstoque.map((tipo) {
                               return DropdownMenuItem(
                                 value: tipo,
@@ -339,10 +396,37 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
                             },
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: _limparTipoMovimentacao,
-                        ),
+                        if (_tipoMovimentacaoEstoqueSelecionado == null)
+                          IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: () async {
+                              final tipo =
+                                  await showDialog<Map<String, dynamic>>(
+                                context: context,
+                                builder: (context) =>
+                                    const DialogPesquisaTipoMovimentacaoEstoque(),
+                              );
+                              if (tipo != null) {
+                                final encontrado =
+                                    _tiposMovimentacaoEstoque.firstWhere(
+                                  (t) =>
+                                      t['idTipoMovimentacaoEstoque'] ==
+                                      tipo['idTipoMovimentacaoEstoque'],
+                                  orElse: () => {},
+                                );
+                                if (encontrado != {}) {
+                                  setState(() =>
+                                      _tipoMovimentacaoEstoqueSelecionado =
+                                          encontrado);
+                                }
+                              }
+                            },
+                          ),
+                        if (_tipoMovimentacaoEstoqueSelecionado != null)
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: _limparTipoMovimentacao,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -477,6 +561,12 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
             label: 'Cadastrar Compra',
             onTap: _abrirFormularioCompras,
           ),
+          SpeedDialChild(
+            child: const Icon(Icons.delete),
+            backgroundColor: const Color.fromARGB(255, 0, 134, 151),
+            label: 'Descartar',
+            onTap: _abrirFormularioDescarte,
+          )
         ],
       ),
     );

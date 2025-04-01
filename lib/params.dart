@@ -3,7 +3,7 @@ class Params {
 }
 
 const apiRique = 'apimercado.rostirolla.work';
-const apiLocal = '$senacMateus:5277';
+const apiLocal = '$casaMateus:5277';
 
 const teleconMateus = '192.168.230.122';
 const teleconLeo = '192.168.230.104';

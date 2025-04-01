@@ -143,7 +143,7 @@ class _EstoquePageState extends State<EstoquePage> {
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: InputDecoration(
-                      labelText: 'Pesquisar',
+                      labelText: 'Descrição',
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search),
                         onPressed: () =>

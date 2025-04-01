@@ -3,25 +3,26 @@ import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DialogPesquisaTipoEstoque extends StatefulWidget {
-  const DialogPesquisaTipoEstoque({super.key});
+class DialogPesquisaTipoMovimentacaoEstoque extends StatefulWidget {
+  const DialogPesquisaTipoMovimentacaoEstoque({super.key});
 
   @override
-  State<DialogPesquisaTipoEstoque> createState() =>
-      _DialogPesquisaTipoEstoqueState();
+  State<DialogPesquisaTipoMovimentacaoEstoque> createState() =>
+      _DialogPesquisaTipoMovimentacaoEstoqueState();
 }
 
-class _DialogPesquisaTipoEstoqueState extends State<DialogPesquisaTipoEstoque> {
+class _DialogPesquisaTipoMovimentacaoEstoqueState
+    extends State<DialogPesquisaTipoMovimentacaoEstoque> {
   final TextEditingController _pesquisaController = TextEditingController();
   static const String apiUrl = Params.apiUrl;
   List<Map<String, dynamic>> _resultados = [];
   bool _carregando = false;
 
-  Future<void> _pesquisarTiposEstoque(String texto) async {
+  Future<void> _pesquisarTiposMovimentacaoEstoque(String texto) async {
     setState(() => _carregando = true);
     try {
       final response = await http.post(
-        Uri.http(apiUrl, 'TiposEstoque/descricao'),
+        Uri.http(apiUrl, 'TiposMovimentacaoEstoque/descricao'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'query': texto}),
       );
@@ -47,13 +48,13 @@ class _DialogPesquisaTipoEstoqueState extends State<DialogPesquisaTipoEstoque> {
   @override
   void initState() {
     super.initState();
-    _pesquisarTiposEstoque('');
+    _pesquisarTiposMovimentacaoEstoque('');
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Pesquisar Tipo de Estoque'),
+      title: const Text('Pesquisar Tipo de Movimentação de Estoque'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -63,8 +64,8 @@ class _DialogPesquisaTipoEstoqueState extends State<DialogPesquisaTipoEstoque> {
               labelText: 'Descrição',
               suffixIcon: IconButton(
                 icon: const Icon(Icons.search),
-                onPressed: () =>
-                    _pesquisarTiposEstoque(_pesquisaController.text),
+                onPressed: () => _pesquisarTiposMovimentacaoEstoque(
+                    _pesquisaController.text),
               ),
             ),
           ),
@@ -76,10 +77,11 @@ class _DialogPesquisaTipoEstoqueState extends State<DialogPesquisaTipoEstoque> {
                     shrinkWrap: true,
                     itemCount: _resultados.length,
                     itemBuilder: (context, index) {
-                      final tipoEstoque = _resultados[index];
+                      final tipoMovimentacaoEstoque = _resultados[index];
                       return ListTile(
-                        title: Text(tipoEstoque['descricao']),
-                        onTap: () => Navigator.pop(context, tipoEstoque),
+                        title: Text(tipoMovimentacaoEstoque['descricao']),
+                        onTap: () =>
+                            Navigator.pop(context, tipoMovimentacaoEstoque),
                       );
                     },
                   ),

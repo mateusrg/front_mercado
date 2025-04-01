@@ -85,12 +85,12 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
       }
 
       try {
-        await _adicionarFuncionario(widget.funcionarios!);
+        await _adicionarFuncionario(funcionario);
         Navigator.of(context).pop();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao salvar funcionário.'),
+            content: Text('Erro ao cadastrar funcionário.'),
             backgroundColor: Colors.red,
           ),
         );

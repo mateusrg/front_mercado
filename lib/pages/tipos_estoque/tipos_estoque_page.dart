@@ -118,7 +118,7 @@ class _TiposEstoquePageState extends State<TiposEstoquePage> {
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: const InputDecoration(
-                      labelText: 'Pesquisar',
+                      labelText: 'Tipo de Estoque',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => _pesquisarTiposEstoque(),

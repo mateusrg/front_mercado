@@ -115,7 +115,7 @@ class _FuncionariosPageState extends State<FuncionariosPage> {
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: const InputDecoration(
-                      labelText: 'Pesquisar',
+                      labelText: 'Nome, E-mail ou Setor',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => _pesquisarFuncionarios(),

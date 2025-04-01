@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class ProdutosFormPage extends StatefulWidget {
   final Map<String, dynamic>? produto;
@@ -64,6 +66,9 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
       if (response.statusCode >= 400) {
         _mostrarErro('Erro ao adicionar produto: ${response.statusCode}');
       }
+      if (response.body == '0') {
+        _mostrarErro('Esse código de barras já é usado por outro produto.');
+      }
     } catch (e) {
       _mostrarErro('Não foi possível se conectar com a API.');
     }
@@ -97,7 +102,9 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
         } else {
           await _adicionarProduto(produto);
         }
-        Navigator.of(context).pop(produto);
+        if (mounted) {
+          Navigator.of(context).pop(produto);
+        }
       } catch (e) {
         _mostrarErro('Não foi possível se conectar com a API.');
       } finally {
@@ -115,6 +122,33 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
         backgroundColor: Colors.red,
       ),
     );
+  }
+
+  Future<String?> _lerCodigoDeBarras() async {
+    String? res = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Ler Código de Barras',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 2000,
+      cameraFace: CameraFace.back,
+      cancelButtonText: 'Cancelar',
+    );
+
+    return res != null && res.length > 5 ? res : null;
+  }
+
+  _consultarPorLeitor() async {
+    final codBarras = await _lerCodigoDeBarras();
+    if (codBarras != null) {
+      setState(() {
+        _codbarrasController.text = codBarras;
+      });
+    }
   }
 
   @override
@@ -142,22 +176,32 @@ class _ProdutosFormPageState extends State<ProdutosFormPage> {
                 onFieldSubmitted: (_) => _salvar(),
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _codbarrasController,
-                decoration:
-                    const InputDecoration(labelText: 'Código de Barras'),
-                maxLength: 13,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o Código de Barras';
-                  }
-                  if (value.length != 13) {
-                    return 'O Código de barras deve ter 13 caracteres';
-                  }
-                  return null;
-                },
-                onFieldSubmitted: (_) => _salvar(),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _codbarrasController,
+                      decoration:
+                          const InputDecoration(labelText: 'Código de Barras'),
+                      maxLength: 13,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, insira o código de barras';
+                        }
+                        if (value.length < 6) {
+                          return 'O código deve ter no mínimo 6 caracteres';
+                        }
+                        return null;
+                      },
+                      onFieldSubmitted: (_) => _salvar(),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _consultarPorLeitor,
+                    icon: const Icon(Symbols.barcode_scanner),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               ElevatedButton(

@@ -314,20 +314,19 @@ class _PrincipalPageState extends State<PrincipalPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 50),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Column(
                   children: [
                     Text(
                       'Fenômenos SM',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        fontSize: 40,
+                        fontSize: 36,
                         fontWeight: FontWeight.bold,
                         color: Colors.cyanAccent,
                         shadows: [
-                          Shadow(
+                          const Shadow(
                             blurRadius: 5.0,
                             color: const Color.fromARGB(255, 151, 147, 147),
                             offset: Offset(2, 2),

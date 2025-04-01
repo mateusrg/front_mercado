@@ -61,7 +61,7 @@ class _DialogPesquisaFornecedoresState
           TextField(
             controller: _pesquisaController,
             decoration: InputDecoration(
-              labelText: 'Pesquisar',
+              labelText: 'Nome ou CNPJ',
               suffixIcon: IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () =>

@@ -168,7 +168,7 @@ class _FornecedoresPageState extends State<FornecedoresPage> {
                   child: TextField(
                     controller: _pesquisaController,
                     decoration: const InputDecoration(
-                      labelText: 'Pesquisar',
+                      labelText: 'Nome ou CNPJ',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) =>

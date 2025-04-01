@@ -59,7 +59,7 @@ class _TipoMovimentacaoEstoqueFormPageState
           )
           .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode < 400) {
+      if (response.statusCode >= 400) {
         _mostrarErro(
             'Erro ao adicionar tipo de movimentação de estoque: ${response.statusCode}');
       }

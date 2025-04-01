@@ -162,7 +162,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
         backButtonIcon: Icon(Icons.arrow_back_ios),
       ),
       isShowFlashIcon: true,
-      delayMillis: 500,
+      delayMillis: 2000,
       cameraFace: CameraFace.back,
       cancelButtonText: 'Cancelar',
     );
@@ -300,7 +300,7 @@ class _CompraFormPageState extends State<CompraFormPage> {
                     ),
                     IconButton(
                         onPressed: _consultarPorLeitor,
-                        icon: const Icon(Symbols.barcode_scanner)),
+                        icon: const Icon(Symbols.barcode_scanner),),
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {

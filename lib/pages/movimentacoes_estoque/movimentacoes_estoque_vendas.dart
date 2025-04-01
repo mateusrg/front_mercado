@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_produtos.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_solicitador.dart';
 import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_pesquisa_funcionario_autenticador.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/modais/dialog_verificacao_funcionario_autenticador.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -12,7 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class VendaPage extends StatefulWidget {
-  const VendaPage({super.key});
+  const VendaPage({super.key, this.produto});
+
+  final Map<String, dynamic>? produto;
 
   @override
   State<VendaPage> createState() => _VendaPageState();
@@ -45,6 +48,13 @@ class _VendaPageState extends State<VendaPage> {
   Future<void> _carregarDados() async {
     await _carregarProdutos();
     await _carregarFuncionarios();
+    if (widget.produto != null) {
+      final encontrado = _produtos.firstWhere(
+        (p) => p['idProduto'] == widget.produto!['idProduto'],
+        orElse: () => {},
+      );
+      _produtoSelecionado = encontrado;
+    }
     setState(() => _carregando = false);
   }
 
@@ -87,6 +97,17 @@ class _VendaPageState extends State<VendaPage> {
     if (_formKey.currentState!.validate()) {
       setState(() => _salvando = true);
       try {
+        final senhaValida = await showDialog<bool>(
+          context: context,
+          builder: (context) => DialogVerificacaoFuncionarioAutenticador(
+            funcionario: _funcionarioAutenticadorSelecionado!,
+          ),
+        );
+
+        if (senhaValida != true) {
+          return;
+        }
+
         final venda = {
           'idProduto': _produtoSelecionado!['idProduto'],
           'quantidade': int.parse(_quantidadeController.text),
@@ -124,7 +145,7 @@ class _VendaPageState extends State<VendaPage> {
         backButtonIcon: Icon(Icons.arrow_back_ios),
       ),
       isShowFlashIcon: true,
-      delayMillis: 500,
+      delayMillis: 2000,
       cameraFace: CameraFace.back,
       cancelButtonText: 'Cancelar',
     );
@@ -225,11 +246,15 @@ class _VendaPageState extends State<VendaPage> {
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Insira a quantidade';
+                    }
                     final qtd = int.tryParse(value);
                     if (qtd == null) return 'Número inválido';
                     if (qtd <= 0) return 'Quantidade deve ser maior que zero';
+                    if (qtd >= 2147483648) {
+                      return 'Quantidadade deve ser menor que 2147483648';
+                    }
                     return null;
                   },
                 ),
@@ -361,8 +386,9 @@ class _VendaPageState extends State<VendaPage> {
                           }),
                         ],
                         validator: (value) {
-                          if (value == null || value.isEmpty)
+                          if (value == null || value.isEmpty) {
                             return 'Insira a hora';
+                          }
                           if (value.length != 5) return 'Horário inválido';
                           return null;
                         },
@@ -423,8 +449,7 @@ class _VendaPageState extends State<VendaPage> {
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode >= 400) {
-        _mostrarErro(
-            'Erro na venda: ${response.statusCode} - ${response.body}');
+        _mostrarErro(response.body);
       }
     } catch (e) {
       _mostrarErro('Erro de conexão: ${e.toString()}');

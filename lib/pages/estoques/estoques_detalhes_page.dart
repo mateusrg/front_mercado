@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:front_mercado/pages/estoques/estoque_detalhes_card_page.dart';
 import 'package:front_mercado/pages/estoques/estoques_form.dart';
 import 'package:front_mercado/pages/estoques/movimentacoes_recentes_do_estoque_page.dart';
 import 'package:front_mercado/pages/estoques/produtos_no_estoque_page.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_descarte.dart';
+import 'package:front_mercado/pages/movimentacoes_estoque/movimentacoes_estoque_transferencia.dart';
 import 'package:front_mercado/params.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -263,23 +266,74 @@ class _EstoqueDetalhesPageState extends State<EstoqueDetalhesPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.edit),
-        onPressed: () async {
-          final resultado = await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => EstoquesFormPage(estoque: widget.estoque),
-            ),
-          );
+      floatingActionButton: SpeedDial(
+        icon: Icons.more_vert,
+        activeIcon: Icons.close,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        foregroundColor: Colors.white,
+        activeBackgroundColor: Colors.red,
+        activeForegroundColor: Colors.white,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.delete),
+            backgroundColor: const Color.fromARGB(255, 0, 156, 59),
+            label: 'Descartar',
+            onTap: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DescartePage(estoque: widget.estoque),
+                ),
+              );
+              setState(() {
+                carregandoMovimentacoes = true;
+                carregandoProdutos = true;
+              });
+              await carregarProdutosEMovimentacoesRecentes();
+              setState(() {});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.swap_horiz),
+            backgroundColor: const Color.fromARGB(255, 240, 222, 57),
+            label: 'Transferir Estoque',
+            onTap: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      TransferenciaEstoquePage(estoque: widget.estoque),
+                ),
+              );
+              setState(() {
+                carregandoMovimentacoes = true;
+                carregandoProdutos = true;
+              });
+              await carregarProdutosEMovimentacoesRecentes();
+              setState(() {});
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.edit),
+            backgroundColor: const Color.fromARGB(255, 0, 39, 118),
+            label: 'Editar',
+            onTap: () async {
+              final resultado = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EstoquesFormPage(estoque: widget.estoque),
+                ),
+              );
 
-          if (resultado != null) {
-            setState(() {
-              widget.estoque['descricaoEstoque'] = resultado['estoque'];
-              widget.estoque['idTipoEstoque'] = resultado['idTipoEstoque'];
-              widget.estoque['descricaoTipoEstoque'] = resultado['tipoEstoque'];
-            });
-          }
-        },
+              if (resultado != null) {
+                setState(() {
+                  widget.estoque['descricaoEstoque'] = resultado['estoque'];
+                  widget.estoque['idTipoEstoque'] = resultado['idTipoEstoque'];
+                  widget.estoque['descricaoTipoEstoque'] =
+                      resultado['tipoEstoque'];
+                });
+              }
+            },
+          ),
+        ],
       ),
     );
   }
