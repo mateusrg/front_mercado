@@ -72,12 +72,12 @@ class MovimentacoesFuncionarioPage extends StatelessWidget {
                     leading: movimentacoes[i]['idFuncionarioSolicitador'] ==
                             funcionario['idFuncionario']
                         ? Icon(
-                            Icons.vpn_key_outlined,
-                            color: Colors.yellow.withValues(alpha: 0.5),
-                          )
-                        : Icon(
                             Icons.description_outlined,
                             color: Colors.green.withValues(alpha: 0.5),
+                          )
+                        : Icon(
+                            Icons.vpn_key_outlined,
+                            color: Colors.yellow.withValues(alpha: 0.5),
                           ),
                     title: Text(
                       movimentacoes[i]['descricaoProduto'],

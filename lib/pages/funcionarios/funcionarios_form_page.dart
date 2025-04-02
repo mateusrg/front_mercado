@@ -96,7 +96,9 @@ class _FuncionariosFormPageState extends State<FuncionariosFormPage> {
           ),
         );
 
-        _salvando = false;
+        setState(() {
+          _salvando = false;
+        });
 
         if (senhaValida != true) {
           return;

@@ -13,6 +13,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import 'movimentacao_estoque_detalhes_page.dart';
 
@@ -240,6 +242,39 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
     }
   }
 
+  Future<String?> _lerCodigoDeBarras() async {
+    String? res = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Ler Código de Barras',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 2000,
+      cameraFace: CameraFace.back,
+      cancelButtonText: 'Cancelar',
+    );
+
+    return res != null && res.length > 5 ? res : null;
+  }
+
+  _consultarPorLeitor() async {
+    final codBarras = await _lerCodigoDeBarras();
+    if (codBarras != null) {
+      final encontrado = _produtos.firstWhere(
+        (p) => p['codBarras'] == codBarras,
+        orElse: () => {},
+      );
+      if (encontrado.isNotEmpty) {
+        setState(() => _produtoSelecionado = encontrado);
+      } else {
+        _mostrarErro('Produto não encontrado.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -297,7 +332,27 @@ class _MovimentacoesEstoquePageState extends State<MovimentacoesEstoquePage> {
                                 _produtoSelecionado = value;
                               });
                             },
+                            selectedItemBuilder: (BuildContext context) {
+                              return _produtos.map<Widget>((produto) {
+                                return Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                                0.65 -
+                                            48,
+                                  ),
+                                  child: Text(
+                                    produto['descricao'],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              }).toList();
+                            },
                           ),
+                        ),
+                        IconButton(
+                          onPressed: _consultarPorLeitor,
+                          icon: const Icon(Symbols.barcode_scanner),
                         ),
                         if (_produtoSelecionado == null)
                           IconButton(
